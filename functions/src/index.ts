@@ -4,7 +4,7 @@ import { setGlobalOptions } from "firebase-functions/v2";
 initializeApp();
 
 setGlobalOptions({
-  region: "europe-west1",
+  region: "us-central1",
   memory: "256MiB",
   timeoutSeconds: 30,
 });

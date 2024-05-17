@@ -1,6 +1,5 @@
 import { onRequest } from "firebase-functions/v2/https";
-import express from "express";
-import { type Request, type Response } from "express";
+import express, { type Request, type Response } from "express";
 import { logMiddleware } from "./logMiddleware";
 
 const app = express();
