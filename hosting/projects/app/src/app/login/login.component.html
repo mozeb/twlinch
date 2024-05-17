@@ -1,0 +1,52 @@
+<div class="main-div">
+  <mat-card style="padding: 8px">
+    <mat-card-header> </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form">
+        <mat-form-field style="width: 280px" [hideRequiredMarker]="true">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            required
+            formControlName="email"
+            autocomplete="email"
+            type="email"
+          />
+          @if (form.controls["email"].hasError("required")) {
+            <mat-error> Missing Email.</mat-error>
+          }
+          @if (form.controls["email"].hasError("email")) {
+            <mat-error> Email not valid.</mat-error>
+          }
+        </mat-form-field>
+        <br />
+        <mat-form-field style="width: 280px" [hideRequiredMarker]="true">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            required
+            formControlName="password"
+            autocomplete="current-password"
+            type="password"
+          />
+          @if (form.controls["password"].hasError("required")) {
+            <mat-error> Missing Password.</mat-error>
+          }
+          @if (form.controls["password"].hasError("minLength")) {
+            <mat-error> Password is to short. (min. 8)</mat-error>
+          }
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="formSubmit()"
+        [disabled]="!form.valid"
+      >
+        Sign in
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

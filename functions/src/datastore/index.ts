@@ -1,0 +1,1 @@
+export { fsusersoncreated } from "./onUserCreated";

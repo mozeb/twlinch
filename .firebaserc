@@ -1,0 +1,14 @@
+{
+    "projects": {
+        "dev": "<project-name>",
+    },
+    "targets": {
+        "<project-name>": {
+            "hosting": {
+                "<site-name-1>": [
+                    "<hosting-site-id1>"
+                ],
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+/lib/**/*
+/environment/**/*
+/test/**/*
+/node_modules/**/*
+jest.config.js
+.runtimeconfig.json
+.npmrc
+package-lock.json

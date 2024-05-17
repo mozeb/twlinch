@@ -1,0 +1,16 @@
+{
+  "name": "firebase-angular-template",
+  "version": "1.0.0",
+  "description": "Template for project with Firebase Hosting, Functions and Angular.",
+  "author": "Cave Lab",
+  "scripts": {
+    "emulator": "concurrently \"cd functions && npm run watch\" \"firebase emulators:start --only \"database,functions\" --import=./emulator_data --export-on-exit\"",
+    "emulator-no-watch": "firebase emulators:start --only \"database,functions\" --import=./emulator_data --export-on-exit"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^9.2.0",
+    "prettier": "^3.2.5"
+  }
+}

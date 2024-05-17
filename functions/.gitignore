@@ -1,0 +1,15 @@
+# Compiled JavaScript files
+lib/**/*.js
+lib/**/*.js.map
+
+# Node.js dependency directory
+node_modules/
+
+# Build folder
+lib/
+
+# Firebase Functions local config
+test/.runtimeconfig.json
+
+# Environmental variables
+!.env
