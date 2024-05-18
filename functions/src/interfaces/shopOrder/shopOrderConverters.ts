@@ -1,6 +1,6 @@
 import { ShopOrder, ShopOrderBase, ShopOrderJSON } from "./shopOrder";
 import { shopOrderTypeGuard } from "./shopOrderTypeGuard";
-import { WCOrder } from "../WCOrder";
+import { WCOrderJSON } from "../WCOrder";
 import { ShopItemLine } from "./shopItemLine";
 import {
   dateTimeToString,
@@ -37,7 +37,7 @@ export const shopOrderJSONConverter: JSONConverter<ShopOrder, ShopOrderJSON> = {
  * Woocommerce to shopOrder converter.
  */
 export const shopOrderWCOrderConverter = {
-  async toDefined(order: WCOrder): Promise<ShopOrder> {
+  toJSON(order: WCOrderJSON): ShopOrderJSON {
     // items
     const item_lines: ShopItemLine[] = [];
     for (const line_item of order.line_items) {

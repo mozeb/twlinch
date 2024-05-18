@@ -1,9 +1,3 @@
-import { Dinero } from "dinero.js";
-import {
-  WCOrderTaxes,
-  WCOrderTaxesBase,
-  WCOrderTaxesJSON,
-} from "../WCOrderTaxes";
 import { WCMetaData } from "../WCMetaData";
 
 /**
@@ -21,11 +15,6 @@ export interface WCOrderItemLineBase {
    * @example "AmblyoPlay STANDARD 6-Month Access"
    */
   name: string;
-
-  /**
-   * Product price.
-   */
-  price: Dinero<number> | number;
 
   /**
    * Product ID.
@@ -49,31 +38,6 @@ export interface WCOrderItemLineBase {
   tax_class: string;
 
   /**
-   * Line subtotal (before discounts).
-   */
-  subtotal: Dinero<number> | string;
-
-  /**
-   * Line subtotal tax (before discounts).
-   */
-  subtotal_tax: Dinero<number> | string;
-
-  /**
-   * Line total (after discounts).
-   */
-  total: Dinero<number> | string;
-
-  /**
-   * Line total tax (after discounts).
-   */
-  total_tax: Dinero<number> | string;
-
-  /**
-   * Line taxes. Order - Taxes properties.
-   */
-  taxes?: WCOrderTaxesBase[];
-
-  /**
    * Meta data. Order - Meta data properties.
    */
   meta_data?: WCMetaData[];
@@ -91,47 +55,10 @@ export interface WCOrderItemLineBase {
  * Properties are converted to their respectable classes.
  * Use only when primary object is passed through appropriate converter.
  */
-export interface WCOrderItemLine extends WCOrderItemLineBase {
-  /**
-   * Product price.
-   */
-  price: Dinero<number>;
-
-  /**
-   * Line subtotal (before discounts).
-   */
-  subtotal: Dinero<number>;
-
-  /**
-   * Line subtotal tax (before discounts).
-   */
-  subtotal_tax: Dinero<number>;
-
-  /**
-   * Line total (after discounts).
-   */
-  total: Dinero<number>;
-
-  /**
-   * Line total tax (after discounts).
-   */
-  total_tax: Dinero<number>;
-
-  /**
-   * Line taxes. Order - Taxes properties.
-   */
-  taxes?: WCOrderTaxes[];
-}
+export interface WCOrderItemLine extends WCOrderItemLineBase {}
 
 /**
  * Woocommerce order item
  * Only JSON compatible properties.
  */
-export interface WCOrderItemLineJSON extends WCOrderItemLineBase {
-  price: number;
-  subtotal: string;
-  subtotal_tax: string;
-  total: string;
-  total_tax: string;
-  taxes?: WCOrderTaxesJSON[];
-}
+export interface WCOrderItemLineJSON extends WCOrderItemLineBase {}

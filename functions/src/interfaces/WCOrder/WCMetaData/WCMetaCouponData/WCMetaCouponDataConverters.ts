@@ -1,5 +1,4 @@
 import { cloneDeep } from "lodash";
-import { JSONConverter } from "../../../../../rtdb/JSONConverter";
 import {
   WCMetaCouponData,
   WCMetaCouponDataBase,
@@ -7,6 +6,7 @@ import {
 } from "./WCMetaCouponData";
 import { WCMetaCouponDataTypeGuard } from "./WCMetaCouponDataTypeGuard";
 import { WCMetaDateTimeObjectJSONConverter } from "../WCMetaDateTimeObject";
+import { JSONConverter } from "../../../JSONConverter";
 
 /**
  * JSON converter

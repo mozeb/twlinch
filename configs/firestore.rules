@@ -10,7 +10,7 @@ service cloud.firestore {
     }
 
     // Customer data
-    match /users/{uid} {
+    match /shopOrders/{uid} {
       allow read: if isItself(uid) || isAdmin();
       allow write: if isItself(uid) || isAdmin();
     }

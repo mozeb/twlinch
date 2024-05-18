@@ -4,7 +4,7 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase-functions/v2/firestore";
 import { logInfo } from "../services";
-import { User } from "../../../shared-interfaces";
+import { User } from "../interfaces/user";
 
 export const fsusersoncreated = onDocumentCreated(
   {

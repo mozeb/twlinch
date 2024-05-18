@@ -3,7 +3,7 @@ import { logInfo } from "../services";
 import {
   StartSomethingSpecialReq,
   StartSomethingSpecialRes,
-} from "../../../shared-interfaces";
+} from "../interfaces/startSomethingSpecial";
 
 export const callstartsomethingspecial = onCall(
   async (req: CallableRequest) => {

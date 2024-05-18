@@ -1,34 +1,13 @@
 import { DateTime } from "luxon";
-import { Currency, Dinero } from "dinero.js";
 import { WCOrderBilling } from "./WCOrderBilling";
-import {
-  WCOrderCouponLine,
-  WCOrderCouponLineBase,
-  WCOrderCouponLineJSON,
-} from "./WCOrderCouponLine";
 import { WCOrderShipping } from "./WCOrderShipping";
 import { WCOrderStatus } from "./WCOrderStatus";
-import {
-  WCOrderTaxLine,
-  WCOrderTaxLineBase,
-  WCOrderTaxLineJSON,
-} from "./WCOrderTaxLine";
-import {
-  WCOrderRefundLine,
-  WCOrderRefundLineBase,
-  WCOrderRefundLineJSON,
-} from "./WCOrderRefundLine";
 import {
   WCOrderItemLine,
   WCOrderItemLineBase,
   WCOrderItemLineJSON,
 } from "./WCOrderItemLine";
 import { WCMetaData } from "./WCMetaData";
-import {
-  WCOrderShippingLine,
-  WCOrderShippingLineBase,
-  WCOrderShippingLineJSON,
-} from "./WCOrderShippingLine";
 
 /**
  * Woocommerce Order properties.
@@ -53,17 +32,6 @@ export interface WCOrderBase {
   cart_hash: string;
 
   /**
-   * Sum of line item taxes only.
-   * @example "47.60"
-   */
-  cart_tax: Dinero<number> | string;
-
-  /**
-   * Coupons line data. Order - Coupon lines properties.
-   */
-  coupon_lines?: WCOrderCouponLineBase[];
-
-  /**
    * Shows where the order was created.
    * @example "checkout"
    */
@@ -73,7 +41,7 @@ export interface WCOrderBase {
    * Currency the order was created with, in ISO format.
    * @example "USD", "EUR", ...
    */
-  currency: Currency<number> | string;
+  // currency: Currency<number> | string;
 
   /**
    * Currency symbol the order was created with.
@@ -144,12 +112,12 @@ export interface WCOrderBase {
   /**
    * Total discount tax amount for the order.
    */
-  discount_tax: Dinero<number> | string;
+  // discount_tax: Dinero<number> | string;
 
   /**
    * Total discount amount for the order.
    */
-  discount_total: Dinero<number> | string;
+  // discount_total: Dinero<number> | string;
 
   /**
    * Fee lines data. Order - Fee lines properties.
@@ -209,7 +177,6 @@ export interface WCOrderBase {
   /**
    * List of refunds. Order - Refunds properties.
    */
-  refunds?: WCOrderRefundLineBase[];
 
   /**
    * Shipping address. Order - Shipping properties.
@@ -217,21 +184,16 @@ export interface WCOrderBase {
   shipping: WCOrderShipping;
 
   /**
-   * Shipping lines data. Order - Shipping lines properties.
-   */
-  shipping_lines: WCOrderShippingLineBase[];
-
-  /**
    * Total shipping tax amount for the order.
    * @example "1.08"
    */
-  shipping_tax: Dinero<number> | string;
+  // shipping_tax: Dinero<number> | string;
 
   /**
    * Total shipping amount for the order.
    * @example "4.92"
    */
-  shipping_total: Dinero<number> | string;
+  // shipping_total: Dinero<number> | string;
 
   /**
    * Order status.
@@ -242,19 +204,18 @@ export interface WCOrderBase {
   /**
    * Tax lines data. Order - Tax lines properties.
    */
-  tax_lines: WCOrderTaxLineBase[];
 
   /**
    * Grand total.
    * @example "269.99"
    */
-  total: Dinero<number> | string;
+  // total: Dinero<number> | string;
 
   /**
    * Sum of all taxes.
    * @example "33.36"
    */
-  total_tax: Dinero<number> | string;
+  // total_tax: Dinero<number> | string;
 
   /**
    * Unique transaction ID.
@@ -280,18 +241,13 @@ export interface WCOrder extends WCOrderBase {
    * Sum of line item taxes only.
    * @example "47.60"
    */
-  cart_tax: Dinero<number>;
-
-  /**
-   * Coupons line data. Order - Coupon lines properties.
-   */
-  coupon_lines?: WCOrderCouponLine[];
+  // cart_tax: Dinero<number>;
 
   /**
    * Currency the order was created with, in ISO format.
    * @example "USD", "EUR", ...
    */
-  currency: Currency<number>;
+  // currency: Currency<number>;
 
   /**
    * The date the order was completed, in the site's timezone.
@@ -336,12 +292,12 @@ export interface WCOrder extends WCOrderBase {
   /**
    * Total discount tax amount for the order.
    */
-  discount_tax: Dinero<number>;
+  // discount_tax: Dinero<number>;
 
   /**
    * Total discount amount for the order.
    */
-  discount_total: Dinero<number>;
+  // discount_total: Dinero<number>;
 
   /**
    * Line items data. Order - Line items properties.
@@ -349,43 +305,32 @@ export interface WCOrder extends WCOrderBase {
   line_items: WCOrderItemLine[];
 
   /**
-   * List of refunds. Order - Refunds properties.
-   */
-  refunds?: WCOrderRefundLine[];
-
-  /**
-   * Shipping lines data. Order - Shipping lines properties.
-   */
-  shipping_lines: WCOrderShippingLine[];
-
-  /**
    * Total shipping tax amount for the order.
    * @example "1.08"
    */
-  shipping_tax: Dinero<number>;
+  // shipping_tax: Dinero<number>;
 
   /**
    * Total shipping amount for the order.
    * @example "4.92"
    */
-  shipping_total: Dinero<number>;
+  // shipping_total: Dinero<number>;
 
   /**
    * Tax lines data. Order - Tax lines properties.
    */
-  tax_lines: WCOrderTaxLine[];
 
   /**
    * Grand total.
    * @example "269.99"
    */
-  total: Dinero<number>;
+  // total: Dinero<number>;
 
   /**
    * Sum of all taxes.
    * @example "33.36"
    */
-  total_tax: Dinero<number>;
+  // total_tax: Dinero<number>;
 }
 
 /**
@@ -394,7 +339,6 @@ export interface WCOrder extends WCOrderBase {
  */
 export interface WCOrderJSON extends WCOrderBase {
   cart_tax: string;
-  coupon_lines?: WCOrderCouponLineJSON[];
   currency: string;
   date_completed?: string;
   date_completed_gmt?: string;
@@ -407,11 +351,8 @@ export interface WCOrderJSON extends WCOrderBase {
   discount_tax: string;
   discount_total: string;
   line_items: WCOrderItemLineJSON[];
-  refunds?: WCOrderRefundLineJSON[];
-  shipping_lines: WCOrderShippingLineJSON[];
   shipping_tax: string;
   shipping_total: string;
-  tax_lines: WCOrderTaxLineJSON[];
   total: string;
   total_tax: string;
 }

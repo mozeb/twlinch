@@ -10,8 +10,9 @@
     "build": "tsc",
     "watch": "tsc --watch --preserveWatchOutput",
     "serve": "concurrently \"npm run watch\" \"firebase emulators:start --only auth,database,firestore,functions\" --import=../emulator_data --export-on-exit",
-    "deploy": "firebase deploy --only \"functions,firestore,database\"",
-    "deploy-single": "firebase deploy --only functions:api"
+    "deploy": "firebase deploy --only \"functions,firestore\"",
+    "deploy-single": "firebase deploy --only functions:api",
+    "update": "npm-check-updates -i"
   },
   "dependencies": {
     "@woocommerce/woocommerce-rest-api": "^1.0.1",

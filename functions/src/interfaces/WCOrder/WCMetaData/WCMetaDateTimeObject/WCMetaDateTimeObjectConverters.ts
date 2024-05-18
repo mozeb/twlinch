@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
-import { JSONConverter } from "../../../../../rtdb/JSONConverter";
 import { WCMetaDateTimeObject } from "./WCMetaDateTimeObject";
 import { WCMetaDateTimeObjectTypeGuard } from "./WCMetaDateTimeObjectTypeGuard";
+import { JSONConverter } from "../../../JSONConverter";
 
 /**
  * JSON converter

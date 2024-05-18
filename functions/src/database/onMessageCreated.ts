@@ -1,7 +1,7 @@
 import { DataSnapshot } from "firebase-admin/database";
 import { DatabaseEvent, onValueCreated } from "firebase-functions/v2/database";
 import { logInfo } from "../services";
-import { Message } from "../../../shared-interfaces";
+import { Message } from "../interfaces/message";
 
 export const dbmessageoncreated = onValueCreated(
   {
