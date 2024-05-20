@@ -15,8 +15,8 @@
   },
   "hosting": [
     {
-      "target": "<site-name-1>",
-      "public": "hosting/dist/<site-name-1>",
+      "target": "app",
+      "public": "hosting/dist/app",
       "ignore": [
         "firebase.json",
         "**/.*",

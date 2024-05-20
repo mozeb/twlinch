@@ -1,5 +1,14 @@
 {
-    "projects": {
-        "default": "twlinch-records"
+  "projects": {},
+  "targets": {
+    "default": {
+      "hosting": {
+        "app": [
+          "twlinch-records"
+        ]
+      }
     }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
