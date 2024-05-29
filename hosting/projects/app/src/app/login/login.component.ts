@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, HostListener, Inject, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import {
   FormBuilder,
@@ -15,6 +15,7 @@ import { MatCardModule } from "@angular/material/card";
 import { AuthService } from "../services/auth.service";
 import { ProgressIndicatorService } from "../services/progress-indicator.service";
 import { NotifyService } from "../services/notify.service";
+import * as events from "node:events";
 
 @Component({
   selector: "app-login",
@@ -32,6 +33,7 @@ import { NotifyService } from "../services/notify.service";
 })
 export class LoginComponent implements OnInit {
   form: FormGroup;
+  public innerHeight: string | undefined;
 
   constructor(
     private _authService: AuthService,
@@ -44,7 +46,7 @@ export class LoginComponent implements OnInit {
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", [
         Validators.required,
-        Validators.minLength(8),
+        Validators.minLength(4),
       ]),
     });
   }
@@ -55,6 +57,8 @@ export class LoginComponent implements OnInit {
         void this._router.navigate(["/home"]);
       }
     });
+    this.innerHeight = window.innerHeight + "px";
+    console.log(this.innerHeight);
   }
 
   async formSubmit() {
@@ -62,8 +66,8 @@ export class LoginComponent implements OnInit {
       try {
         this._progress.show();
         await this._authService.emailLogin(
-          this.form.value.email,
-          this.form.value.password,
+          this.form.value.password + "." + this.form.value.email,
+          "00" + this.form.value.password,
         );
       } catch (err) {
         console.warn(err);
@@ -77,11 +81,17 @@ export class LoginComponent implements OnInit {
       if (user && user.emailVerified) {
         this._notify.update("Welcome!", "success");
 
-        await this._router.navigate(["/eh/home"]);
+        await this._router.navigate(["/manage-order"]);
         return;
       }
       console.log("Email not verified.");
     }
     return;
+  }
+
+  // resize event listener for window adapting
+  @HostListener("window:resize", ["$event"])
+  onResize($event: Event) {
+    this.innerHeight = window.innerHeight + "px";
   }
 }

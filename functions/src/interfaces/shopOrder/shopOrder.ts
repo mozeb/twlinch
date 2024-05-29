@@ -52,6 +52,8 @@ export interface ShopOrderBase {
    * Line items data. Order - Line items properties.
    */
   item_lines: ShopItemLineBase[];
+
+  auth_uid?: string;
 }
 
 /**

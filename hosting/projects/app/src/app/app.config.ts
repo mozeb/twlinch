@@ -27,6 +27,7 @@ import {
 } from "@angular/fire/functions";
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
 import { provideAnimations } from "@angular/platform-browser/animations";
+import { getStorage, provideStorage } from "@angular/fire/storage";
 
 const useEmulators = false;
 
@@ -34,6 +35,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideAnimations(),
+    provideStorage(() => getStorage()),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => {
       const auth = initializeAuth(getApp(), {

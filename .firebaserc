@@ -1,7 +1,9 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "twlinch-records"
+  },
   "targets": {
-    "default": {
+    "twlinch-records": {
       "hosting": {
         "app": [
           "twlinch-records"

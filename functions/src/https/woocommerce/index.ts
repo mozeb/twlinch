@@ -8,7 +8,7 @@ import { has } from "lodash";
 import { logLog } from "../../services";
 import { getFirestore } from "firebase-admin/firestore";
 import { shopOrderWCOrderConverter, WCOrderJSON } from "../../interfaces";
-
+import { getAuth } from "firebase-admin/auth";
 export const woocommerceRouter = Router();
 
 woocommerceRouter.use((req: Request, res: Response, next: NextFunction) => {
@@ -28,10 +28,18 @@ woocommerceRouter.use((req: Request, res: Response, next: NextFunction) => {
 async function onOrderCreate(req: Request) {
   const wcData = req.body as WCOrderJSON;
   const shopOrder = shopOrderWCOrderConverter.toJSON(wcData);
+  const user = await getAuth().createUser({
+    email: shopOrder.wc_order_num + "." + shopOrder.address_billing.email,
+    emailVerified: true,
+    password: "00" + shopOrder.wc_order_num,
+  });
+
+  shopOrder.auth_uid = user.uid;
+
   await getFirestore()
     .collection("shopOrders")
-    .doc(shopOrder.wc_order_num)
-    .set(shopOrder);
+    .doc(user.uid)
+    .set(shopOrder, { merge: true });
 }
 
 woocommerceRouter.post("/webhook", async (req: Request, res: Response) => {
