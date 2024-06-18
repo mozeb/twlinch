@@ -1,0 +1,44 @@
+.main-view{
+  width: 100%;
+}
+
+.draw-content{
+  display: flex;
+  height:100%;
+}
+
+.draw-container{
+  height: 100%;
+}
+
+.side-menu{
+  background-color: black;
+  min-width:50px;
+  padding:20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menu-items{
+  display: flex;
+  flex-direction: column;
+  gap:30px;
+}
+
+.version{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: "Ubuntu Mono";
+  font-size: 5px;
+  color:white;
+  align-items: center;
+}
+
+.dash-icon{
+  cursor: pointer;
+  width:25px;
+  filter: brightness(0) invert(1);
+}
