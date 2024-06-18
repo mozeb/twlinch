@@ -18,7 +18,7 @@ import { ProgressIndicatorService } from "../progress-indicator.service";
 @Injectable({
   providedIn: "root",
 })
-export class DatastoreBaseService {
+export class FirestoreBaseService {
   protected firestore: Firestore = inject(Firestore);
 
   constructor(private _baseProgress: ProgressIndicatorService) {}

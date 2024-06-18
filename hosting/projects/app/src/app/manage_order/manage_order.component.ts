@@ -4,7 +4,7 @@ import { MatDividerModule } from "@angular/material/divider";
 import { AuthService } from "../services/auth.service";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { Order_detailsComponent } from "./order_details/order_details.component";
-import { DatastoreApiService } from "../services/datastore-api.service";
+import { FirestoreApiService } from "../services/firestore-api.service";
 import { ShopOrder } from "../interfaces/shopOrder";
 import { RouterLink, RouterOutlet } from "@angular/router";
 
@@ -25,7 +25,7 @@ import { RouterLink, RouterOutlet } from "@angular/router";
 export class Manage_orderComponent implements OnInit {
   constructor(
     protected _authService: AuthService,
-    private _firestoreService: DatastoreApiService,
+    private _firestoreService: FirestoreApiService,
   ) {}
 
   public innerHeight: string | undefined;

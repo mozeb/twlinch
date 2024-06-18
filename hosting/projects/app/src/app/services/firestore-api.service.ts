@@ -1,17 +1,20 @@
 import { Injectable } from "@angular/core";
 import { QueryConstraint } from "@angular/fire/firestore";
-import { DatastoreBaseService } from "./api-base/datastore-base.service";
+import { FirestoreBaseService } from "./api-base/firestore-base.service";
 import { ProgressIndicatorService } from "./progress-indicator.service";
+import { ShopOrder, ShopOrderJSON } from "../interfaces/shopOrder";
 
 @Injectable({
   providedIn: "root",
 })
-export class DatastoreApiService extends DatastoreBaseService {
+export class FirestoreApiService extends FirestoreBaseService {
   constructor(private _progress: ProgressIndicatorService) {
     super(_progress);
   }
 
-  public async getShopOrder(userId: string): Promise<any> {
+  public async getShopOrder(
+    userId: string,
+  ): Promise<ShopOrderJSON | undefined> {
     return this.getDoc(`shopOrders/${userId}`);
   }
 

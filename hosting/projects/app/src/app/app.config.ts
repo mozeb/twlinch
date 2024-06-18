@@ -1,6 +1,5 @@
 import { ApplicationConfig } from "@angular/core";
 import { provideRouter } from "@angular/router";
-import { provideStorage, getStorage } from "@angular/fire/storage";
 import { routes } from "./app.routes";
 import { environment } from "../environments/environment";
 import { getApp, initializeApp, provideFirebaseApp } from "@angular/fire/app";
@@ -21,6 +20,11 @@ import {
   provideFirestore,
 } from "@angular/fire/firestore";
 import {
+  provideStorage,
+  getStorage,
+  connectStorageEmulator,
+} from "@angular/fire/storage";
+import {
   connectFunctionsEmulator,
   getFunctions,
   provideFunctions,
@@ -34,7 +38,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideAnimations(),
-    provideStorage(() => getStorage()),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => {
       const auth = initializeAuth(getApp(), {
@@ -47,13 +50,6 @@ export const appConfig: ApplicationConfig = {
       }
       return auth;
     }),
-    provideDatabase(() => {
-      const database = getDatabase();
-      if (useEmulators && location.hostname === "localhost") {
-        connectDatabaseEmulator(database, "127.0.0.1", 9000);
-      }
-      return database;
-    }),
     provideFirestore(() => {
       const firestore = getFirestore();
       if (useEmulators && location.hostname === "localhost") {
@@ -61,13 +57,27 @@ export const appConfig: ApplicationConfig = {
       }
       return firestore;
     }),
-    provideFunctions(() => {
-      const functions = getFunctions();
+    provideStorage(() => {
+      const storage = getStorage();
       if (useEmulators && location.hostname === "localhost") {
-        connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+        connectStorageEmulator(storage, "127.0.0.1", 9199);
       }
-      return functions;
+      return storage;
     }),
+    // provideDatabase(() => {
+    //   const database = getDatabase();
+    //   if (useEmulators && location.hostname === "localhost") {
+    //     connectDatabaseEmulator(database, "127.0.0.1", 9000);
+    //   }
+    //   return database;
+    // }),
+    // provideFunctions(() => {
+    //   const functions = getFunctions();
+    //   if (useEmulators && location.hostname === "localhost") {
+    //     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+    //   }
+    //   return functions;
+    // }),
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: "outline", floatLabel: "always" },

@@ -96,11 +96,12 @@
 </div>-->
 
 <div class="main-content">
-
-
-
-  <mat-stepper [linear]=false #stepper class="music-steps" labelPosition="end" >
-
+  <mat-stepper
+    [linear]="false"
+    #stepper
+    class="music-steps"
+    labelPosition="end"
+  >
     <!-- Icon overrides. -->
     <ng-template matStepperIcon="album">
       <mat-icon>album</mat-icon>
@@ -112,84 +113,153 @@
       <mat-icon>file_upload</mat-icon>
     </ng-template>
 
-    <mat-step  [completed]="true"  label="Side A" state="album">
-
+    <mat-step [completed]="true" label="Side A" state="album">
       <div class="upload-cards">
         <div class="headers">
           <div class="upload-header">Side A</div>
-          <div class="upload-subheader">{{vinylSize}}</div>
+          <div class="upload-subheader">{{ vinylSize }}</div>
         </div>
-        <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event, 'a')" >
+        <div
+          cdkDropList
+          class="example-list"
+          (cdkDropListDropped)="drop($event, 'a')"
+        >
           <div class="tracks" *ngFor="let track of twlArrayA; let i = index">
-            <div class="track-number">
-              {{i+1}}.
-            </div>
+            <div class="track-number">{{ i + 1 }}.</div>
             <div class="track-box" cdkDrag>
-              <div>{{track.file.name}}</div>
-              <div>{{track.duration}}</div>
+              <div>{{ track.file.name }}</div>
+              <div>{{ track.duration }}</div>
             </div>
             <div class="remove-track">
-              <img src="/assets/Remove_Icon.svg" class="remove-icon" (click)="removeTrack(i, 'a')">
+              <img
+                src="/assets/Remove_Icon.svg"
+                class="remove-icon"
+                (click)="removeTrack(i, 'a')"
+              />
             </div>
           </div>
-
         </div>
 
         <div class="last-line">
-          <button class="select-music-button" onclick="document.getElementById('music-a-input').click()">Add music files</button>
-          <input type='file' id="music-a-input" style="display:none" (change)="addFiles($event, 'a')"  multiple="multiple" #upload>
+          <button
+            class="select-music-button"
+            onclick="document.getElementById('music-a-input').click()"
+          >
+            Add music files
+          </button>
+          <input
+            type="file"
+            id="music-a-input"
+            style="display: none"
+            (change)="addFiles($event, 'a')"
+            multiple="multiple"
+            #upload
+          />
 
           <div class="playtime" *ngIf="tptA > maxDuration">
             <div>Total playtime over limit!</div>
-            <div class="playtime-tag red-time" style="font-size: 14px; font-family: 'Ubuntu Mono'; padding-top:5px;">{{totalPlaytimeA}} </div>
+            <div
+              class="playtime-tag red-time"
+              style="
+                font-size: 14px;
+                font-family: &quot;Ubuntu Mono&quot;;
+                padding-top: 5px;
+              "
+            >
+              {{ totalPlaytimeA }}
+            </div>
           </div>
 
           <div class="playtime" *ngIf="tptA <= maxDuration">
             <div>Total playtime:</div>
-            <div class="playtime-tag green-time" style="font-size: 14px; font-family: 'Ubuntu Mono'; padding-top:5px;">{{totalPlaytimeA}} </div>
+            <div
+              class="playtime-tag green-time"
+              style="
+                font-size: 14px;
+                font-family: &quot;Ubuntu Mono&quot;;
+                padding-top: 5px;
+              "
+            >
+              {{ totalPlaytimeA }}
+            </div>
           </div>
         </div>
       </div>
 
       <div class="steps-buttons" style="justify-content: center">
-        <button matStepperNext mat-button class="step-button">Next Step ></button>
+        <button matStepperNext mat-button class="step-button">
+          Next Step >
+        </button>
       </div>
-
     </mat-step>
-    <mat-step  label="Side B" state="album">
+    <mat-step label="Side B" state="album">
       <div class="upload-cards">
         <div class="headers">
           <div class="upload-header">Side B</div>
-          <div class="upload-subheader">{{vinylSize}}</div>
+          <div class="upload-subheader">{{ vinylSize }}</div>
         </div>
-        <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event, 'b')" >
+        <div
+          cdkDropList
+          class="example-list"
+          (cdkDropListDropped)="drop($event, 'b')"
+        >
           <div class="tracks" *ngFor="let track of twlArrayB; let i = index">
-            <div class="track-number">
-              {{i+1}}.
-            </div>
+            <div class="track-number">{{ i + 1 }}.</div>
             <div class="track-box" cdkDrag>
-              <div>{{track.file.name}}</div>
-              <div>{{track.duration}}</div>
+              <div>{{ track.file.name }}</div>
+              <div>{{ track.duration }}</div>
             </div>
             <div class="remove-track">
-              <img src="/assets/Remove_Icon.svg" class="remove-icon" (click)="removeTrack(i, 'b')">
+              <img
+                src="/assets/Remove_Icon.svg"
+                class="remove-icon"
+                (click)="removeTrack(i, 'b')"
+              />
             </div>
           </div>
-
         </div>
 
         <div class="last-line">
-          <button class="select-music-button" onclick="document.getElementById('music-b-input').click()">Add music files</button>
-          <input id="music-b-input" type='file' style="display:none" (change)="addFiles($event, 'b')"  multiple="multiple">
+          <button
+            class="select-music-button"
+            onclick="document.getElementById('music-b-input').click()"
+          >
+            Add music files
+          </button>
+          <input
+            id="music-b-input"
+            type="file"
+            style="display: none"
+            (change)="addFiles($event, 'b')"
+            multiple="multiple"
+          />
 
           <div class="playtime" *ngIf="tptB > maxDuration">
             <div>Total playtime over limit!</div>
-            <div class="playtime-tag red-time" style="font-size: 14px; font-family: 'Ubuntu Mono'; padding-top:5px;">{{totalPlaytimeB}} </div>
+            <div
+              class="playtime-tag red-time"
+              style="
+                font-size: 14px;
+                font-family: &quot;Ubuntu Mono&quot;;
+                padding-top: 5px;
+              "
+            >
+              {{ totalPlaytimeB }}
+            </div>
           </div>
 
           <div class="playtime" *ngIf="tptB <= maxDuration">
             <div>Total playtime:</div>
-            <div class="playtime-tag green-time" style="font-size: 14px; font-family: 'Ubuntu Mono'; padding-top:5px;">{{totalPlaytimeB}} </div>
+            <div
+              class="playtime-tag green-time"
+              style="
+                font-size: 14px;
+                font-family: &quot;Ubuntu Mono&quot;;
+                padding-top: 5px;
+              "
+            >
+              {{ totalPlaytimeB }}
+            </div>
           </div>
         </div>
       </div>
@@ -198,74 +268,142 @@
       <div class="upload-cards">
         <div class="headers">
           <div class="upload-header">Side C</div>
-          <div class="upload-subheader">{{vinylSize}}</div>
+          <div class="upload-subheader">{{ vinylSize }}</div>
         </div>
-        <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event, 'c')" >
+        <div
+          cdkDropList
+          class="example-list"
+          (cdkDropListDropped)="drop($event, 'c')"
+        >
           <div class="tracks" *ngFor="let track of twlArrayC; let i = index">
-            <div class="track-number">
-              {{i+1}}.
-            </div>
+            <div class="track-number">{{ i + 1 }}.</div>
             <div class="track-box" cdkDrag>
-              <div>{{track.file.name}}</div>
-              <div>{{track.duration}}</div>
+              <div>{{ track.file.name }}</div>
+              <div>{{ track.duration }}</div>
             </div>
             <div class="remove-track">
-              <img src="/assets/Remove_Icon.svg" class="remove-icon" (click)="removeTrack(i, 'c')">
+              <img
+                src="/assets/Remove_Icon.svg"
+                class="remove-icon"
+                (click)="removeTrack(i, 'c')"
+              />
             </div>
           </div>
-
         </div>
 
         <div class="last-line">
-          <button class="select-music-button" onclick="document.getElementById('music-c-input').click()">Add music files</button>
-          <input type='file' id="music-c-input" style="display:none" (change)="addFiles($event, 'c')"  multiple="multiple">
+          <button
+            class="select-music-button"
+            onclick="document.getElementById('music-c-input').click()"
+          >
+            Add music files
+          </button>
+          <input
+            type="file"
+            id="music-c-input"
+            style="display: none"
+            (change)="addFiles($event, 'c')"
+            multiple="multiple"
+          />
 
           <div class="playtime" *ngIf="tptC > maxDuration">
             <div>Total playtime over limit!</div>
-            <div class="playtime-tag red-time" style="font-size: 14px; font-family: 'Ubuntu Mono'; padding-top:5px;">{{totalPlaytimeC}} </div>
+            <div
+              class="playtime-tag red-time"
+              style="
+                font-size: 14px;
+                font-family: &quot;Ubuntu Mono&quot;;
+                padding-top: 5px;
+              "
+            >
+              {{ totalPlaytimeC }}
+            </div>
           </div>
 
           <div class="playtime" *ngIf="tptC <= maxDuration">
             <div>Total playtime:</div>
-            <div class="playtime-tag green-time" style="font-size: 14px; font-family: 'Ubuntu Mono'; padding-top:5px;">{{totalPlaytimeC}} </div>
+            <div
+              class="playtime-tag green-time"
+              style="
+                font-size: 14px;
+                font-family: &quot;Ubuntu Mono&quot;;
+                padding-top: 5px;
+              "
+            >
+              {{ totalPlaytimeC }}
+            </div>
           </div>
         </div>
       </div>
     </mat-step>
-    <mat-step *ngIf="doubleAlbum"  label="Side D" state="album">
+    <mat-step *ngIf="doubleAlbum" label="Side D" state="album">
       <div class="upload-cards">
         <div class="headers">
           <div class="upload-header">Side D</div>
-          <div class="upload-subheader">{{vinylSize}}</div>
+          <div class="upload-subheader">{{ vinylSize }}</div>
         </div>
-        <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event, 'd')" >
+        <div
+          cdkDropList
+          class="example-list"
+          (cdkDropListDropped)="drop($event, 'd')"
+        >
           <div class="tracks" *ngFor="let track of twlArrayD; let i = index">
-            <div class="track-number">
-              {{i+1}}.
-            </div>
+            <div class="track-number">{{ i + 1 }}.</div>
             <div class="track-box" cdkDrag>
-              <div>{{track.file.name}}</div>
-              <div>{{track.duration}}</div>
+              <div>{{ track.file.name }}</div>
+              <div>{{ track.duration }}</div>
             </div>
             <div class="remove-track">
-              <img src="/assets/Remove_Icon.svg" class="remove-icon" (click)="removeTrack(i, 'd')">
+              <img
+                src="/assets/Remove_Icon.svg"
+                class="remove-icon"
+                (click)="removeTrack(i, 'd')"
+              />
             </div>
           </div>
-
         </div>
 
         <div class="last-line">
-          <button class="select-music-button" onclick="document.getElementById('id=music-d-input').click()">Add music files</button>
-          <input type='file' id="music-d-input" style="display:none" (change)="addFiles($event, 'd')"  multiple="multiple">
+          <button
+            class="select-music-button"
+            onclick="document.getElementById('id=music-d-input').click()"
+          >
+            Add music files
+          </button>
+          <input
+            type="file"
+            id="music-d-input"
+            style="display: none"
+            (change)="addFiles($event, 'd')"
+            multiple="multiple"
+          />
 
           <div class="playtime" *ngIf="tptD > maxDuration">
             <div>Total playtime over limit!</div>
-            <div class="playtime-tag red-time" style="font-size: 14px; font-family: 'Ubuntu Mono'; padding-top:5px;">{{totalPlaytimeD}} </div>
+            <div
+              class="playtime-tag red-time"
+              style="
+                font-size: 14px;
+                font-family: &quot;Ubuntu Mono&quot;;
+                padding-top: 5px;
+              "
+            >
+              {{ totalPlaytimeD }}
+            </div>
           </div>
 
           <div class="playtime" *ngIf="tptD <= maxDuration">
             <div>Total playtime:</div>
-            <div class="playtime-tag green-time" style="font-size: 14px; font-family: 'Ubuntu Mono'; padding-top:5px;">{{totalPlaytimeD}} </div>
+            <div
+              class="playtime-tag green-time"
+              style="
+                font-size: 14px;
+                font-family: &quot;Ubuntu Mono&quot;;
+                padding-top: 5px;
+              "
+            >
+              {{ totalPlaytimeD }}
+            </div>
           </div>
         </div>
       </div>
@@ -274,45 +412,53 @@
       <div class="upload-cards">
         <div class="headers">
           <div class="upload-header">Tracks Summary</div>
-          <div class="upload-subheader">Final selection of tracks for your vinyl.</div>
+          <div class="upload-subheader">
+            Final selection of tracks for your vinyl.
+          </div>
         </div>
 
         <div class="summary-table">
           <span class="summary-side"><mat-icon>album</mat-icon>Side A</span>
-          <div class="tracklist-summary" *ngFor="let track of twlArrayA; let i = index">
-            <div class="track-number-summary">
-              {{i+1}}.
-            </div>
+          <div
+            class="tracklist-summary"
+            *ngFor="let track of twlArrayA; let i = index"
+          >
+            <div class="track-number-summary">{{ i + 1 }}.</div>
             <div class="track-box-summary" cdkDrag>
-              <div>{{track.file.name}}</div>
+              <div>{{ track.file.name }}</div>
             </div>
           </div>
-          <span class="summary-playtime">Duration: {{totalPlaytimeA}}</span>
+          <span class="summary-playtime">Duration: {{ totalPlaytimeA }}</span>
         </div>
 
         <div class="summary-table">
           <span class="summary-side"><mat-icon>album</mat-icon>Side B</span>
-          <div class="tracklist-summary" *ngFor="let track of twlArrayB; let i = index">
-            <div class="track-number-summary">
-              {{i+1}}.
-            </div>
+          <div
+            class="tracklist-summary"
+            *ngFor="let track of twlArrayB; let i = index"
+          >
+            <div class="track-number-summary">{{ i + 1 }}.</div>
             <div class="track-box-summary" cdkDrag>
-              <div>{{track.file.name}}</div>
+              <div>{{ track.file.name }}</div>
             </div>
           </div>
-          <span class="summary-playtime">Duration: {{totalPlaytimeB}}</span>
+          <span class="summary-playtime">Duration: {{ totalPlaytimeB }}</span>
         </div>
-
       </div>
       <p>You are now done.</p>
       <div>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button (click)="stepper.reset()">Reset</button>
-        <button mat-button (click)="uploadFile(upload)">Upload</button>
+        <button mat-button (click)="uploadTracks(upload)">Upload</button>
+
+        <mat-progress-bar
+          *ngIf="showProgress$ | async"
+          mode="determinate"
+          [value]="uploadPercentDone$ | async"
+          class="toolbar-progress-bar"
+        ></mat-progress-bar>
+
       </div>
     </mat-step>
-
-
   </mat-stepper>
-
 </div>

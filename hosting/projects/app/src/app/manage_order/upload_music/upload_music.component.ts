@@ -12,8 +12,8 @@ import { MatDividerModule } from "@angular/material/divider";
 import { environment } from "../../../environments/environment";
 import { AuthService } from "../../services/auth.service";
 import { MatSidenavModule } from "@angular/material/sidenav";
-import { DatastoreApiService } from "../../services/datastore-api.service";
-import { ShopOrder } from "../../interfaces/shopOrder";
+import { FirestoreApiService } from "../../services/firestore-api.service";
+import { ShopOrder, ShopOrderJSON } from "../../interfaces/shopOrder";
 
 import {
   FormBuilder,
@@ -31,22 +31,19 @@ import {
 } from "@angular/cdk/drag-drop";
 import { MatStep, MatStepHeader, MatStepper } from "@angular/material/stepper";
 import { MatIcon } from "@angular/material/icon";
-import { ref } from "@angular/fire/database";
 import {
   Storage,
   ref as refStorage,
   uploadBytesResumable,
 } from "@angular/fire/storage";
-import { finalize } from "rxjs";
+import { finalize, Observable } from "rxjs";
 import { createUploadTask } from "@angular/fire/compat/storage";
 import { MatButton } from "@angular/material/button";
-
-const URL2 = "https://evening-anchorage-3159.herokuapp.com/api/";
-var mySound = new Audio();
-var songDuraton = "00:00";
-var fullDuration = 0;
-
-var fileList: FileList | null;
+import { padStart } from "lodash";
+import { StorageBaseService } from "../../services/api-base/storage-base.service";
+import { StorageApiService } from "../../services/storage-api.service";
+import { MatProgressBar } from "@angular/material/progress-bar";
+import { ProgressIndicatorService } from "../../services/progress-indicator.service";
 
 @Component({
   selector: "upload-music",
@@ -63,6 +60,7 @@ var fileList: FileList | null;
     ReactiveFormsModule,
     MatIcon,
     MatButton,
+    MatProgressBar,
   ],
   providers: [
     {
@@ -94,31 +92,44 @@ export class Upload_musicComponent implements OnInit {
   maxDuration = 0;
   doubleAlbum = false;
 
+  fileList: FileList | null = null;
+
   musicInput = document.getElementById("music-a-input") as HTMLInputElement;
+
+  order: ShopOrderJSON | undefined;
+
+  showProgress$: Observable<boolean>;
+  uploadPercentDone$: Observable<number>;
 
   // Storage reference
   protected storage: Storage = inject(Storage);
 
   constructor(
     protected _authService: AuthService,
-    private _firestoreService: DatastoreApiService,
+    private _firestoreService: FirestoreApiService,
+    private _storageService: StorageApiService,
     private _formBuilder: FormBuilder,
-  ) {}
+    private _progress: ProgressIndicatorService,
+  ) {
+    this.showProgress$ = this._progress.isOn;
+    this.uploadPercentDone$ = this._progress.percentDone;
+  }
 
   ngOnInit() {
     this.innerHeight = window.innerHeight + "px";
-    this.getOrderData();
+    void this.getOrderData();
   }
 
   // Get order data
   async getOrderData() {
     const user = await this._authService.currentUser;
-    const order = (await this._firestoreService.getShopOrder(
-      user?.uid as string,
-    )) as ShopOrder;
+    this.order = await this._firestoreService.getShopOrder(user?.uid as string);
+    if (this.order === undefined) {
+      return;
+    }
 
     // Check the size of vinyl
-    order.item_lines.forEach((element) => {
+    this.order.item_lines.forEach((element) => {
       // Check for size of the record
       switch (element.wc_product_id) {
         case 619:
@@ -153,16 +164,16 @@ export class Upload_musicComponent implements OnInit {
 
   public addFiles(event: Event, inputSelector: String): void {
     const element = event.currentTarget as HTMLInputElement;
-    fileList = element.files;
+    this.fileList = element.files;
     // If not empty
-    if (fileList) {
-      var files = Array.from(fileList || []);
+    if (this.fileList) {
+      const files = Array.from(this.fileList || []);
       files.forEach((element, index) => {
-        var obj = {} as TwlinchMusicFile;
+        const obj = {} as TwlinchMusicFile;
         obj.file = element;
         obj.duration = "00:00";
-        var objectURL = URL.createObjectURL(element);
-        var audio = new Audio();
+        const objectURL = URL.createObjectURL(element);
+        const audio = new Audio();
         audio.src = objectURL;
         switch (inputSelector) {
           case "a":
@@ -180,7 +191,7 @@ export class Upload_musicComponent implements OnInit {
         }
 
         audio.addEventListener("loadeddata", function () {
-          var minutes = Math.floor(this.duration / 60);
+          const minutes = Math.floor(this.duration / 60);
           obj.durationMs = this.duration;
           obj.duration =
             minutes.toString() +
@@ -196,14 +207,16 @@ export class Upload_musicComponent implements OnInit {
   }
 
   recalculateTotalPlaytime(inputSelector: String) {
+    let minutes: number;
+    let seconds: number;
     switch (inputSelector) {
       case "a":
         this.tptA = 0;
         this.twlArrayA.forEach((element, index) => {
           this.tptA = this.tptA + element.durationMs;
         });
-        var minutes = Math.floor(this.tptA / 60);
-        var seconds = Math.floor(this.tptA % 60);
+        minutes = Math.floor(this.tptA / 60);
+        seconds = Math.floor(this.tptA % 60);
         this.totalPlaytimeA = minutes.toString() + ":" + seconds.toString();
         console.log("Side A total: " + this.totalPlaytimeA);
         break;
@@ -212,8 +225,8 @@ export class Upload_musicComponent implements OnInit {
         this.twlArrayB.forEach((element, index) => {
           this.tptB = this.tptB + element.durationMs;
         });
-        var minutes = Math.floor(this.tptB / 60);
-        var seconds = Math.floor(this.tptB % 60);
+        minutes = Math.floor(this.tptB / 60);
+        seconds = Math.floor(this.tptB % 60);
         this.totalPlaytimeB = minutes.toString() + ":" + seconds.toString();
         console.log("Side B total: " + this.totalPlaytimeB);
         break;
@@ -222,8 +235,8 @@ export class Upload_musicComponent implements OnInit {
         this.twlArrayC.forEach((element, index) => {
           this.tptC = this.tptC + element.durationMs;
         });
-        var minutes = Math.floor(this.tptC / 60);
-        var seconds = Math.floor(this.tptC % 60);
+        minutes = Math.floor(this.tptC / 60);
+        seconds = Math.floor(this.tptC % 60);
         this.totalPlaytimeC = minutes.toString() + ":" + seconds.toString();
         console.log("Side C total: " + this.totalPlaytimeC);
         break;
@@ -232,8 +245,8 @@ export class Upload_musicComponent implements OnInit {
         this.twlArrayD.forEach((element, index) => {
           this.tptD = this.tptD + element.durationMs;
         });
-        var minutes = Math.floor(this.tptD / 60);
-        var seconds = Math.floor(this.tptD % 60);
+        minutes = Math.floor(this.tptD / 60);
+        seconds = Math.floor(this.tptD % 60);
         this.totalPlaytimeD = minutes.toString() + ":" + seconds.toString();
         console.log("Side D total: " + this.totalPlaytimeD);
         break;
@@ -294,22 +307,15 @@ export class Upload_musicComponent implements OnInit {
     }
   }
 
-  uploadFile(input: HTMLInputElement) {
-    if (!input.files) return;
-    const files: FileList = input.files;
-    for (let i = 0; i < files.length; i++) {
-      const file = files.item(i);
-      if (file) {
-        const storageRef = refStorage(
-          this.storage,
-          "/" + "testupload/" + "track_0" + (i + 1) + " - " + file.name,
-        );
-        uploadBytesResumable(storageRef, file);
-      }
-    }
+  async uploadTracks(input: HTMLInputElement) {
+    if (!input.files || !this.order) return;
+    await this._storageService.uploadTrackFiles(this.order.wc_order_num, {
+      A: this.twlArrayA,
+      B: this.twlArrayB,
+      C: this.twlArrayC,
+      D: this.twlArrayD,
+    });
   }
-
-  protected readonly fileList = fileList;
 }
 
 export interface TwlinchMusicFile {

@@ -9,6 +9,9 @@ import { ProgressIndicatorService } from "./progress-indicator.service";
 export class DatabaseApiService extends DatabaseBaseService {
   constructor(private _progress: ProgressIndicatorService) {
     super(_progress);
+    console.error(
+      "TODO to use this, un-comment 'provideFunctions' in app.config.ts",
+    );
   }
   // public getMessage(id: string): Promise<Message> {
   //   return this.getVal(`/messages/${id}`);
