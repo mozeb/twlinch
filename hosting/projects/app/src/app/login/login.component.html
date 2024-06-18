@@ -121,7 +121,7 @@
           matInput
           required
           formControlName="password"
-          autocomplete="current-password"
+          (keydown.enter)="formSubmit()"
           type="number"
         />
         @if (form.controls["password"].hasError("required")) {

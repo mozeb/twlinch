@@ -453,9 +453,10 @@
 
         <mat-progress-bar
           *ngIf="showProgress$ | async"
-          mode="determinate"
+          mode="buffer"
           [value]="uploadPercentDone$ | async"
-          class="toolbar-progress-bar"
+          [bufferValue]="uploadPercentBuffer$ | async"
+          style="height: 20px; width: 100%"
         ></mat-progress-bar>
 
       </div>

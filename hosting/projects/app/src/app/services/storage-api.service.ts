@@ -10,9 +10,6 @@ import { get, keys, padStart } from "lodash";
 export class StorageApiService extends StorageBaseService {
   constructor(private _progress: ProgressIndicatorService) {
     super(_progress);
-    console.error(
-      "TODO to use this, un-comment 'provideFunctions' in app.config.ts",
-    );
   }
 
   public async uploadTrackFiles(
@@ -22,24 +19,23 @@ export class StorageApiService extends StorageBaseService {
     },
   ) {
     this._progress.show();
-    this._progress.changeValue(0);
+    this._progress.updateDonePercent(0);
 
     const totalSize = this.calculateTotalUploadSize(files);
     let bytesUploaded = 0;
 
     for (const trackSide of keys(files)) {
       const trackFiles = get(files, trackSide);
-      for (let i = 1; i <= trackFiles.length; i++) {
+      console.log(`Starting side ${trackSide}. Items: ${trackFiles.length}`);
+      for (let i = 0; i < trackFiles.length; i++) {
         const file = get(trackFiles, i);
-        const path = `/${orderNum}/music/${trackSide}/${trackSide}_${padStart(i.toFixed(0), 2, "0")} - ${file.file.name}`;
-        const uploadTask = this.uploadFile(path, file.file);
-        uploadTask.on("state_changed", (data) => {
-          this._progress.changeValue(
-            ((bytesUploaded + data.bytesTransferred) * 100) / totalSize,
-          );
-        });
-        await uploadTask;
+        this._progress.updateBufferPercent(
+          ((bytesUploaded + file.file.size) * 100) / totalSize,
+        );
+        const path = `/${orderNum}/music/${trackSide}/${trackSide}_${padStart((i + 1).toFixed(0), 2, "0")} - ${file.file.name}`;
+        await this.uploadFile(path, file.file);
         bytesUploaded += file.file.size;
+        this._progress.updateDonePercent((bytesUploaded * 100) / totalSize);
       }
     }
     this._progress.hide();

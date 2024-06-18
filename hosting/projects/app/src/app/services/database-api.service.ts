@@ -10,7 +10,7 @@ export class DatabaseApiService extends DatabaseBaseService {
   constructor(private _progress: ProgressIndicatorService) {
     super(_progress);
     console.error(
-      "TODO to use this, un-comment 'provideFunctions' in app.config.ts",
+      "TODO to use this, un-comment 'provideDatabase' in app.config.ts",
     );
   }
   // public getMessage(id: string): Promise<Message> {

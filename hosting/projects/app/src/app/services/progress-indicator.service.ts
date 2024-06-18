@@ -8,8 +8,11 @@ export class ProgressIndicatorService {
   private progressSource = new BehaviorSubject<boolean>(false);
   isOn: Observable<boolean> = this.progressSource.asObservable();
 
-  private valueSource = new BehaviorSubject<number>(0);
-  percentDone: Observable<number> = this.valueSource.asObservable();
+  private doneSource = new BehaviorSubject<number>(0);
+  percentDone: Observable<number> = this.doneSource.asObservable();
+
+  private bufferSource = new BehaviorSubject<number>(0);
+  percentBuffer: Observable<number> = this.bufferSource.asObservable();
 
   show() {
     this.progressSource.next(true);
@@ -19,7 +22,11 @@ export class ProgressIndicatorService {
     this.progressSource.next(false);
   }
 
-  changeValue(percent: number) {
-    this.valueSource.next(percent);
+  updateDonePercent(percent: number) {
+    this.doneSource.next(percent);
+  }
+
+  updateBufferPercent(percent: number) {
+    this.bufferSource.next(percent);
   }
 }

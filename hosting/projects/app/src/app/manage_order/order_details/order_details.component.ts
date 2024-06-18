@@ -36,9 +36,12 @@ export class Order_detailsComponent implements OnInit {
 
   async getOrderData() {
     const user = await this._authService.currentUser;
-    const order = (await this._firestoreService.getShopOrder(
+    const order = await this._firestoreService.getShopOrder(
       user?.uid as string,
-    )) as ShopOrder;
+    );
+    if (order === undefined) {
+      return;
+    }
 
     order.item_lines.forEach((element) => {
       // Check for size of the record

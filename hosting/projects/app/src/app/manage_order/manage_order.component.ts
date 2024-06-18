@@ -38,9 +38,12 @@ export class Manage_orderComponent implements OnInit {
 
   async getOrderData() {
     const user = await this._authService.currentUser;
-    const order = (await this._firestoreService.getShopOrder(
+    const order = await this._firestoreService.getShopOrder(
       user?.uid as string,
-    )) as ShopOrder;
+    );
+    if (order === undefined) {
+      return;
+    }
     this.orderNumber = order.wc_order_num;
     console.log(order.item_lines[0].name);
   }

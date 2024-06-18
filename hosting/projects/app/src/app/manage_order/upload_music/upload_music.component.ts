@@ -1,46 +1,30 @@
-import {
-  Component,
-  HostListener,
-  inject,
-  Input,
-  input,
-  NgModule,
-  OnInit,
-} from "@angular/core";
+import { Component, HostListener, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatDividerModule } from "@angular/material/divider";
-import { environment } from "../../../environments/environment";
 import { AuthService } from "../../services/auth.service";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { FirestoreApiService } from "../../services/firestore-api.service";
-import { ShopOrder, ShopOrderJSON } from "../../interfaces/shopOrder";
+import { ShopOrderJSON } from "../../interfaces/shopOrder";
 
-import {
-  FormBuilder,
-  Validators,
-  FormsModule,
-  ReactiveFormsModule,
-} from "@angular/forms";
+import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { STEPPER_GLOBAL_OPTIONS } from "@angular/cdk/stepper";
 
 import {
+  CdkDrag,
   CdkDragDrop,
   CdkDropList,
-  CdkDrag,
   moveItemInArray,
 } from "@angular/cdk/drag-drop";
-import { MatStep, MatStepHeader, MatStepper } from "@angular/material/stepper";
-import { MatIcon } from "@angular/material/icon";
 import {
-  Storage,
-  ref as refStorage,
-  uploadBytesResumable,
-} from "@angular/fire/storage";
-import { finalize, Observable } from "rxjs";
-import { createUploadTask } from "@angular/fire/compat/storage";
+  MatStep,
+  MatStepHeader,
+  MatStepper,
+  MatStepperPrevious,
+} from "@angular/material/stepper";
+import { MatIcon } from "@angular/material/icon";
+import { Storage } from "@angular/fire/storage";
+import { Observable } from "rxjs";
 import { MatButton } from "@angular/material/button";
-import { padStart } from "lodash";
-import { StorageBaseService } from "../../services/api-base/storage-base.service";
 import { StorageApiService } from "../../services/storage-api.service";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { ProgressIndicatorService } from "../../services/progress-indicator.service";
@@ -61,6 +45,7 @@ import { ProgressIndicatorService } from "../../services/progress-indicator.serv
     MatIcon,
     MatButton,
     MatProgressBar,
+    MatStepperPrevious,
   ],
   providers: [
     {
@@ -100,6 +85,7 @@ export class Upload_musicComponent implements OnInit {
 
   showProgress$: Observable<boolean>;
   uploadPercentDone$: Observable<number>;
+  uploadPercentBuffer$: Observable<number>;
 
   // Storage reference
   protected storage: Storage = inject(Storage);
@@ -113,6 +99,7 @@ export class Upload_musicComponent implements OnInit {
   ) {
     this.showProgress$ = this._progress.isOn;
     this.uploadPercentDone$ = this._progress.percentDone;
+    this.uploadPercentBuffer$ = this._progress.percentBuffer;
   }
 
   ngOnInit() {
@@ -169,12 +156,13 @@ export class Upload_musicComponent implements OnInit {
     if (this.fileList) {
       const files = Array.from(this.fileList || []);
       files.forEach((element, index) => {
-        const obj = {} as TwlinchMusicFile;
-        obj.file = element;
-        obj.duration = "00:00";
+        const obj: TwlinchMusicFile = {
+          file: element,
+          duration: "00:00",
+          durationMs: 0,
+        };
         const objectURL = URL.createObjectURL(element);
-        const audio = new Audio();
-        audio.src = objectURL;
+        const audio = new Audio(objectURL);
         switch (inputSelector) {
           case "a":
             this.twlArrayA.push(obj);
@@ -215,6 +203,9 @@ export class Upload_musicComponent implements OnInit {
         this.twlArrayA.forEach((element, index) => {
           this.tptA = this.tptA + element.durationMs;
         });
+        if (isNaN(this.tptA)) {
+          break;
+        }
         minutes = Math.floor(this.tptA / 60);
         seconds = Math.floor(this.tptA % 60);
         this.totalPlaytimeA = minutes.toString() + ":" + seconds.toString();
@@ -225,6 +216,9 @@ export class Upload_musicComponent implements OnInit {
         this.twlArrayB.forEach((element, index) => {
           this.tptB = this.tptB + element.durationMs;
         });
+        if (isNaN(this.tptB)) {
+          break;
+        }
         minutes = Math.floor(this.tptB / 60);
         seconds = Math.floor(this.tptB % 60);
         this.totalPlaytimeB = minutes.toString() + ":" + seconds.toString();
@@ -235,6 +229,9 @@ export class Upload_musicComponent implements OnInit {
         this.twlArrayC.forEach((element, index) => {
           this.tptC = this.tptC + element.durationMs;
         });
+        if (isNaN(this.tptC)) {
+          break;
+        }
         minutes = Math.floor(this.tptC / 60);
         seconds = Math.floor(this.tptC % 60);
         this.totalPlaytimeC = minutes.toString() + ":" + seconds.toString();
@@ -245,6 +242,9 @@ export class Upload_musicComponent implements OnInit {
         this.twlArrayD.forEach((element, index) => {
           this.tptD = this.tptD + element.durationMs;
         });
+        if (isNaN(this.tptD)) {
+          break;
+        }
         minutes = Math.floor(this.tptD / 60);
         seconds = Math.floor(this.tptD % 60);
         this.totalPlaytimeD = minutes.toString() + ":" + seconds.toString();
