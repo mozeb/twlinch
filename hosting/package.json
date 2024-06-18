@@ -24,6 +24,7 @@
     "@angular/router": "^17.3.0",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
+    "ng2-file-upload": "^5.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
@@ -46,5 +47,11 @@
     "eslint-plugin-prettier": "^5.1.3",
     "prettier": "^3.2.5",
     "typescript": "~5.4.2"
+  },
+  "overrides": {
+    "ng2-file-upload": {
+      "@angular/common": "17.3.0",
+      "@angular/core": "17.3.0"
+    }
   }
 }

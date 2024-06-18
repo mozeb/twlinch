@@ -1,43 +1,30 @@
-
-<div class="main-view" style="height:{{innerHeight}}">
-  <mat-drawer-container class="draw-container">
-
-    <!-- Mobile drawer -->
-    <mat-drawer #drawer mode="over">
-      <div class="side-menu" style="height: calc(100% - 40px)">
-        <img src="/assets/Twlinch_Fav_Portal.png" style="width:35px;">
-        <div class="menu-items">
-          <img src="/assets/dashboard_icon.svg" class="dash-icon">
-          <img src="/assets/music_icon.svg" class="dash-icon">
-          <img src="/assets/design_icon.svg" class="dash-icon">
-        </div>
-        <div class="version">
-          <img src="/assets/Twlinch_Logo.svg" style="width:50px; filter: brightness(0) invert(1);">
-          <span>Version 1.0</span>
-        </div>
-      </div>
-    </mat-drawer>
-
-
-    <mat-drawer-content class="draw-content">
-      <div class="side-menu">
-        <img src="/assets/Twlinch_Fav_Portal.png" style="width:35px;">
-        <div class="menu-items">
-          <img src="/assets/dashboard_icon.svg" class="dash-icon">
-          <img src="/assets/music_icon.svg" class="dash-icon">
-          <img src="/assets/design_icon.svg" class="dash-icon">
-        </div>
-        <div class="version">
-          <img src="/assets/Twlinch_Logo.svg" style="width:50px; filter: brightness(0) invert(1);">
-          <span>Version 1.0</span>
-        </div>
-      </div>
-
+<!--<div>
       <h1>Home!</h1>
       {{(_authService.user$ | async)?.uid}}
       <button (click)="_authService.signOut()">Logout</button>
-      <button mat-raised-button (click)="drawer.toggle()">Toggle drawer</button>
-    </mat-drawer-content>
-  </mat-drawer-container>
-</div>
+</div>-->
 
+<div class="main-content">
+  <div class="order-details-card">
+    <span class="order-header">Your order:</span>
+   <span>{{vinylSize}}</span>
+    <span>{{vinylColor}}</span>
+    <span>{{label}}</span>
+    <span>{{sleeve}}</span>
+    <span>{{doubleAlbum}}</span>
+  </div>
+  <div class="upload-cards" >
+    <a class="upload-card" [routerLink]="'/manage-order/upload-music'">
+      <div class="inner-upload-card">
+        <img src="/assets/Upload_Music.svg" style="width:45px;">
+        <span class="upload-text">upload music</span>
+      </div>
+    </a>
+    <div class="upload-card">
+      <div class="inner-upload-card">
+        <img src="/assets/Upload_Artwork.svg" style="width:45px;">
+        <span class="upload-text">upload artwork</span>
+      </div>
+    </div>
+  </div>
+</div>

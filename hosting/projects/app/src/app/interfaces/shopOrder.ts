@@ -1,6 +1,5 @@
 import { DateTime } from "luxon";
 import { ShopItemLineBase } from "./shopItemLine";
-import { WCOrderBilling, WCOrderShipping, WCOrderStatus } from "../WCOrder";
 
 /**
  * Data model. Shop order data.
@@ -15,18 +14,18 @@ export interface ShopOrderBase {
    * Order status.
    * @example "pending", "processing", "completed", "failed", ...
    */
-  wc_status: WCOrderStatus;
+  wc_status: string;
 
   /**
    * Billing address. Order - Billing properties.
    * @see WCOrderBillingProperties
    */
-  address_billing: WCOrderBilling;
+  address_billing: string;
 
   /**
    * Shipping address. Order - Shipping properties.
    */
-  address_shipping: WCOrderShipping;
+  address_shipping: string;
 
   /**
    * Note left by customer during checkout.

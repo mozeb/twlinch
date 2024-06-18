@@ -1,3 +1,4 @@
+
 # Template project for Firebase and Angular
 
 ## Setup

@@ -11,10 +11,10 @@ export class DatastoreApiService extends DatastoreBaseService {
     super(_progress);
   }
 
-  // public async getUser(id: string): Promise<User | undefined> {
-  //   return this.getDoc(`users/${id}`);
-  // }
-  //
+  public async getShopOrder(userId: string): Promise<any> {
+    return this.getDoc(`shopOrders/${userId}`);
+  }
+
   // public async setUser(id: string, data: User): Promise<void> {
   //   return this.setDoc(`users/${id}`, data);
   // }

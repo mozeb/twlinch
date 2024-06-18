@@ -1,6 +1,6 @@
 import { ApplicationConfig } from "@angular/core";
 import { provideRouter } from "@angular/router";
-
+import { provideStorage, getStorage } from "@angular/fire/storage";
 import { routes } from "./app.routes";
 import { environment } from "../environments/environment";
 import { getApp, initializeApp, provideFirebaseApp } from "@angular/fire/app";
@@ -27,7 +27,6 @@ import {
 } from "@angular/fire/functions";
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
 import { provideAnimations } from "@angular/platform-browser/animations";
-import { getStorage, provideStorage } from "@angular/fire/storage";
 
 const useEmulators = false;
 
