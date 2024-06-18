@@ -3,13 +3,19 @@ import { ProgressIndicatorService } from "./progress-indicator.service";
 import { StorageBaseService } from "./api-base/storage-base.service";
 import { TwlinchMusicFile } from "../manage_order/upload_music/upload_music.component";
 import { get, keys, padStart } from "lodash";
+import { AuthService } from "./auth.service";
+import { NotifyService } from "./notify.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class StorageApiService extends StorageBaseService {
-  constructor(private _progress: ProgressIndicatorService) {
-    super(_progress);
+  constructor(
+    private _progressService: ProgressIndicatorService,
+    private _authService: AuthService,
+    private _notifyService: NotifyService,
+  ) {
+    super(_progressService, _notifyService);
   }
 
   public async uploadTrackFiles(
@@ -18,8 +24,14 @@ export class StorageApiService extends StorageBaseService {
       [trackSide: string]: TwlinchMusicFile[];
     },
   ) {
-    this._progress.show();
-    this._progress.updateDonePercent(0);
+    this._progressService.show();
+    this._progressService.updateDonePercent(0);
+
+    const user = await this._authService.currentUser;
+    const folderPath = `/orders/${user?.uid}/music`;
+
+    await this.deleteFolder(folderPath);
+    console.log(`Folder ${folderPath} deleted`);
 
     const totalSize = this.calculateTotalUploadSize(files);
     let bytesUploaded = 0;
@@ -29,16 +41,22 @@ export class StorageApiService extends StorageBaseService {
       console.log(`Starting side ${trackSide}. Items: ${trackFiles.length}`);
       for (let i = 0; i < trackFiles.length; i++) {
         const file = get(trackFiles, i);
-        this._progress.updateBufferPercent(
+        this._progressService.updateBufferPercent(
           ((bytesUploaded + file.file.size) * 100) / totalSize,
         );
-        const path = `/${orderNum}/music/${trackSide}/${trackSide}_${padStart((i + 1).toFixed(0), 2, "0")} - ${file.file.name}`;
-        await this.uploadFile(path, file.file);
+        const path = `${folderPath}/${trackSide}/${trackSide}_${padStart((i + 1).toFixed(0), 2, "0")} - ${file.file.name}`;
+        const result = await this.uploadFile(path, file.file);
+
+        // TODO tale 'result.fullPath' kasneje uporabiš, da dobiš ven stvari z v bazo (pot do dokumenta, itd). Pomoje :)
+        console.log(result.metadata.fullPath);
+
         bytesUploaded += file.file.size;
-        this._progress.updateDonePercent((bytesUploaded * 100) / totalSize);
+        this._progressService.updateDonePercent(
+          (bytesUploaded * 100) / totalSize,
+        );
       }
     }
-    this._progress.hide();
+    this._progressService.hide();
   }
 
   calculateTotalUploadSize(files: {

@@ -6,7 +6,7 @@ import { MatSidenavModule } from "@angular/material/sidenav";
 import { FirestoreApiService } from "../../services/firestore-api.service";
 import { ShopOrderJSON } from "../../interfaces/shopOrder";
 
-import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
+import { ReactiveFormsModule } from "@angular/forms";
 import { STEPPER_GLOBAL_OPTIONS } from "@angular/cdk/stepper";
 
 import {
@@ -28,6 +28,13 @@ import { MatButton } from "@angular/material/button";
 import { StorageApiService } from "../../services/storage-api.service";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { ProgressIndicatorService } from "../../services/progress-indicator.service";
+import { padStart } from "lodash";
+
+export interface TwlinchMusicFile {
+  file: File;
+  duration: string;
+  durationMs: number;
+}
 
 @Component({
   selector: "upload-music",
@@ -79,8 +86,6 @@ export class Upload_musicComponent implements OnInit {
 
   fileList: FileList | null = null;
 
-  musicInput = document.getElementById("music-a-input") as HTMLInputElement;
-
   order: ShopOrderJSON | undefined;
 
   showProgress$: Observable<boolean>;
@@ -94,7 +99,6 @@ export class Upload_musicComponent implements OnInit {
     protected _authService: AuthService,
     private _firestoreService: FirestoreApiService,
     private _storageService: StorageApiService,
-    private _formBuilder: FormBuilder,
     private _progress: ProgressIndicatorService,
   ) {
     this.showProgress$ = this._progress.isOn;
@@ -195,59 +199,31 @@ export class Upload_musicComponent implements OnInit {
   }
 
   recalculateTotalPlaytime(inputSelector: String) {
-    let minutes: number;
-    let seconds: number;
+    function calculateTotalDuration(files: TwlinchMusicFile[]): number {
+      let tmp = 0;
+      files.forEach((file) => (tmp += file.durationMs));
+      return tmp;
+    }
+
     switch (inputSelector) {
       case "a":
-        this.tptA = 0;
-        this.twlArrayA.forEach((element, index) => {
-          this.tptA = this.tptA + element.durationMs;
-        });
-        if (isNaN(this.tptA)) {
-          break;
-        }
-        minutes = Math.floor(this.tptA / 60);
-        seconds = Math.floor(this.tptA % 60);
-        this.totalPlaytimeA = minutes.toString() + ":" + seconds.toString();
+        this.tptA = calculateTotalDuration(this.twlArrayA);
+        this.totalPlaytimeA = this.timeString(this.tptA);
         console.log("Side A total: " + this.totalPlaytimeA);
         break;
       case "b":
-        this.tptB = 0;
-        this.twlArrayB.forEach((element, index) => {
-          this.tptB = this.tptB + element.durationMs;
-        });
-        if (isNaN(this.tptB)) {
-          break;
-        }
-        minutes = Math.floor(this.tptB / 60);
-        seconds = Math.floor(this.tptB % 60);
-        this.totalPlaytimeB = minutes.toString() + ":" + seconds.toString();
+        this.tptB = calculateTotalDuration(this.twlArrayB);
+        this.totalPlaytimeB = this.timeString(this.tptB);
         console.log("Side B total: " + this.totalPlaytimeB);
         break;
       case "c":
-        this.tptC = 0;
-        this.twlArrayC.forEach((element, index) => {
-          this.tptC = this.tptC + element.durationMs;
-        });
-        if (isNaN(this.tptC)) {
-          break;
-        }
-        minutes = Math.floor(this.tptC / 60);
-        seconds = Math.floor(this.tptC % 60);
-        this.totalPlaytimeC = minutes.toString() + ":" + seconds.toString();
+        this.tptC = calculateTotalDuration(this.twlArrayC);
+        this.totalPlaytimeC = this.timeString(this.tptC);
         console.log("Side C total: " + this.totalPlaytimeC);
         break;
       case "d":
-        this.tptD = 0;
-        this.twlArrayD.forEach((element, index) => {
-          this.tptD = this.tptD + element.durationMs;
-        });
-        if (isNaN(this.tptD)) {
-          break;
-        }
-        minutes = Math.floor(this.tptD / 60);
-        seconds = Math.floor(this.tptD % 60);
-        this.totalPlaytimeD = minutes.toString() + ":" + seconds.toString();
+        this.tptD = calculateTotalDuration(this.twlArrayD);
+        this.totalPlaytimeD = this.timeString(this.tptD);
         console.log("Side D total: " + this.totalPlaytimeD);
         break;
     }
@@ -316,12 +292,12 @@ export class Upload_musicComponent implements OnInit {
       D: this.twlArrayD,
     });
   }
-}
 
-export interface TwlinchMusicFile {
-  file: File;
-  duration: string;
-  durationMs: number;
+  timeString(milliseconds: number): string {
+    return (
+      padStart(Math.floor(milliseconds / 60).toString(), 2, " ") +
+      ":" +
+      padStart(Math.ceil(milliseconds % 60).toString(), 2, "0")
+    );
+  }
 }
-
-export interface TwlinchMusicFiles extends Array<TwlinchMusicFile> {}
