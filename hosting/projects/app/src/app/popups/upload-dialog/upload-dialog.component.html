@@ -1,0 +1,39 @@
+<div class="dialog">
+  <img *ngIf="uploadComplete === false" src="/assets/Upload_Cloud.svg" style="width: 80px;padding-bottom:20px;" >
+  <img *ngIf="uploadComplete === true" src="/assets/Upload_Complete_Icon.svg" style="width: 80px;padding-bottom:20px;" class="success" >
+  <span *ngIf="uploadComplete === false" class="upload-header">
+    Your music is uploading!
+  </span>
+  <span *ngIf="uploadComplete === true" class="upload-header">
+    Upload Completed!
+  </span>
+  <span *ngIf="uploadComplete === false" class="upload-subheader">
+    This can take a while. Please don't close this window while uploading.
+  </span>
+  <span *ngIf="uploadComplete === true" class="upload-subheader">
+    Your music files uploaded successfully! You can now close this window.
+  </span>
+
+  <!-- *ngIf="showProgress$ | async" -->
+
+  <div   style="width:100%; display: flex; flex-direction: column; justify-content: center; align-items: center">
+    <mat-progress-bar
+      mode="determinate"
+      [value]="uploadPercentDone$ | async"
+      [bufferValue]="uploadPercentBuffer$ | async"
+      style="height: 20px; width: 100%"
+    ></mat-progress-bar>
+    <span  class="buffer-string">{{uploadBuffer.toFixed(0)}}%</span>
+  </div>
+
+  <button *ngIf="uploadComplete === true" [mat-dialog-close]="true"
+          class="twl-app-button"
+          style="margin-top: 20px"
+
+  >
+    Close window
+  </button>
+
+
+
+</div>

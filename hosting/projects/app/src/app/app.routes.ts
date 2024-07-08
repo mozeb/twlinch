@@ -5,6 +5,7 @@ import { Manage_orderComponent } from "./manage_order/manage_order.component";
 import { AuthGuard, redirectUnauthorizedTo } from "@angular/fire/auth-guard";
 import { Order_detailsComponent } from "./manage_order/order_details/order_details.component";
 import { Upload_musicComponent } from "./manage_order/upload_music/upload_music.component";
+import { Upload_artworkComponent } from "./manage_order/upload_artwork/upload_artwork.component";
 
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(["login"]);
 
@@ -35,6 +36,12 @@ export const routes: Routes = [
       {
         path: "upload-music",
         component: Upload_musicComponent,
+        canActivate: [AuthGuard],
+        data: { authGuardPipe: redirectUnauthorizedToLogin },
+      },
+      {
+        path: "upload-artwork",
+        component: Upload_artworkComponent,
         canActivate: [AuthGuard],
         data: { authGuardPipe: redirectUnauthorizedToLogin },
       },

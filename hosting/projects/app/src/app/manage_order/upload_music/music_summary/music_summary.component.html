@@ -1,0 +1,86 @@
+<div class="main-content">
+  <div class="upload-cards">
+    <div class="top-line">
+      <div class="completed-tag">
+        <img src="/assets/Upload_Complete_Icon.svg" style="width: 20px;"/>
+        Completed</div>
+
+    <div class="date-tag">
+      15/5/2024
+    </div>
+    </div>
+    <div class="headers">
+      <div class="upload-header"> You have successfully submitted music!</div>
+      <div class="upload-subheader">
+        Here is the list of tracks you have uploaded.
+      </div>
+    </div>
+
+    <div *ngIf="doubleAlbum">
+      <span style="font-weight: 800; text-transform: uppercase; font-size: 14px; font-family: 'Ubuntu Mono'">Vinyl One</span>
+      <hr style="width: 100%; border-width: 0; background-color: black; height: 1px;"/>
+    </div>
+
+    <div class="single-vinyl">
+      <div class="summary-table">
+        <span class="summary-side"><mat-icon>album</mat-icon>Side A</span>
+        <div
+          class="tracklist-summary"
+          *ngFor="let track of sideA; let i = index"
+        >
+          <div class="track-number-summary">{{ i + 1 }}.</div>
+          <div class="track-box-summary" cdkDrag>
+            <div>{{ track }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-table">
+        <span class="summary-side"><mat-icon>album</mat-icon>Side B</span>
+        <div
+          class="tracklist-summary"
+          *ngFor="let track of sideB; let i = index"
+        >
+          <div class="track-number-summary">{{ i + 1 }}.</div>
+          <div class="track-box-summary" cdkDrag>
+            <div>{{ track }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="doubleAlbum">
+      <span style="font-weight: 800; text-transform: uppercase; font-size: 14px; font-family: 'Ubuntu Mono'">Vinyl Two</span>
+      <hr style="width: 100%; border-width: 0; background-color: black; height: 1px;"/>
+    </div>
+
+    <div *ngIf="doubleAlbum" class="single-vinyl">
+      <div class="summary-table" >
+        <span class="summary-side"><mat-icon>album</mat-icon>Side C</span>
+        <div
+          class="tracklist-summary"
+          *ngFor="let track of sideC; let i = index"
+        >
+          <div class="track-number-summary">{{ i + 1 }}.</div>
+          <div class="track-box-summary" >
+            <div>{{ track}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-table">
+        <span class="summary-side"><mat-icon>album</mat-icon>Side D</span>
+        <div
+          class="tracklist-summary"
+          *ngFor="let track of sideD; let i = index"
+        >
+          <div class="track-number-summary">{{ i + 1 }}.</div>
+          <div class="track-box-summary">
+            <div>{{ track }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

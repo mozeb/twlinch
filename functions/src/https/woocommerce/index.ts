@@ -28,6 +28,7 @@ woocommerceRouter.use((req: Request, res: Response, next: NextFunction) => {
 async function onOrderCreate(req: Request) {
   const wcData = req.body as WCOrderJSON;
   const shopOrder = shopOrderWCOrderConverter.toJSON(wcData);
+
   const user = await getAuth().createUser({
     email: shopOrder.wc_order_num + "." + shopOrder.address_billing.email,
     emailVerified: true,
@@ -35,6 +36,40 @@ async function onOrderCreate(req: Request) {
   });
 
   shopOrder.auth_uid = user.uid;
+
+  const customInfo = {
+    labelUploaded: true,
+    sleeveUploaded: true,
+    slipmatUploaded: true,
+    musicUploaded: false,
+    pictureDiscUploaded: true,
+  };
+
+  // Search which element were purchased and have to be uploaded
+  shopOrder.item_lines.forEach((element) => {
+    if (
+      element.wc_product_id == 659 ||
+      element.wc_product_id == 3974 ||
+      element.wc_product_id == 3975
+    ) {
+      customInfo.sleeveUploaded = false;
+    }
+    if (element.wc_product_id == 691) {
+      customInfo.slipmatUploaded = false;
+    }
+    if (
+      element.wc_product_id == 3972 ||
+      element.wc_product_id == 3973 ||
+      element.wc_product_id == 627
+    ) {
+      customInfo.labelUploaded = false;
+    }
+  });
+
+  await getFirestore()
+    .collection("shopOrders")
+    .doc(user.uid)
+    .set(customInfo, { merge: true });
 
   await getFirestore()
     .collection("shopOrders")

@@ -5,9 +5,14 @@ import { AuthService } from "../../services/auth.service";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { FirestoreApiService } from "../../services/firestore-api.service";
 import { ShopOrderJSON } from "../../interfaces/shopOrder";
+import { MatDialog, MatDialogModule } from "@angular/material/dialog";
+import { Music_summaryComponent } from "./music_summary/music_summary.component";
 
 import { ReactiveFormsModule } from "@angular/forms";
-import { STEPPER_GLOBAL_OPTIONS } from "@angular/cdk/stepper";
+import {
+  STEPPER_GLOBAL_OPTIONS,
+  StepperOrientation,
+} from "@angular/cdk/stepper";
 
 import {
   CdkDrag,
@@ -29,6 +34,10 @@ import { StorageApiService } from "../../services/storage-api.service";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { ProgressIndicatorService } from "../../services/progress-indicator.service";
 import { padStart } from "lodash";
+import { UploadDialogComponent } from "../../popups/upload-dialog/upload-dialog.component";
+import { PlaytimeWarningDialogComponent } from "../../popups/playtime-warning-dialog/playtime-warning-dialog.component";
+import { initializeApp } from "@angular/fire/app";
+import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
 
 export interface TwlinchMusicFile {
   file: File;
@@ -53,6 +62,8 @@ export interface TwlinchMusicFile {
     MatButton,
     MatProgressBar,
     MatStepperPrevious,
+    MatDialogModule,
+    Music_summaryComponent,
   ],
   providers: [
     {
@@ -64,6 +75,9 @@ export interface TwlinchMusicFile {
   styleUrls: ["./upload_music.component.scss"],
 })
 export class Upload_musicComponent implements OnInit {
+  protected firestore: Firestore = inject(Firestore);
+  musicUploaded = false;
+
   twlArrayA: Array<TwlinchMusicFile> = [];
   totalPlaytimeA: String = "00:00";
   tptA = 0;
@@ -92,6 +106,8 @@ export class Upload_musicComponent implements OnInit {
   uploadPercentDone$: Observable<number>;
   uploadPercentBuffer$: Observable<number>;
 
+  orientation: StepperOrientation = "horizontal";
+
   // Storage reference
   protected storage: Storage = inject(Storage);
 
@@ -99,6 +115,7 @@ export class Upload_musicComponent implements OnInit {
     protected _authService: AuthService,
     private _firestoreService: FirestoreApiService,
     private _storageService: StorageApiService,
+    private dialog: MatDialog,
     private _progress: ProgressIndicatorService,
   ) {
     this.showProgress$ = this._progress.isOn;
@@ -109,11 +126,25 @@ export class Upload_musicComponent implements OnInit {
   ngOnInit() {
     this.innerHeight = window.innerHeight + "px";
     void this.getOrderData();
+    if (window.innerWidth < 768) {
+      this.orientation = "vertical";
+    } else {
+      this.orientation = "horizontal";
+    }
   }
 
   // Get order data
   async getOrderData() {
     const user = await this._authService.currentUser;
+
+    const unsub = onSnapshot(
+      doc(this.firestore, `shopOrders/${user?.uid as string}`),
+      (doc) => {
+        console.log("Music uploaded: ", doc.get("musicUploaded"));
+        this.musicUploaded = doc.get("musicUploaded");
+      },
+    );
+
     this.order = await this._firestoreService.getShopOrder(user?.uid as string);
     if (this.order === undefined) {
       return;
@@ -151,6 +182,11 @@ export class Upload_musicComponent implements OnInit {
   @HostListener("window:resize", ["$event"])
   onResize($event: Event) {
     this.innerHeight = window.innerHeight + "px";
+    if (window.innerWidth < 768) {
+      this.orientation = "vertical";
+    } else {
+      this.orientation = "horizontal";
+    }
   }
 
   public addFiles(event: Event, inputSelector: String): void {
@@ -182,15 +218,18 @@ export class Upload_musicComponent implements OnInit {
             break;
         }
 
-        audio.addEventListener("loadeddata", function () {
-          const minutes = Math.floor(this.duration / 60);
-          obj.durationMs = this.duration;
+        audio.onloadedmetadata = (event) => {
+          const minutes = Math.floor(audio.duration / 60);
+          obj.durationMs = audio.duration;
           obj.duration =
             minutes.toString() +
             ":" +
-            (this.duration % 60).toFixed(0).toString();
-          console.log(this.duration);
-        });
+            (audio.duration % 60).toFixed(0).toString();
+          console.log(audio.duration);
+          this.recalculateTotalPlaytime(inputSelector);
+        };
+
+        audio.addEventListener("loadeddata", function () {});
         audio.addEventListener("loadeddata", () =>
           this.recalculateTotalPlaytime(inputSelector),
         );
@@ -285,6 +324,8 @@ export class Upload_musicComponent implements OnInit {
 
   async uploadTracks(input: HTMLInputElement) {
     if (!input.files || !this.order) return;
+    this.dialog.open(UploadDialogComponent, { disableClose: true });
+
     await this._storageService.uploadTrackFiles(this.order.wc_order_num, {
       A: this.twlArrayA,
       B: this.twlArrayB,
@@ -299,5 +340,26 @@ export class Upload_musicComponent implements OnInit {
       ":" +
       padStart(Math.ceil(milliseconds % 60).toString(), 2, "0")
     );
+  }
+
+  goBack(stepper: MatStepper) {
+    stepper.previous();
+  }
+
+  goForward(stepper: MatStepper, playtime: number) {
+    if (playtime <= this.maxDuration) {
+      stepper.next();
+    } else {
+      this.openPlaytimeWarningDialog(playtime);
+    }
+  }
+
+  openPlaytimeWarningDialog(platime: number) {
+    this.dialog.open(PlaytimeWarningDialogComponent, {
+      data: {
+        maxTime: this.timeString(this.maxDuration),
+        yourTime: this.timeString(platime),
+      },
+    });
   }
 }

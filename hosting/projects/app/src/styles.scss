@@ -269,4 +269,60 @@ body{
   margin: 0px !important;
 }
 
+.mat-vertical-content-container{
+  margin-left: 0px !important;
+}
+.twl-app-button{
+  background-color: black;
+  color:white;
+  border:none;
+  padding:12px 22px;
+  border-radius: 2px;
+  font-family: "Ubuntu Mono";
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: fit-content;
+}
+
+.twl-app-gray-button{
+  background-color: #dedede;
+  color:black;
+  border:none;
+  padding:12px 22px;
+  border-radius: 2px;
+  font-family: "Ubuntu Mono";
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: fit-content;
+}
+
+.twl-app-transparent-button{
+  background-color: transparent;
+  color:black;
+  border:none;
+  padding:12px 0px;
+  border-radius: 2px;
+  font-family: "Ubuntu Mono";
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: fit-content;
+}
+
+
+.twl-app-empty-button{
+  background-color: transparent;
+  border: 2px black solid;
+  color:black;
+  padding:10px 20px;
+  border-radius: 2px;
+  font-family: "Ubuntu Mono";
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: fit-content;
+}
+
 

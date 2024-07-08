@@ -2,11 +2,12 @@
   width: 100%;
   height: calc(100% - 78px);
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   flex-direction: column;
   background-color: #F0F0F0;
   gap:20px;
+  overflow: scroll;
 }
 .upload-cards{
   display: flex;
@@ -226,9 +227,25 @@
   font-weight: 800;
 }
 
+.single-vinyl{
+  display: flex;
+  flex-direction: row;
+  gap:30px
+}
+
+.bottom-line{
+  padding-top:20px;
+  display: flex;
+  justify-content: space-between;
+}
+
 @media only screen and (max-width: 650px) {
   .music-steps {
     width:100%;
+  }
+  .single-vinyl{
+    flex-direction: column;
+    gap:20px;
   }
 }
 
@@ -241,6 +258,9 @@
   0 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 
+.mat-vertical-content-container{
+  margin-left: 0px !important;
+}
 .cdk-drag-placeholder {
   opacity: 0;
 }

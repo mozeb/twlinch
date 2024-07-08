@@ -51,6 +51,15 @@ export class FirestoreBaseService {
     this._baseProgress.hide();
   }
 
+  public async mergeDoc<T>(path: string, data: T): Promise<void> {
+    this._baseProgress.show();
+
+    const ref = doc(this.firestore, path);
+    await setDoc(ref, data as any, { merge: true });
+
+    this._baseProgress.hide();
+  }
+
   /**
    * Update a document from path.
    * @param path

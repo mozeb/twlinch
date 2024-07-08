@@ -25,8 +25,18 @@
             class="dash-icon"
             [routerLink]="'/manage-order/order-details'"
           />
-          <img src="/assets/music_icon.svg" class="dash-icon" />
-          <img src="/assets/design_icon.svg" class="dash-icon" />
+          <div style="position:relative;">
+            <img src="/assets/music_icon.svg" class="dash-icon"  [routerLink]="'/manage-order/upload-music'"  />
+            <div *ngIf="musicUploaded === false" class="orange-indicator"></div>
+            <div *ngIf="musicUploaded"  class="green-indicator"></div>
+          </div>
+          <div style="position:relative;">
+            <img src="/assets/design_icon.svg" class="dash-icon" [routerLink]="'/manage-order/upload-artwork'"/>
+            <div class="orange-indicator"></div>
+            <div *ngIf="sleeveUploaded === false || labelUploaded === false || slipmatUploaded === false" class="orange-indicator"></div>
+            <div *ngIf="sleeveUploaded && labelUploaded && slipmatUploaded"  class="green-indicator"></div>
+          </div>
+
         </div>
         <div class="version">
           <img
@@ -38,11 +48,15 @@
       </div>
       <div class="main-content">
         <div class="top-menu">
-          <span
-            >Custom Vinyl Order<br /><span style="font-size: 20px"
-              >#{{ orderNumber }}</span
-            ></span
-          >
+          <span class="finish">Finish your record</span>
+          <div class="mobile-logo"><img src="/assets/Twlinch_Logo.svg" style="width: 80px;"/></div>
+          <div class="right-side">
+            <span>No. : </span><span style="font-size: 14px">#{{ orderNumber }}</span>
+            <button class="logout-button" (click)="this.logOut()">
+              <img src="/assets/Exit_Icon.svg" style="width: 18px;"/>
+            </button>
+          </div>
+
         </div>
         <router-outlet></router-outlet>
       </div>
@@ -57,7 +71,17 @@
       class="dash-icon"
       [routerLink]="'/manage-order/order-details'"
     />
-    <img src="/assets/music_icon.svg" class="dash-icon" />
-    <img src="/assets/design_icon.svg" class="dash-icon" />
+
+    <div style="position:relative;">
+      <img src="/assets/music_icon.svg" class="dash-icon"  [routerLink]="'/manage-order/upload-music'"  />
+      <div *ngIf="musicUploaded === false" class="orange-indicator"></div>
+      <div *ngIf="musicUploaded"  class="green-indicator"></div>
+    </div>
+    <div style="position:relative;">
+      <img src="/assets/design_icon.svg" class="dash-icon" [routerLink]="'/manage-order/upload-artwork'"/>
+      <div class="orange-indicator"></div>
+      <div *ngIf="sleeveUploaded === false || labelUploaded === false || slipmatUploaded === false" class="orange-indicator"></div>
+      <div *ngIf="sleeveUploaded && labelUploaded && slipmatUploaded"  class="green-indicator"></div>
+    </div>
   </div>
 </div>

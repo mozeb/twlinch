@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component, HostListener, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatDividerModule } from "@angular/material/divider";
 import { environment } from "../../../environments/environment";
@@ -6,7 +6,7 @@ import { AuthService } from "../../services/auth.service";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { FirestoreApiService } from "../../services/firestore-api.service";
 import { ShopOrder } from "../../interfaces/shopOrder";
-import { or } from "@angular/fire/firestore";
+import { doc, Firestore, onSnapshot, or } from "@angular/fire/firestore";
 import { RouterLink } from "@angular/router";
 
 @Component({
@@ -22,12 +22,20 @@ export class Order_detailsComponent implements OnInit {
     private _firestoreService: FirestoreApiService,
   ) {}
 
+  protected firestore: Firestore = inject(Firestore);
+  musicUploaded = false;
+  labelUploaded = false;
+  sleeveUploaded = false;
+  slipmatUploaded = false;
+  pictureDiscUploaded = false;
+
   public innerHeight: string | undefined;
   public vinylSize: string | undefined;
   public vinylColor: string | undefined;
   public sleeve: string | undefined;
   public label: string | undefined;
   public doubleAlbum: string | undefined;
+  public slipmat: string | undefined;
 
   ngOnInit() {
     this.innerHeight = window.innerHeight + "px";
@@ -42,6 +50,18 @@ export class Order_detailsComponent implements OnInit {
     if (order === undefined) {
       return;
     }
+
+    // Watch values
+    const unsub = onSnapshot(
+      doc(this.firestore, `shopOrders/${user?.uid as string}`),
+      (doc) => {
+        this.musicUploaded = doc.get("musicUploaded") ?? false;
+        this.sleeveUploaded = doc.get("sleeveUploaded") ?? false;
+        this.labelUploaded = doc.get("labelUploaded") ?? false;
+        this.slipmatUploaded = doc.get("slipmatUploaded") ?? false;
+        this.pictureDiscUploaded = doc.get("pictureDiscUploaded") ?? false;
+      },
+    );
 
     order.item_lines.forEach((element) => {
       // Check for size of the record
@@ -109,7 +129,7 @@ export class Order_detailsComponent implements OnInit {
 
       // Custom slipmat
       if (element.wc_product_id == 691) {
-        this.doubleAlbum = "Custom Slipmat";
+        this.slipmat = "Custom Slipmat";
       }
     });
   }

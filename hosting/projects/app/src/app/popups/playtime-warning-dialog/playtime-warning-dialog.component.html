@@ -1,0 +1,22 @@
+<div class="dialog">
+  <img src="/assets/Warning_Icon.svg" style="width: 80px;padding-bottom:20px;" >
+  <span class="upload-header">
+    Playtime exceeds the maximum available duration!
+  </span>
+  <span class="upload-subheader">
+    Please remove some of your tracks to stay in the duration limit.
+  </span>
+  <div class="limit">
+    <span>Side limit: <span style="background-color:#aaf4aa; padding: 5px 10px; border-radius: 100px;">{{data.maxTime}}</span> | Your current duration: <span style="background-color:#ff6c6c; padding: 5px 10px; border-radius: 100px;">{{data.yourTime}}</span></span>
+  </div>
+  <button [mat-dialog-close]="true"
+    class="twl-app-button"
+    style="margin-top: 20px"
+
+  >
+    Okay, Got It!
+  </button>
+
+
+
+</div>

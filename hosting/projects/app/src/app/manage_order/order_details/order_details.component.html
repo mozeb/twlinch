@@ -1,30 +1,44 @@
-<!--<div>
-      <h1>Home!</h1>
-      {{(_authService.user$ | async)?.uid}}
-      <button (click)="_authService.signOut()">Logout</button>
-</div>-->
-
+<!--{{(_authService.user$ | async)?.uid}}-->
 <div class="main-content">
-  <div class="order-details-card">
-    <span class="order-header">Your order:</span>
-    <span>{{ vinylSize }}</span>
-    <span>{{ vinylColor }}</span>
-    <span>{{ label }}</span>
-    <span>{{ sleeve }}</span>
-    <span>{{ doubleAlbum }}</span>
+  <div class="outter-div">
+    <div class="order-details-card">
+      <span class="order-header">Your order:</span>
+      <span>{{ vinylSize }}</span>
+      <span>{{ vinylColor }}</span>
+      <span>{{ label }}</span>
+      <span>{{ sleeve }}</span>
+      <span>{{ doubleAlbum }}</span>
+      <span>{{ slipmat }}</span>
+      <img src="/assets/black_cl_cs.png" class="vinyl-record-image" />
+    </div>
   </div>
+  <div class="outter-div">
   <div class="upload-cards">
-    <a class="upload-card" [routerLink]="'/manage-order/upload-music'">
+    <div class="upload-card" [routerLink]="'/manage-order/upload-music'">
+      <div class="completed-icon" >
+        <img *ngIf="musicUploaded" src="/assets/Upload_Complete_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(73%) sepia(64%) saturate(6218%) hue-rotate(115deg) brightness(103%) contrast(99%);" />
+        <img *ngIf="musicUploaded === false" src="/assets/Pending_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(74%) sepia(90%) saturate(2139%) hue-rotate(1deg) brightness(109%) contrast(105%);" />
+      </div>
       <div class="inner-upload-card">
         <img src="/assets/Upload_Music.svg" style="width: 45px" />
         <span class="upload-text">upload music</span>
+        <span *ngIf="musicUploaded === false" class="pending-text">PENDING</span>
+        <span *ngIf="musicUploaded" class="completed-text">COMPLETED</span>
       </div>
-    </a>
-    <div class="upload-card">
+    </div>
+    <div class="upload-card" [routerLink]="'/manage-order/upload-artwork'">
+      <div class="completed-icon">
+        <img *ngIf="sleeveUploaded && labelUploaded && slipmatUploaded" src="/assets/Upload_Complete_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(73%) sepia(64%) saturate(6218%) hue-rotate(115deg) brightness(103%) contrast(99%);" />
+        <img *ngIf="sleeveUploaded === false || labelUploaded === false || slipmatUploaded === false" src="/assets/Pending_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(74%) sepia(90%) saturate(2139%) hue-rotate(1deg) brightness(109%) contrast(105%);" />
+      </div>
+      <div class="indicator"></div>
       <div class="inner-upload-card">
         <img src="/assets/Upload_Artwork.svg" style="width: 45px" />
         <span class="upload-text">upload artwork</span>
+        <span *ngIf="sleeveUploaded === false || labelUploaded === false || slipmatUploaded === false" class="pending-text">PENDING</span>
+        <span *ngIf="sleeveUploaded && labelUploaded && slipmatUploaded"  class="completed-text">COMPLETED</span>
       </div>
     </div>
   </div>
+</div>
 </div>

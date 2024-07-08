@@ -10,6 +10,8 @@ import {
 import { ProgressIndicatorService } from "../progress-indicator.service";
 import { NotifyService } from "../notify.service";
 import { FirebaseError } from "@angular/fire/app";
+import { isFirebaseDataSnapshot } from "@angular/fire/compat/database/utils";
+import { ListResult } from "@angular/fire/compat/storage/interfaces";
 
 @Injectable({
   providedIn: "root",
@@ -29,20 +31,30 @@ export class StorageBaseService {
 
   public async deleteFolder(path: string): Promise<void> {
     const ref = refStorage(this.storage, path);
-
-    // TODO Write recursive function to crawl over folder, get all refs, and then delete all with Promise.all() ?
+    const filesAtRef = await listAll(ref);
     //
-    // const filesAtRef = await listAll(ref);
-    //
-    // for (const item of filesAtRef.items) {
-    //   item.
-    // }
-
-    try {
-      await deleteObject(ref);
-    } catch (e) {
-      this.handleError(e as Error, "deleteFolder");
+    for (const item of filesAtRef.items) {
+      try {
+        await deleteObject(item);
+      } catch (e) {
+        this.handleError(e as Error, "deleteFolder");
+      }
     }
+  }
+
+  public async getFileName(path: string): Promise<Array<string>> {
+    const ref = refStorage(this.storage, path);
+    const fileName: Array<string> = [];
+    const filesAtRef = await listAll(ref);
+    //
+    for (const item of filesAtRef.items) {
+      try {
+        await fileName.push(item.name.substring(7));
+      } catch (e) {
+        this.handleError(e as Error, "getFilesNames");
+      }
+    }
+    return fileName;
   }
 
   private handleError(error: any, method: string): void {

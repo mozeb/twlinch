@@ -1,0 +1,93 @@
+
+//.mat-mdc-dialog-surface ,mdc-dialog__surface{
+//  background-color: transparent !important;
+//  box-shadow: none !important;
+//}
+
+.success{
+  filter: brightness(0) saturate(100%) invert(61%) sepia(92%) saturate(3224%) hue-rotate(112deg) brightness(99%) contrast(99%);
+}
+
+
+.dialog{
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding:30px;
+  gap:10px;
+}
+
+.buffer-string{
+  font-family: "Ubuntu Mono";
+  font-size:14px;
+  padding-top: 5px;
+  font-weight: 800;
+}
+
+.cdk-overlay-dark-backdrop{
+  background-color: rgba(0, 0, 0, 0.72) !important;
+}
+
+.mdc-linear-progress__bar{
+  height:10px !important;
+  background-color: #01c962 !important;
+ //border-radius: 100px;
+}
+
+.mat-progress-bar-fill::after {
+  background-color: #1E457C;
+}
+
+.mdc-linear-progress__buffer-dots {
+  background-color: black !important;
+}
+
+.mdc-linear-progress__buffer-bar{
+  background-color: black !important;
+  //border-radius: 100px !important;
+}
+
+.mdc-linear-progress__buffer{
+  height:10px;
+}
+
+.mdc-linear-progress__bar-inner{
+  border-color: #01c962 !important;
+  //border-radius: 6px !important;
+}
+
+.mat-mdc-progress-bar{
+  background-color: white !important;
+  //padding:10px !important;
+  //border-radius: 10px;
+  height: 10px !important;
+}
+
+mat-progress-bar .mdc-linear-progress__bar-inner {
+  border-top-width: 0px;
+}
+
+
+.mdc-linear-progress__bar{
+  position: relative !important;
+}
+.mdc-linear-progress__buffer{
+ // width: calc(100% - 20px) !important;
+  height:10px !important;
+}
+
+.upload-header{
+  font-family: "Public Sans";
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.upload-subheader{
+  font-family: "Public Sans";
+  font-weight: 400;
+  font-size: 12px;
+  color:black;
+}

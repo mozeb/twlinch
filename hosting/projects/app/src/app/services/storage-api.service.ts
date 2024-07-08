@@ -18,6 +18,17 @@ export class StorageApiService extends StorageBaseService {
     super(_progressService, _notifyService);
   }
 
+  public async getFilesNames(files: {
+    [trackSide: string]: TwlinchMusicFile[];
+  }) {
+    const user = await this._authService.currentUser;
+    for (const trackSide of keys(files)) {
+      // Delete files form folders
+      const folderPath = `/orders/${user?.uid}/music/${trackSide}`;
+      await this.getFileName(folderPath);
+    }
+  }
+
   public async uploadTrackFiles(
     orderNum: string,
     files: {
@@ -28,15 +39,16 @@ export class StorageApiService extends StorageBaseService {
     this._progressService.updateDonePercent(0);
 
     const user = await this._authService.currentUser;
-    const folderPath = `/orders/${user?.uid}/music`;
-
-    await this.deleteFolder(folderPath);
-    console.log(`Folder ${folderPath} deleted`);
 
     const totalSize = this.calculateTotalUploadSize(files);
     let bytesUploaded = 0;
 
     for (const trackSide of keys(files)) {
+      // Delete files form folders
+      const folderPath = `/orders/${user?.uid}/music/${trackSide}`;
+      await this.deleteFolder(folderPath);
+      console.log(`Folder ${folderPath} deleted`);
+
       const trackFiles = get(files, trackSide);
       console.log(`Starting side ${trackSide}. Items: ${trackFiles.length}`);
       for (let i = 0; i < trackFiles.length; i++) {
@@ -44,7 +56,7 @@ export class StorageApiService extends StorageBaseService {
         this._progressService.updateBufferPercent(
           ((bytesUploaded + file.file.size) * 100) / totalSize,
         );
-        const path = `${folderPath}/${trackSide}/${trackSide}_${padStart((i + 1).toFixed(0), 2, "0")} - ${file.file.name}`;
+        const path = `${folderPath}/${trackSide}_${padStart((i + 1).toFixed(0), 2, "0")} - ${file.file.name}`;
         const result = await this.uploadFile(path, file.file);
 
         // TODO tale 'result.fullPath' kasneje uporabiš, da dobiš ven stvari z v bazo (pot do dokumenta, itd). Pomoje :)

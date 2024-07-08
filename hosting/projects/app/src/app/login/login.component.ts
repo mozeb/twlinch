@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
       if (user && user.emailVerified) {
         this._notify.update("Welcome!", "success");
 
-        await this._router.navigate(["/manage-order"]);
+        await this._router.navigate(["/manage-order/order-details"]);
         return;
       }
       console.log("Email not verified.");

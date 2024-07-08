@@ -1,106 +1,11 @@
-<!--<div>
-      <h1>Home!</h1>
-      {{(_authService.user$ | async)?.uid}}
-      <button (click)="_authService.signOut()">Logout</button>
-</div>-->
-
-<!--<div id="aa" *ngFor="let item of allTracks">
-  <div>Jaa<strong>{{ item.duration  }}</strong></div>
-</div>
-
-<div class="main-content">
-
-  <div id='uploadfile'>
-    <input  (change)="onChange($event)" type="file" ng2FileSelect [uploader]="uploader" multiple/>
-  </div>
-
-  <div class="upload-cards">
-    <div class="upload-header">Side A</div>
-    <p>Queue length: {{ uploader?.queue?.length }}</p>
-
-
-    <table class="table">
-      <thead>
-      <tr>
-        <th width="50%">Name</th>
-        <th>Size</th>
-        <th>Duration</th>
-        <th>Progress</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let item of uploader.queue">
-        <td><strong>{{ item?.file?.name }}</strong></td>
-        <td><strong>{{ item?.file?.type }}</strong></td>
-        <td id="time"><strong>{{ songDuraton }}</strong></td>
-        <td *ngIf="uploader.options.isHTML5" nowrap>{{ item?.file?.size/1024/1024 | number:'.2' }} MB</td>
-        <td *ngIf="uploader.options.isHTML5">
-          <div class="progress" style="margin-bottom: 0;">
-            <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': item.progress + '%' }"></div>
-          </div>
-        </td>
-        <td class="text-center">
-          <span *ngIf="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
-          <span *ngIf="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
-          <span *ngIf="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
-        </td>
-        <td nowrap>
-          <button type="button" class="btn btn-success btn-xs"
-                  (click)="item.upload()" [disabled]="item.isReady || item.isUploading || item.isSuccess">
-            <span class="glyphicon glyphicon-upload"></span> Upload
-          </button>
-          <button type="button" class="btn btn-warning btn-xs"
-                  (click)="item.cancel()" [disabled]="!item.isUploading">
-            <span class="glyphicon glyphicon-ban-circle"></span> Cancel
-          </button>
-          <button type="button" class="btn btn-danger btn-xs"
-                  (click)="item.remove()">
-            <span class="glyphicon glyphicon-trash"></span> Remove
-          </button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <div>
-
-      <div>
-        Queue progress:
-        <div class="progress" style="">
-          <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }"></div>
-        </div>
-      </div>
-      <button type="button" class="btn btn-success btn-s"
-              (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
-        <span class="glyphicon glyphicon-upload"></span> Upload all
-      </button>
-      <button type="button" class="btn btn-warning btn-s"
-              (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
-        <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
-      </button>
-      <button type="button" class="btn btn-danger btn-s"
-              (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
-        <span class="glyphicon glyphicon-trash"></span> Remove all
-      </button>
-    </div>
-
-  </div>
-
-  <div class="col-md-9" style="margin-bottom: 40px">
-
-
-  </div>
-
-</div>-->
-
-<div class="main-content">
+<div  class="main-content">
   <mat-stepper
-    [linear]="false"
+    [linear]="true"
     #stepper
     class="music-steps"
     labelPosition="end"
+    [orientation]="orientation"
+    *ngIf="musicUploaded === false"
   >
     <!-- Icon overrides. -->
     <ng-template matStepperIcon="album">
@@ -142,7 +47,7 @@
 
         <div class="last-line">
           <button
-            class="select-music-button"
+            class="twl-app-button"
             onclick="document.getElementById('music-a-input').click()"
           >
             Add music files
@@ -186,10 +91,8 @@
         </div>
       </div>
 
-      <div class="steps-buttons" style="justify-content: center">
-        <button matStepperNext mat-button class="step-button">
-          Next Step >
-        </button>
+      <div class="steps-buttons" style="justify-content:flex-end">
+        <button  (click)="goForward(stepper, tptA)"  class="twl-app-transparent-button">Next Step ></button>
       </div>
     </mat-step>
     <mat-step label="Side B" state="album">
@@ -221,7 +124,7 @@
 
         <div class="last-line">
           <button
-            class="select-music-button"
+            class="twl-app-button"
             onclick="document.getElementById('music-b-input').click()"
           >
             Add music files
@@ -263,6 +166,10 @@
           </div>
         </div>
       </div>
+      <div class="steps-buttons">
+        <button class="twl-app-transparent-button" matStepperPrevious>< Prev step</button>
+        <button  (click)="goForward(stepper, tptB)"  class="twl-app-transparent-button">Next Step ></button>
+      </div>
     </mat-step>
     <mat-step *ngIf="doubleAlbum" label="Side C" state="album">
       <div class="upload-cards">
@@ -293,7 +200,7 @@
 
         <div class="last-line">
           <button
-            class="select-music-button"
+            class="twl-app-button"
             onclick="document.getElementById('music-c-input').click()"
           >
             Add music files
@@ -335,6 +242,10 @@
           </div>
         </div>
       </div>
+      <div class="steps-buttons">
+        <button class="twl-app-transparent-button" matStepperPrevious>< Prev step</button>
+        <button  (click)="goForward(stepper, tptC)"  class="twl-app-transparent-button">Next Step ></button>
+      </div>
     </mat-step>
     <mat-step *ngIf="doubleAlbum" label="Side D" state="album">
       <div class="upload-cards">
@@ -365,8 +276,8 @@
 
         <div class="last-line">
           <button
-            class="select-music-button"
-            onclick="document.getElementById('id=music-d-input').click()"
+            class="twl-app-button"
+            onclick="document.getElementById('music-d-input').click()"
           >
             Add music files
           </button>
@@ -407,59 +318,101 @@
           </div>
         </div>
       </div>
+      <div class="steps-buttons">
+        <button class="twl-app-transparent-button" matStepperPrevious>< Prev step</button>
+        <button  (click)="goForward(stepper, tptD)"  class="twl-app-transparent-button">Next Step ></button>
+      </div>
     </mat-step>
     <mat-step label="Upload" state="upload">
       <div class="upload-cards">
         <div class="headers">
           <div class="upload-header">Tracks Summary</div>
           <div class="upload-subheader">
-            Final selection of tracks for your vinyl.
+            Final selection of tracks for your vinyl. Please check the tracks before upload.
           </div>
         </div>
 
-        <div class="summary-table">
-          <span class="summary-side"><mat-icon>album</mat-icon>Side A</span>
-          <div
-            class="tracklist-summary"
-            *ngFor="let track of twlArrayA; let i = index"
-          >
-            <div class="track-number-summary">{{ i + 1 }}.</div>
-            <div class="track-box-summary" cdkDrag>
-              <div>{{ track.file.name }}</div>
-            </div>
-          </div>
-          <span class="summary-playtime">Duration: {{ totalPlaytimeA }}</span>
+        <div *ngIf="doubleAlbum">
+          <span style="font-weight: 800; text-transform: uppercase; font-size: 14px;">Vinyl One</span>
+          <hr style="width: 100%; border-width: 0; background-color: black; height: 1px;"/>
         </div>
 
-        <div class="summary-table">
-          <span class="summary-side"><mat-icon>album</mat-icon>Side B</span>
-          <div
-            class="tracklist-summary"
-            *ngFor="let track of twlArrayB; let i = index"
-          >
-            <div class="track-number-summary">{{ i + 1 }}.</div>
-            <div class="track-box-summary" cdkDrag>
-              <div>{{ track.file.name }}</div>
+        <div class="single-vinyl">
+          <div class="summary-table">
+            <span class="summary-side"><mat-icon>album</mat-icon>Side A</span>
+            <div
+              class="tracklist-summary"
+              *ngFor="let track of twlArrayA; let i = index"
+            >
+              <div class="track-number-summary">{{ i + 1 }}.</div>
+              <div class="track-box-summary" cdkDrag>
+                <div>{{ track.file.name }}</div>
+              </div>
             </div>
+            <span class="summary-playtime">Duration: {{ totalPlaytimeA }}</span>
           </div>
-          <span class="summary-playtime">Duration: {{ totalPlaytimeB }}</span>
+
+          <div class="summary-table">
+            <span class="summary-side"><mat-icon>album</mat-icon>Side B</span>
+            <div
+              class="tracklist-summary"
+              *ngFor="let track of twlArrayB; let i = index"
+            >
+              <div class="track-number-summary">{{ i + 1 }}.</div>
+              <div class="track-box-summary" cdkDrag>
+                <div>{{ track.file.name }}</div>
+              </div>
+            </div>
+            <span class="summary-playtime">Duration: {{ totalPlaytimeB }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="doubleAlbum">
+          <span style="font-weight: 800; text-transform: uppercase; font-size: 14px;">Vinyl Two</span>
+          <hr style="width: 100%; border-width: 0; background-color: black; height: 1px;"/>
+        </div>
+
+        <div class="single-vinyl">
+          <div class="summary-table" *ngIf="doubleAlbum">
+            <span class="summary-side"><mat-icon>album</mat-icon>Side C</span>
+            <div
+              class="tracklist-summary"
+              *ngFor="let track of twlArrayC; let i = index"
+            >
+              <div class="track-number-summary">{{ i + 1 }}.</div>
+              <div class="track-box-summary" cdkDrag>
+                <div>{{ track.file.name }}</div>
+              </div>
+            </div>
+            <span class="summary-playtime">Duration: {{ totalPlaytimeC }}</span>
+          </div>
+
+          <div class="summary-table" *ngIf="doubleAlbum">
+            <span class="summary-side"><mat-icon>album</mat-icon>Side D</span>
+            <div
+              class="tracklist-summary"
+              *ngFor="let track of twlArrayD; let i = index"
+            >
+              <div class="track-number-summary">{{ i + 1 }}.</div>
+              <div class="track-box-summary" cdkDrag>
+                <div>{{ track.file.name }}</div>
+              </div>
+            </div>
+            <span class="summary-playtime">Duration: {{ totalPlaytimeD }}</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bottom-line">
+        <button class="twl-app-transparent-button" matStepperPrevious>< Prev step</button>
+        <div style="display:flex; gap:15px;">
+          <button  class="twl-app-empty-button" (click)="stepper.reset()">Reset And Clear</button>
+          <button  class="twl-app-button" (click)="uploadTracks(upload)">Start Upload</button>
         </div>
       </div>
-      <p>You are now done.</p>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button (click)="stepper.reset()">Reset</button>
-        <button mat-button (click)="uploadTracks(upload)">Upload</button>
 
-        <mat-progress-bar
-          *ngIf="showProgress$ | async"
-          mode="buffer"
-          [value]="uploadPercentDone$ | async"
-          [bufferValue]="uploadPercentBuffer$ | async"
-          style="height: 20px; width: 100%"
-        ></mat-progress-bar>
-
-      </div>
     </mat-step>
   </mat-stepper>
+  <music-summary *ngIf="musicUploaded === true"></music-summary>
 </div>
