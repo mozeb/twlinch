@@ -19,9 +19,7 @@ woocommerceRouter.use((req: Request, res: Response, next: NextFunction) => {
   if (topic === undefined && has(req.body, "webhook_id")) {
     return res.status(200).json({});
   }
-
   res.locals.topic = topic;
-
   return next();
 });
 
@@ -37,12 +35,12 @@ async function onOrderCreate(req: Request) {
 
   shopOrder.auth_uid = user.uid;
 
-  const customInfo = {
-    labelUploaded: true,
-    sleeveUploaded: true,
-    slipmatUploaded: true,
-    musicUploaded: false,
-    pictureDiscUploaded: true,
+  const _orderProcess: OrderProcess = {
+    musicProcess: "waitingForUpload",
+    sleeveProcess: "notOrdered",
+    labelProcess: "notOrdered",
+    slipmatProcess: "notOrdered",
+    pictureDiscProcess: "notOrdered",
   };
 
   // Search which element were purchased and have to be uploaded
@@ -52,29 +50,29 @@ async function onOrderCreate(req: Request) {
       element.wc_product_id == 3974 ||
       element.wc_product_id == 3975
     ) {
-      customInfo.sleeveUploaded = false;
+      _orderProcess.sleeveProcess = "waitingForUpload";
     }
     if (element.wc_product_id == 691) {
-      customInfo.slipmatUploaded = false;
+      _orderProcess.slipmatProcess = "waitingForUpload";
     }
     if (
       element.wc_product_id == 3972 ||
       element.wc_product_id == 3973 ||
       element.wc_product_id == 627
     ) {
-      customInfo.labelUploaded = false;
+      _orderProcess.labelProcess = "waitingForUpload";
     }
   });
 
   await getFirestore()
     .collection("shopOrders")
     .doc(user.uid)
-    .set(customInfo, { merge: true });
+    .set(shopOrder, { merge: true });
 
   await getFirestore()
     .collection("shopOrders")
     .doc(user.uid)
-    .set(shopOrder, { merge: true });
+    .set({ order_process: _orderProcess }, { merge: true });
 }
 
 woocommerceRouter.post("/webhook", async (req: Request, res: Response) => {
@@ -93,3 +91,13 @@ woocommerceRouter.post("/webhook", async (req: Request, res: Response) => {
 
   res.status(200).json({});
 });
+
+export interface OrderProcess {
+  musicProcess: orderState;
+  sleeveProcess: orderState;
+  labelProcess: orderState;
+  slipmatProcess: orderState;
+  pictureDiscProcess: orderState;
+}
+
+export type orderState = "notOrdered" | "waitingForUpload" | "uploadFinished";

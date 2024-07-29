@@ -5,9 +5,9 @@ import { AuthService } from "../services/auth.service";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { Order_detailsComponent } from "./order_details/order_details.component";
 import { FirestoreApiService } from "../services/firestore-api.service";
-import { ShopOrder } from "../interfaces/shopOrder";
-import { RouterLink, RouterOutlet, Router } from "@angular/router";
+import { Router, RouterLink, RouterOutlet } from "@angular/router";
 import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
+import { OrderProcess } from "../services/interfaces";
 
 @Component({
   selector: "manage-order",
@@ -30,15 +30,19 @@ export class Manage_orderComponent implements OnInit {
     private _router: Router,
   ) {}
 
+  justVinyl = false;
+  _orderProcess: OrderProcess = {
+    musicProcess: "notOrdered",
+    labelProcess: "notOrdered",
+    sleeveProcess: "notOrdered",
+    slipmatProcess: "notOrdered",
+    pictureDiscProcess: "notOrdered",
+  };
+
   public innerHeight: string | undefined;
   public orderNumber: string | undefined;
 
   protected firestore: Firestore = inject(Firestore);
-  musicUploaded = false;
-  labelUploaded = false;
-  sleeveUploaded = false;
-  slipmatUploaded = false;
-  pictureDiscUploaded = false;
 
   ngOnInit() {
     this.innerHeight = window.innerHeight + "px";
@@ -48,20 +52,23 @@ export class Manage_orderComponent implements OnInit {
   async getOrderData() {
     const user = await this._authService.currentUser;
 
+    // Watch values
     const unsub = onSnapshot(
       doc(this.firestore, `shopOrders/${user?.uid as string}`),
       (doc) => {
-        this.musicUploaded = doc.get("musicUploaded") ?? false;
-        this.sleeveUploaded = doc.get("sleeveUploaded") ?? false;
-        this.labelUploaded = doc.get("labelUploaded") ?? false;
-        this.slipmatUploaded = doc.get("slipmatUploaded") ?? false;
-        this.pictureDiscUploaded = doc.get("pictureDiscUploaded") ?? false;
+        this._orderProcess = doc.get("order_process") as OrderProcess;
+        // Check if there is nothing for design
+        if (
+          this._orderProcess.sleeveProcess === "notOrdered" &&
+          this._orderProcess.labelProcess === "notOrdered" &&
+          this._orderProcess.slipmatProcess == "notOrdered"
+        ) {
+          this.justVinyl = true;
+        }
       },
     );
 
-    const order = await this._firestoreService.getShopOrder(
-      user?.uid as string,
-    );
+    const order = await this._firestoreService.getShopOrder();
     if (order === undefined) {
       return;
     }

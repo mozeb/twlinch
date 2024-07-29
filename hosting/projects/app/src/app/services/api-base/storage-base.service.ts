@@ -6,6 +6,7 @@ import {
   Storage,
   uploadBytes,
   UploadResult,
+  getDownloadURL,
 } from "@angular/fire/storage";
 import { ProgressIndicatorService } from "../progress-indicator.service";
 import { NotifyService } from "../notify.service";
@@ -27,6 +28,11 @@ export class StorageBaseService {
   public uploadFile(path: string, file: File): Promise<UploadResult> {
     const ref = refStorage(this.storage, path);
     return uploadBytes(ref, file);
+  }
+
+  public getStorageDownloadLink(path: string) {
+    const ref = refStorage(this.storage, path);
+    return getDownloadURL(ref);
   }
 
   public async deleteFolder(path: string): Promise<void> {

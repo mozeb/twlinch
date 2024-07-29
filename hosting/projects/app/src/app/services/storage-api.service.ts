@@ -29,6 +29,26 @@ export class StorageApiService extends StorageBaseService {
     }
   }
 
+  // Uploading design files - label, sleeve, slipmat..
+  public async uploadDesignFile(
+    path: string,
+    folderPath: string,
+    designFile: File,
+  ) {
+    // Show progress
+    this._progressService.show();
+    this._progressService.updateDonePercent(0);
+
+    // Delete folder and contents
+    await this.deleteFolder(folderPath);
+
+    const totalSize = designFile.size;
+    let bytesUploaded = 0;
+    const result = await this.uploadFile(path, designFile);
+    bytesUploaded += designFile.size;
+    this._progressService.updateDonePercent((bytesUploaded * 100) / totalSize);
+  }
+
   public async uploadTrackFiles(
     orderNum: string,
     files: {

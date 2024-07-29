@@ -1,21 +1,24 @@
 <div  class="main-content">
-  <!-- <section>
-   <ko-stage [config]="configStage">
-      <ko-layer>
-        <ko-rect
-          [config]="configRect"
-          (click)="handleClick($event)"
-        ></ko-rect>
-      </ko-layer>
-      <ko-layer>
-        <ko-path [config]="configPath" (click)="handleClick($event)">
-        </ko-path>-->
-      <!--  <ko-image [config]="configBG"></ko-image>
-
-      </ko-layer>
-    </ko-stage>
-  </section> -->
-
-  <canvas id="myCanvas" width="500" height="500"></canvas>
+  <div class="artwork-upload-selection">
+    <div *ngIf="_orderProcess.sleeveProcess !== 'notOrdered'" class="upload-card">
+      <img src="/assets/Vinyl_Sleeve_Twlinch.png" class="artwork-image" />
+      <div class="upload-header">upload sleeve design</div>
+      <div *ngIf="_orderProcess.sleeveProcess === 'uploadFinished'" class="completed-tag"><img src="/assets/Upload_Complete_Icon.svg" style="width: 20px;"/>Completed</div>
+      <button *ngIf="_orderProcess.sleeveProcess === 'waitingForUpload'" class="upload-button twl-app-button" (click)="goToUploader('sleeve')">START NOW</button>
+    </div>
+    <div *ngIf="_orderProcess.labelProcess !== 'notOrdered'" class="upload-card">
+      <img src="/assets/Label_Design_Twlinch.png" class="artwork-image" />
+      <div class="upload-header">upload label design</div>
+      <div *ngIf="_orderProcess.labelProcess === 'uploadFinished'" class="completed-tag"><img src="/assets/Upload_Complete_Icon.svg" style="width: 20px;"/>Completed</div>
+      <button *ngIf="_orderProcess.labelProcess === 'waitingForUpload'" class="upload-button twl-app-button" (click)="goToUploader('label')">START NOW</button>
+    </div>
+    <div *ngIf="_orderProcess.slipmatProcess !== 'notOrdered'" class="upload-card">
+      <img src="/assets/Twlinch_Custom_Slipmat.png" class="artwork-image" />
+      <div class="upload-header">upload slipmat design</div>
+      <div *ngIf="_orderProcess.slipmatProcess === 'uploadFinished'" class="completed-tag"><img src="/assets/Upload_Complete_Icon.svg" style="width: 20px;"/>Completed</div>
+      <button *ngIf="_orderProcess.slipmatProcess === 'waitingForUpload'" class="upload-button twl-app-button" (click)="goToUploader('slipmat')">START NOW</button>
+    </div>
+  </div>
 </div>
+
 

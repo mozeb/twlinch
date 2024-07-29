@@ -5,7 +5,7 @@
     class="music-steps"
     labelPosition="end"
     [orientation]="orientation"
-    *ngIf="musicUploaded === false"
+    *ngIf="_orderProcess.musicProcess === 'waitingForUpload' "
   >
     <!-- Icon overrides. -->
     <ng-template matStepperIcon="album">
@@ -58,6 +58,7 @@
             style="display: none"
             (change)="addFiles($event, 'a')"
             multiple="multiple"
+            accept=".MP3, .OGG, .M4A, .WMA, .WAV, .AAC, .FLAC, .AIFF, .AIF"
             #upload
           />
 
@@ -135,6 +136,7 @@
             style="display: none"
             (change)="addFiles($event, 'b')"
             multiple="multiple"
+            accept=".MP3, .OGG, .M4A, .WMA, .WAV, .AAC, .FLAC, .AIFF, .AIF"
           />
 
           <div class="playtime" *ngIf="tptB > maxDuration">
@@ -211,6 +213,7 @@
             style="display: none"
             (change)="addFiles($event, 'c')"
             multiple="multiple"
+            accept=".MP3, .OGG, .M4A, .WMA, .WAV, .AAC, .FLAC, .AIFF, .AIF"
           />
 
           <div class="playtime" *ngIf="tptC > maxDuration">
@@ -287,6 +290,7 @@
             style="display: none"
             (change)="addFiles($event, 'd')"
             multiple="multiple"
+            accept=".MP3, .OGG, .M4A, .WMA, .WAV, .AAC, .FLAC, .AIFF, .AIF"
           />
 
           <div class="playtime" *ngIf="tptD > maxDuration">
@@ -345,7 +349,7 @@
               *ngFor="let track of twlArrayA; let i = index"
             >
               <div class="track-number-summary">{{ i + 1 }}.</div>
-              <div class="track-box-summary" cdkDrag>
+              <div class="track-box-summary" >
                 <div>{{ track.file.name }}</div>
               </div>
             </div>
@@ -359,7 +363,7 @@
               *ngFor="let track of twlArrayB; let i = index"
             >
               <div class="track-number-summary">{{ i + 1 }}.</div>
-              <div class="track-box-summary" cdkDrag>
+              <div class="track-box-summary" >
                 <div>{{ track.file.name }}</div>
               </div>
             </div>
@@ -380,7 +384,7 @@
               *ngFor="let track of twlArrayC; let i = index"
             >
               <div class="track-number-summary">{{ i + 1 }}.</div>
-              <div class="track-box-summary" cdkDrag>
+              <div class="track-box-summary" >
                 <div>{{ track.file.name }}</div>
               </div>
             </div>
@@ -394,7 +398,7 @@
               *ngFor="let track of twlArrayD; let i = index"
             >
               <div class="track-number-summary">{{ i + 1 }}.</div>
-              <div class="track-box-summary" cdkDrag>
+              <div class="track-box-summary">
                 <div>{{ track.file.name }}</div>
               </div>
             </div>
@@ -414,5 +418,5 @@
 
     </mat-step>
   </mat-stepper>
-  <music-summary *ngIf="musicUploaded === true"></music-summary>
+  <music-summary *ngIf="_orderProcess.musicProcess === 'uploadFinished'"></music-summary>
 </div>

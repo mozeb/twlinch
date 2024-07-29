@@ -1,0 +1,151 @@
+.main-content{
+  width: 100%;
+  height: calc(100% - 78px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+  background-color: #F0F0F0;
+  gap:20px;
+  overflow: scroll;
+}
+
+.artwork-upload-selection{
+  display: flex;
+  width:500px;
+  gap:20px;
+}
+
+.upload-card{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 10px;
+  padding:20px;
+  transition: all 0.2s ease-in-out;
+  gap:20px;
+  flex:1;
+  align-items: flex-start;
+}
+
+.headers{
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+}
+
+.upload-header{
+  font-family: "Public Sans";
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.upload-subheader{
+  font-family: "Public Sans";
+  font-weight: 400;
+  font-size: 12px;
+  color:black;
+}
+
+.upload-box {
+  display: flex;
+  flex-display: row;
+  padding: 10px 10px;
+  font-family: "Public Sans";
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  background: white;
+  font-size: 12px;
+  flex: 1;
+}
+
+.file-list {
+  width: 100%;
+  max-width: 100%;
+  border: solid 1px #ccc;
+  min-height: 34px;
+  display: block;
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.files{
+  display: flex;
+  flex-display: row;
+}
+
+.templates{
+ display: flex;
+  gap:15px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.icons{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:10px;
+}
+
+.template-link{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:10px;
+  border-radius: 5px;
+  padding:3px;
+  padding-right:7px;
+  font-family: Ubuntu Mono;
+  font-size: 12px;
+}
+
+.action-buttons{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.file-box {
+  display: flex;
+  flex-display: row;
+  padding: 10px 10px;
+  font-family: "Public Sans";
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  background: white;
+  font-size: 12px;
+  flex: 1;
+}
+
+.remove-file{
+  width:12px;
+  padding:10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-left: solid 1px #cacaca;
+}
+@media only screen and (max-width: 650px) {
+  .artwork-upload-selection{
+    width: calc(100% - 40px);
+    padding:20px;
+    flex-direction:  column;
+  }
+  .upload-card{
+    flex:1;
+    width: auto;
+  }
+
+}

@@ -1,0 +1,56 @@
+<div  class="main-content">
+  <div class="artwork-upload-selection">
+    <div class="upload-card">
+      <div class="templates">
+        <div class="headers">
+          <span class="upload-header">{{ downloadText }}</span>
+          <span class="upload-subheader">Select your preferred file format download template and upload finished design.</span>
+        </div>
+        <div class="icons">
+          <a href="{{PDFUrl}}" target="_blank" class="template-link" style="background-color: #ffd4d5; color:#900f13;">
+            <img src="/assets/pdf_icon.png" style="height: 25px"> Download PDF
+          </a>
+          <a href="{{AIUrl}}" target="_blank" class="template-link" style="background-color: #fee6c1; color:#390000;">
+            <img src="/assets/illustrator_icon.png" style="width: 25px"> Download AI
+          </a>
+          <a href="{{PSDUrl}}" target="_blank" class="template-link" style="background-color: #c7ecff; color:#001834;">
+            <img src="/assets/photoshop_icon.png" style="width: 25px"> Download PSD
+          </a>
+        </div>
+
+        <hr style="height:1px;border-width:0;color:black;background-color:black; width: 100%; margin: 0">
+
+      </div>
+      <span class="upload-header">{{ uploadText }}</span>
+      <div class="file-list">
+        <div class="files">
+          <div class="file-box">
+            {{fileName}}
+          </div>
+         <!-- <div class="remove-file">
+            <img
+              src="/assets/Remove_Icon.svg"
+              class="remove-icon"
+            />
+          </div>-->
+        </div>
+      </div>
+      <input
+        type="file"
+        id="file-input"
+        style="display: none"
+        accept=".ai,.pdf,.psd"
+        #upload
+        (change)="onFileSelected($event)"
+      />
+      <div class="action-buttons">
+        <button class="upload-button twl-app-button" onclick="document.getElementById('file-input').click()">SELECT FILE</button>
+        <button class="upload-button twl-app-button" (click)="this.uploadDesign(upload)">START UPLOAD</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+

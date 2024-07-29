@@ -36,8 +36,8 @@ import { ProgressIndicatorService } from "../../services/progress-indicator.serv
 import { padStart } from "lodash";
 import { UploadDialogComponent } from "../../popups/upload-dialog/upload-dialog.component";
 import { PlaytimeWarningDialogComponent } from "../../popups/playtime-warning-dialog/playtime-warning-dialog.component";
-import { initializeApp } from "@angular/fire/app";
 import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
+import { OrderProcess } from "../../services/interfaces";
 
 export interface TwlinchMusicFile {
   file: File;
@@ -76,7 +76,14 @@ export interface TwlinchMusicFile {
 })
 export class Upload_musicComponent implements OnInit {
   protected firestore: Firestore = inject(Firestore);
-  musicUploaded = false;
+
+  _orderProcess: OrderProcess = {
+    musicProcess: "notOrdered",
+    labelProcess: "notOrdered",
+    sleeveProcess: "notOrdered",
+    slipmatProcess: "notOrdered",
+    pictureDiscProcess: "notOrdered",
+  };
 
   twlArrayA: Array<TwlinchMusicFile> = [];
   totalPlaytimeA: String = "00:00";
@@ -137,15 +144,15 @@ export class Upload_musicComponent implements OnInit {
   async getOrderData() {
     const user = await this._authService.currentUser;
 
+    // Watch values
     const unsub = onSnapshot(
       doc(this.firestore, `shopOrders/${user?.uid as string}`),
       (doc) => {
-        console.log("Music uploaded: ", doc.get("musicUploaded"));
-        this.musicUploaded = doc.get("musicUploaded");
+        this._orderProcess = doc.get("order_process") as OrderProcess;
       },
     );
 
-    this.order = await this._firestoreService.getShopOrder(user?.uid as string);
+    this.order = await this._firestoreService.getShopOrder();
     if (this.order === undefined) {
       return;
     }
@@ -324,7 +331,10 @@ export class Upload_musicComponent implements OnInit {
 
   async uploadTracks(input: HTMLInputElement) {
     if (!input.files || !this.order) return;
-    this.dialog.open(UploadDialogComponent, { disableClose: true });
+    this.dialog.open(UploadDialogComponent, {
+      data: { template: "music" },
+      disableClose: true,
+    });
 
     await this._storageService.uploadTrackFiles(this.order.wc_order_num, {
       A: this.twlArrayA,

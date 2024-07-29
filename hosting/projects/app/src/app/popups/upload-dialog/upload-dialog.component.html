@@ -2,7 +2,7 @@
   <img *ngIf="uploadComplete === false" src="/assets/Upload_Cloud.svg" style="width: 80px;padding-bottom:20px;" >
   <img *ngIf="uploadComplete === true" src="/assets/Upload_Complete_Icon.svg" style="width: 80px;padding-bottom:20px;" class="success" >
   <span *ngIf="uploadComplete === false" class="upload-header">
-    Your music is uploading!
+    {{ uploadingText }}
   </span>
   <span *ngIf="uploadComplete === true" class="upload-header">
     Upload Completed!
@@ -26,7 +26,7 @@
     <span  class="buffer-string">{{uploadBuffer.toFixed(0)}}%</span>
   </div>
 
-  <button *ngIf="uploadComplete === true" [mat-dialog-close]="true"
+  <button *ngIf="uploadComplete === true" (click)="closeDialog()"
           class="twl-app-button"
           style="margin-top: 20px"
 

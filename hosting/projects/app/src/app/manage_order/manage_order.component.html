@@ -27,14 +27,14 @@
           />
           <div style="position:relative;">
             <img src="/assets/music_icon.svg" class="dash-icon"  [routerLink]="'/manage-order/upload-music'"  />
-            <div *ngIf="musicUploaded === false" class="orange-indicator"></div>
-            <div *ngIf="musicUploaded"  class="green-indicator"></div>
+            <div *ngIf="_orderProcess.musicProcess === 'waitingForUpload'" class="orange-indicator"></div>
+            <div *ngIf="_orderProcess.musicProcess === 'uploadFinished'"  class="green-indicator"></div>
           </div>
-          <div style="position:relative;">
+          <div *ngIf="!justVinyl" style="position:relative;">
             <img src="/assets/design_icon.svg" class="dash-icon" [routerLink]="'/manage-order/upload-artwork'"/>
             <div class="orange-indicator"></div>
-            <div *ngIf="sleeveUploaded === false || labelUploaded === false || slipmatUploaded === false" class="orange-indicator"></div>
-            <div *ngIf="sleeveUploaded && labelUploaded && slipmatUploaded"  class="green-indicator"></div>
+            <div *ngIf="_orderProcess.sleeveProcess !== 'uploadFinished' || _orderProcess.labelProcess !== 'uploadFinished' || _orderProcess.slipmatProcess !== 'uploadFinished'" class="orange-indicator"></div>
+            <div *ngIf="_orderProcess.sleeveProcess === 'uploadFinished' && _orderProcess.labelProcess === 'uploadFinished' && _orderProcess.slipmatProcess === 'uploadFinished'"  class="green-indicator"></div>
           </div>
 
         </div>
@@ -74,14 +74,16 @@
 
     <div style="position:relative;">
       <img src="/assets/music_icon.svg" class="dash-icon"  [routerLink]="'/manage-order/upload-music'"  />
-      <div *ngIf="musicUploaded === false" class="orange-indicator"></div>
-      <div *ngIf="musicUploaded"  class="green-indicator"></div>
+      <div *ngIf="_orderProcess.musicProcess === 'waitingForUpload'" class="orange-indicator"></div>
+      <div *ngIf="_orderProcess.musicProcess === 'uploadFinished'"  class="green-indicator"></div>
     </div>
-    <div style="position:relative;">
+    <div *ngIf="!justVinyl" style="position:relative;">
       <img src="/assets/design_icon.svg" class="dash-icon" [routerLink]="'/manage-order/upload-artwork'"/>
       <div class="orange-indicator"></div>
-      <div *ngIf="sleeveUploaded === false || labelUploaded === false || slipmatUploaded === false" class="orange-indicator"></div>
-      <div *ngIf="sleeveUploaded && labelUploaded && slipmatUploaded"  class="green-indicator"></div>
+      <div *ngIf="_orderProcess.sleeveProcess === 'waitingForUpload' || _orderProcess.labelProcess === 'waitingForUpload' || _orderProcess.slipmatProcess === 'waitingForUpload'" class="orange-indicator"></div>
+      <div *ngIf="(_orderProcess.sleeveProcess === 'uploadFinished' || _orderProcess.sleeveProcess === 'notOrdered')
+      && (_orderProcess.labelProcess === 'uploadFinished' || _orderProcess.labelProcess === 'notOrdered' )
+      && (_orderProcess.slipmatProcess === 'uploadFinished' || _orderProcess.slipmatProcess === 'notOrdered' )" class="green-indicator"></div>
     </div>
   </div>
 </div>

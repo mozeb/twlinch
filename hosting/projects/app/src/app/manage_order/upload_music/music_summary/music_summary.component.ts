@@ -8,9 +8,7 @@ import { RouterLink } from "@angular/router";
 import { CdkDrag } from "@angular/cdk/drag-drop";
 import { MatIcon } from "@angular/material/icon";
 import { MatStepperPrevious } from "@angular/material/stepper";
-import { TwlinchMusicFile } from "../upload_music.component";
 import { StorageBaseService } from "../../../services/api-base/storage-base.service";
-import { StorageApiService } from "../../../services/storage-api.service";
 import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
 import { ShopOrderJSON } from "../../../interfaces/shopOrder";
 
@@ -71,7 +69,7 @@ export class Music_summaryComponent implements OnInit {
   async getOrderData() {
     const user = await this._authService.currentUser;
 
-    this.order = await this._firestoreService.getShopOrder(user?.uid as string);
+    this.order = await this._firestoreService.getShopOrder();
     if (this.order === undefined) {
       return;
     }

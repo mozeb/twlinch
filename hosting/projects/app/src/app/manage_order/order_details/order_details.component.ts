@@ -1,13 +1,12 @@
 import { Component, HostListener, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatDividerModule } from "@angular/material/divider";
-import { environment } from "../../../environments/environment";
 import { AuthService } from "../../services/auth.service";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { FirestoreApiService } from "../../services/firestore-api.service";
-import { ShopOrder } from "../../interfaces/shopOrder";
-import { doc, Firestore, onSnapshot, or } from "@angular/fire/firestore";
+import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
 import { RouterLink } from "@angular/router";
+import { orderState, OrderProcess } from "../../services/interfaces";
 
 @Component({
   selector: "order-details",
@@ -23,11 +22,16 @@ export class Order_detailsComponent implements OnInit {
   ) {}
 
   protected firestore: Firestore = inject(Firestore);
-  musicUploaded = false;
-  labelUploaded = false;
-  sleeveUploaded = false;
-  slipmatUploaded = false;
-  pictureDiscUploaded = false;
+
+  _orderProcess: OrderProcess = {
+    musicProcess: "notOrdered",
+    labelProcess: "notOrdered",
+    sleeveProcess: "notOrdered",
+    slipmatProcess: "notOrdered",
+    pictureDiscProcess: "notOrdered",
+  };
+
+  justVinyl = false;
 
   public innerHeight: string | undefined;
   public vinylSize: string | undefined;
@@ -44,9 +48,7 @@ export class Order_detailsComponent implements OnInit {
 
   async getOrderData() {
     const user = await this._authService.currentUser;
-    const order = await this._firestoreService.getShopOrder(
-      user?.uid as string,
-    );
+    const order = await this._firestoreService.getShopOrder();
     if (order === undefined) {
       return;
     }
@@ -55,11 +57,15 @@ export class Order_detailsComponent implements OnInit {
     const unsub = onSnapshot(
       doc(this.firestore, `shopOrders/${user?.uid as string}`),
       (doc) => {
-        this.musicUploaded = doc.get("musicUploaded") ?? false;
-        this.sleeveUploaded = doc.get("sleeveUploaded") ?? false;
-        this.labelUploaded = doc.get("labelUploaded") ?? false;
-        this.slipmatUploaded = doc.get("slipmatUploaded") ?? false;
-        this.pictureDiscUploaded = doc.get("pictureDiscUploaded") ?? false;
+        this._orderProcess = doc.get("order_process") as OrderProcess;
+        // Check if there is nothing for design
+        if (
+          this._orderProcess.sleeveProcess === "notOrdered" &&
+          this._orderProcess.labelProcess === "notOrdered" &&
+          this._orderProcess.slipmatProcess == "notOrdered"
+        ) {
+          this.justVinyl = true;
+        }
       },
     );
 

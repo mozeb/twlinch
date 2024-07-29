@@ -1,12 +1,12 @@
-<div class="main-content">
-  <div class="upload-cards">
+<div class="outter-div">
+  <div class="summary-card">
     <div class="top-line">
       <div class="completed-tag">
         <img src="/assets/Upload_Complete_Icon.svg" style="width: 20px;"/>
         Completed</div>
 
     <div class="date-tag">
-      15/5/2024
+      <!--15/5/2024-->
     </div>
     </div>
     <div class="headers">
@@ -29,7 +29,7 @@
           *ngFor="let track of sideA; let i = index"
         >
           <div class="track-number-summary">{{ i + 1 }}.</div>
-          <div class="track-box-summary" cdkDrag>
+          <div class="track-box-summary" >
             <div>{{ track }}</div>
           </div>
         </div>
@@ -42,7 +42,7 @@
           *ngFor="let track of sideB; let i = index"
         >
           <div class="track-number-summary">{{ i + 1 }}.</div>
-          <div class="track-box-summary" cdkDrag>
+          <div class="track-box-summary" >
             <div>{{ track }}</div>
           </div>
         </div>
@@ -83,4 +83,5 @@
     </div>
 
   </div>
-</div>
+  </div>
+

@@ -16,27 +16,31 @@
   <div class="upload-cards">
     <div class="upload-card" [routerLink]="'/manage-order/upload-music'">
       <div class="completed-icon" >
-        <img *ngIf="musicUploaded" src="/assets/Upload_Complete_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(73%) sepia(64%) saturate(6218%) hue-rotate(115deg) brightness(103%) contrast(99%);" />
-        <img *ngIf="musicUploaded === false" src="/assets/Pending_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(74%) sepia(90%) saturate(2139%) hue-rotate(1deg) brightness(109%) contrast(105%);" />
+        <img *ngIf="_orderProcess.musicProcess === 'uploadFinished'" src="/assets/Upload_Complete_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(73%) sepia(64%) saturate(6218%) hue-rotate(115deg) brightness(103%) contrast(99%);" />
+        <img *ngIf="_orderProcess.musicProcess === 'waitingForUpload'" src="/assets/Pending_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(74%) sepia(90%) saturate(2139%) hue-rotate(1deg) brightness(109%) contrast(105%);" />
       </div>
       <div class="inner-upload-card">
         <img src="/assets/Upload_Music.svg" style="width: 45px" />
         <span class="upload-text">upload music</span>
-        <span *ngIf="musicUploaded === false" class="pending-text">PENDING</span>
-        <span *ngIf="musicUploaded" class="completed-text">COMPLETED</span>
+        <span *ngIf="_orderProcess.musicProcess === 'waitingForUpload'" class="pending-text">START NOW</span>
+        <span *ngIf="_orderProcess.musicProcess === 'uploadFinished'" class="completed-text">COMPLETED</span>
       </div>
     </div>
-    <div class="upload-card" [routerLink]="'/manage-order/upload-artwork'">
+    <div *ngIf="!justVinyl"class="upload-card" [routerLink]="'/manage-order/upload-artwork'">
       <div class="completed-icon">
-        <img *ngIf="sleeveUploaded && labelUploaded && slipmatUploaded" src="/assets/Upload_Complete_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(73%) sepia(64%) saturate(6218%) hue-rotate(115deg) brightness(103%) contrast(99%);" />
-        <img *ngIf="sleeveUploaded === false || labelUploaded === false || slipmatUploaded === false" src="/assets/Pending_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(74%) sepia(90%) saturate(2139%) hue-rotate(1deg) brightness(109%) contrast(105%);" />
+        <img *ngIf="(_orderProcess.sleeveProcess === 'uploadFinished' || _orderProcess.sleeveProcess === 'notOrdered')
+      && (_orderProcess.labelProcess === 'uploadFinished' || _orderProcess.labelProcess === 'notOrdered' )
+      && (_orderProcess.slipmatProcess === 'uploadFinished' || _orderProcess.slipmatProcess === 'notOrdered' )" src="/assets/Upload_Complete_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(73%) sepia(64%) saturate(6218%) hue-rotate(115deg) brightness(103%) contrast(99%);" />
+        <img *ngIf="_orderProcess.sleeveProcess === 'waitingForUpload' || _orderProcess.labelProcess === 'waitingForUpload' || _orderProcess.slipmatProcess === 'waitingForUpload'" src="/assets/Pending_Icon.svg" style="width: 30px; filter: brightness(0) saturate(100%) invert(74%) sepia(90%) saturate(2139%) hue-rotate(1deg) brightness(109%) contrast(105%);" />
       </div>
       <div class="indicator"></div>
       <div class="inner-upload-card">
         <img src="/assets/Upload_Artwork.svg" style="width: 45px" />
         <span class="upload-text">upload artwork</span>
-        <span *ngIf="sleeveUploaded === false || labelUploaded === false || slipmatUploaded === false" class="pending-text">PENDING</span>
-        <span *ngIf="sleeveUploaded && labelUploaded && slipmatUploaded"  class="completed-text">COMPLETED</span>
+        <span *ngIf="_orderProcess.sleeveProcess === 'waitingForUpload' || _orderProcess.labelProcess === 'waitingForUpload' || _orderProcess.slipmatProcess === 'waitingForUpload'" class="pending-text">START NOW</span>
+        <span *ngIf="(_orderProcess.sleeveProcess === 'uploadFinished' || _orderProcess.sleeveProcess === 'notOrdered')
+                && (_orderProcess.labelProcess === 'uploadFinished' || _orderProcess.labelProcess === 'notOrdered' )
+                && (_orderProcess.slipmatProcess === 'uploadFinished' || _orderProcess.slipmatProcess === 'notOrdered' )"  class="completed-text">COMPLETED</span>
       </div>
     </div>
   </div>

@@ -1,6 +1,6 @@
 .main-content{
   width: 100%;
-  height: calc(100% - 78px);
+  height: calc(100% - 115px);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -8,6 +8,8 @@
   background-color: #F0F0F0;
   gap:20px;
   overflow: scroll;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 .upload-cards{
   display: flex;
@@ -246,6 +248,10 @@
   .single-vinyl{
     flex-direction: column;
     gap:20px;
+  }
+  .main-content{
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 
