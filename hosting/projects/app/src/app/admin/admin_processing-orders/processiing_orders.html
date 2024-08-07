@@ -1,0 +1,58 @@
+
+    @if(dataSource){
+      <div class="main-content" style="height: 100%;">
+        <div class="orders">
+          <span class="orders-header">Processing Orders</span>
+          <mat-table [dataSource]="dataSource">
+            <!-- WC Order num -->
+            <ng-container matColumnDef="wc_order_num">
+              <th mat-header-cell *matHeaderCellDef> Order #</th>
+              <td mat-cell *matCellDef="let row"> {{row.wc_order_num}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="address_billing">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let row"> {{row.address_billing.first_name}} {{row.address_billing.last_name}} </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="order_process">
+              <th mat-header-cell *matHeaderCellDef> M/S/L/PD </th>
+              <td mat-cell *matCellDef="let row">
+                <div style="display:flex; justify-content: center; align-items: center; gap:5px">
+                  <div style ="width: 10px; height: 10px; border-radius:20px; "[ngStyle]="{'background-color': statusColor[row.order_process.musicProcess],}">
+                  </div>
+                  <div style ="width: 10px; height: 10px; border-radius:20px; "[ngStyle]="{'background-color': statusColor[row.order_process.sleeveProcess],}">
+                  </div>
+                  <div style ="width: 10px; height: 10px; border-radius:20px; "[ngStyle]="{'background-color': statusColor[row.order_process.labelProcess],}">
+                  </div>
+                  <div style ="width: 10px; height: 10px; border-radius:20px; "[ngStyle]="{'background-color': statusColor[row.order_process.pictureDiscProcess],}">
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="date_created">
+              <th mat-header-cell *matHeaderCellDef> Date </th>
+              <td mat-cell *matCellDef="let row"> {{row.date_created}}
+              </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="wc_status">
+              <th mat-header-cell *matHeaderCellDef> Status </th>
+              <td mat-cell *matCellDef="let row">
+                <div style ="padding:3px 7px; border-radius:20px; font-size:10px; text-align:center; "[ngStyle]="{'background-color': orderProcessColor[row.wc_status],}">{{row.wc_status}}</div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"(click)="clickRow(row.auth_uid)"></tr>
+
+          </mat-table>
+        </div>
+      </div>
+
+    }
+
+

@@ -1,0 +1,28 @@
+
+<mat-drawer-container class="example-container" style="height:{{ innerHeight }}">
+  <mat-drawer class="drawer" mode="side" opened>
+    <!--<img src="/assets/Twl_Admin.png" style="width:100%;padding-bottom:30px;"/>-->
+    <div class="drawr-inner">
+        <div class="admin-header">TWLINCH<br><span style="font-size: 20px; text-align: right; line-height: 0.5em">ADMIN PORTAL</span></div>
+        <div class="submenu">
+          <div class="submenu-item" [routerLink]="'processing-orders'">Processing Orders > </div>
+          <div class="submenu-item" [routerLink]="'shipped-orders'">Shipped Orders ></div>
+          <div class="submenu-item">Templates ></div>
+          <div class="submenu-item">Payment Links ></div>
+        </div>
+      <div class="drawer-footer">
+        <img src="/assets/Twlinch_Logo.svg" style="width: 80px; filter: brightness(0) invert(1)"/>
+        <span style="color:white">Version 1.0</span>
+      </div>
+    </div>
+
+</mat-drawer>
+
+  <mat-drawer-content>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+
+
+

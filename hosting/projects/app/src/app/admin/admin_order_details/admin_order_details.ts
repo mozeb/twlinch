@@ -1,25 +1,52 @@
 import { Component, HostListener, inject, OnInit } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { MatDividerModule } from "@angular/material/divider";
-import { AuthService } from "../../services/auth.service";
-import { MatSidenavModule } from "@angular/material/sidenav";
+import { ActivatedRoute, RouterOutlet } from "@angular/router";
 import { FirestoreApiService } from "../../services/firestore-api.service";
+import { ShopOrderJSON } from "../../interfaces/shopOrder";
+import { NgForOf, NgIf, NgStyle } from "@angular/common";
+import { MatTableDataSource, MatTableModule } from "@angular/material/table";
+import {
+  OrderProcess,
+  orderProcessBackgroundColor,
+  statusBackgroundColor,
+} from "../../services/interfaces";
 import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
-import { RouterLink } from "@angular/router";
-import { orderState, OrderProcess } from "../../services/interfaces";
+import { MatIcon } from "@angular/material/icon";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
-  selector: "order-details",
+  selector: "admin-orders",
   standalone: true,
-  imports: [CommonModule, MatDividerModule, MatSidenavModule, RouterLink],
-  templateUrl: "./order_details.component.html",
-  styleUrls: ["./order_details.component.scss"],
+  imports: [RouterOutlet, NgForOf, MatTableModule, NgStyle, NgIf, MatIcon],
+  templateUrl: "admin_order_details.html",
+  styleUrls: ["./admin_order_details.scss"],
 })
-export class Order_detailsComponent implements OnInit {
-  constructor(
-    protected _authService: AuthService,
-    private _firestoreService: FirestoreApiService,
-  ) {}
+export class Admin_orderDetailsComponent implements OnInit {
+  dataSource: MatTableDataSource<ShopOrderJSON> | undefined;
+  displayedColumns = [
+    "wc_order_num",
+    "address_billing",
+    "order_process",
+    "date_created",
+    "wc_status",
+  ];
+  statusColor = statusBackgroundColor;
+  orderProcessColor = orderProcessBackgroundColor;
+  innerHeight: string | undefined;
+  orderId: string | undefined;
+
+  artworkLink: string | undefined = "";
+  musicLink: string | undefined = "";
+
+  vinylSize: string | undefined;
+  vinylColor: string | undefined;
+  sleeve: string | undefined;
+  label: string | undefined;
+  doubleAlbum: string | undefined;
+  slipmat: string | undefined;
+  name: string | undefined;
+  orderNumber: string | undefined;
+
+  justVinyl: boolean = false;
 
   protected firestore: Firestore = inject(Firestore);
 
@@ -31,29 +58,26 @@ export class Order_detailsComponent implements OnInit {
     pictureDiscProcess: "notOrdered",
   };
 
-  justVinyl = false;
+  constructor(
+    private _firestoreApiService: FirestoreApiService,
+    private _route: ActivatedRoute,
+    protected _authService: AuthService,
+  ) {}
 
-  public innerHeight: string | undefined;
-  public vinylSize: string | undefined;
-  public vinylColor: string | undefined;
-  public sleeve: string | undefined;
-  public label: string | undefined;
-  public doubleAlbum: string | undefined;
-  public slipmat: string | undefined;
-
-  ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.innerHeight = window.innerHeight + "px";
-    this.getOrderData();
-  }
+    this.orderId = this._route.snapshot.paramMap.get("id") as string;
 
-  async getOrderData() {
-    const user = await this._authService.currentUser;
-    const order = await this._firestoreService.getShopOrder();
+    const order = await this._firestoreApiService.getShopOrderAdmin(
+      this.orderId,
+    );
+
     if (order === undefined) {
       return;
     }
 
     // Watch values
+    const user = await this._authService.currentUser;
     const unsub = onSnapshot(
       doc(this.firestore, `shopOrders/${user?.uid as string}`),
       (doc) => {
@@ -69,7 +93,18 @@ export class Order_detailsComponent implements OnInit {
         }
       },
     );
+    console.log(this._orderProcess);
 
+    this.artworkLink = order?.artworkZip;
+    this.musicLink = order?.musicZip;
+    this.name =
+      order.address_billing.first_name + " " + order.address_billing.last_name;
+    this.orderNumber = order.wc_order_num;
+    this.getOrderData(order);
+  }
+
+  async getOrderData(order: ShopOrderJSON) {
+    this._orderProcess = order.order_process;
     order.item_lines.forEach((element) => {
       // Check for size of the record
       switch (element.wc_product_id) {
@@ -149,6 +184,22 @@ export class Order_detailsComponent implements OnInit {
         this.slipmat = "Custom Slipmat";
       }
     });
+  }
+
+  downloadFiles(type: string) {
+    if (type == "music") {
+      window.open(this.musicLink, "_blank");
+    } else if (type == "artwork") {
+      window.open(this.artworkLink, "_blank");
+    }
+  }
+
+  copyToClipboard(type: string) {
+    if (type == "music") {
+      navigator.clipboard.writeText(this.musicLink!);
+    } else if (type == "artwork") {
+      navigator.clipboard.writeText(this.artworkLink!);
+    }
   }
 
   // resize event listener for window adapting

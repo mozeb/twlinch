@@ -1,0 +1,31 @@
+.orders{
+  background-color: white;
+  border-radius: 10px;
+  padding:30px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.orders-header{
+  font-family: "Public Sans";
+  font-weight: 700;
+  font-size: 25px;
+  padding-bottom: 20px;
+}
+
+.main-content{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: #F0F0F0;
+  gap:20px;
+  justify-content: center;
+}
+
+
+
+
+

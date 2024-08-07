@@ -4,6 +4,7 @@ import { FirestoreBaseService } from "./api-base/firestore-base.service";
 import { ProgressIndicatorService } from "./progress-indicator.service";
 import { ShopOrder, ShopOrderJSON } from "../interfaces/shopOrder";
 import { AuthService } from "./auth.service";
+import { forEach } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -19,6 +20,16 @@ export class FirestoreApiService extends FirestoreBaseService {
   public async getShopOrder(): Promise<ShopOrderJSON | undefined> {
     const user = await this._authService.currentUser;
     return await this.getDoc(`shopOrders/${user?.uid as string}`);
+  }
+
+  public async getShopOrderAdmin(
+    userId: string,
+  ): Promise<ShopOrderJSON | undefined> {
+    return await this.getDoc(`shopOrders/${userId}`);
+  }
+
+  public async getAllOrders(): Promise<ShopOrderJSON[] | undefined> {
+    return await this.getCol(`shopOrders`);
   }
 
   // public async setUser(id: string, data: User): Promise<void> {

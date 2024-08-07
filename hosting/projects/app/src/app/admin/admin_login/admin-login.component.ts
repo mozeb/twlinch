@@ -12,15 +12,15 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { NgIf } from "@angular/common";
 import { MatCardModule } from "@angular/material/card";
-import { AuthService } from "../services/auth.service";
-import { ProgressIndicatorService } from "../services/progress-indicator.service";
-import { NotifyService } from "../services/notify.service";
+import { AuthService } from "../../services/auth.service";
+import { ProgressIndicatorService } from "../../services/progress-indicator.service";
+import { NotifyService } from "../../services/notify.service";
 import * as events from "node:events";
 
 @Component({
-  selector: "app-login",
-  templateUrl: "./login.component.html",
-  styleUrls: ["./login.component.scss"],
+  selector: "admin-login",
+  templateUrl: "./admin-login.component.html",
+  styleUrls: ["./admin-login.component.scss"],
   standalone: true,
   imports: [
     NgIf,
@@ -31,7 +31,7 @@ import * as events from "node:events";
     MatCardModule,
   ],
 })
-export class LoginComponent implements OnInit {
+export class AdminLoginComponent implements OnInit {
   form: FormGroup;
   public innerHeight: string | undefined;
 
@@ -44,17 +44,14 @@ export class LoginComponent implements OnInit {
   ) {
     this.form = this._fb.group({
       email: new FormControl("", [Validators.required, Validators.email]),
-      password: new FormControl("", [
-        Validators.required,
-        Validators.minLength(4),
-      ]),
+      password: new FormControl("", [Validators.required]),
     });
   }
 
   ngOnInit() {
     this._authService.user$.subscribe((user) => {
       if (user && user.emailVerified) {
-        void this._router.navigate(["/manage-order/order-details"]);
+        void this._router.navigate(["/admin-dashboard"]);
       }
     });
     this.innerHeight = window.innerHeight + "px";
@@ -66,8 +63,8 @@ export class LoginComponent implements OnInit {
       try {
         this._progress.show();
         await this._authService.emailLogin(
-          this.form.value.password + "." + this.form.value.email,
-          "00" + this.form.value.password,
+          this.form.value.email,
+          this.form.value.password,
         );
       } catch (err) {
         console.warn(err);
@@ -81,7 +78,7 @@ export class LoginComponent implements OnInit {
       if (user && user.emailVerified) {
         this._notify.update("Welcome!", "success");
 
-        await this._router.navigate(["/manage-order/order-details"]);
+        await this._router.navigate(["/admin-dashboard/processing-orders"]);
         return;
       }
       console.log("Email not verified.");

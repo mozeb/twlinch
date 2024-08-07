@@ -282,6 +282,11 @@ body{
   text-transform: uppercase;
   letter-spacing: 1px;
   width: fit-content;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  gap:5px;
+  cursor:pointer;
 }
 
 .twl-app-gray-button{
@@ -295,6 +300,7 @@ body{
   text-transform: uppercase;
   letter-spacing: 1px;
   width: fit-content;
+  cursor:pointer;
 }
 
 .twl-app-transparent-button{
@@ -308,6 +314,7 @@ body{
   text-transform: uppercase;
   letter-spacing: 1px;
   width: fit-content;
+  cursor:pointer;
 }
 
 
@@ -322,6 +329,7 @@ body{
   text-transform: uppercase;
   letter-spacing: 1px;
   width: fit-content;
+  cursor:pointer;
 }
 
 .shimmer{
@@ -339,6 +347,25 @@ body{
   to {
     background-position-x: 0%
   }
+}
+
+.twl-app-small-button{
+  background-color: black;
+  color:white;
+  border:none;
+  font-size: 14px;
+  padding:7px 19px;
+  border-radius: 2px;
+  font-family: "Ubuntu Mono";
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: fit-content;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  gap:5px;
+  cursor:pointer;
 }
 
 

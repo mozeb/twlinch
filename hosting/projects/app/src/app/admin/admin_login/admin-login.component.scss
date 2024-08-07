@@ -1,0 +1,155 @@
+.main-div {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.body{
+  padding: 0px !important;
+  margin: 0px !important;
+
+}
+
+.mobile-login{
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-login-upper{
+  color:white;
+  //height: calc(50% - 40px);
+  height: auto;
+  clip-path: polygon(0 0%, 100% 0, 100% 90%, 0 100%);
+ background: url("/assets/Twlinch_Studio.jpg");
+  background-repeat: repeat;
+  background-size: cover;
+  background-color: transparent;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  font-size: 40px;
+  font-family: "Public Sans";
+  font-weight: 700;
+  line-height: 0.95;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex:1;
+  //filter: invert(99%) sepia(7%) saturate(156%) hue-rotate(224deg) brightness(114%) contrast(80%);
+  position: relative;
+  z-index: 1;
+}
+
+.dark-overlay-mobile{
+  background-color: black;
+  opacity: 0.6;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: -1;
+}
+
+.mobile-login-lower{
+  //width: calc(100% - 40px);
+  //height: calc(50% - 40px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding:20px;
+  padding-top:40px;
+}
+
+.login-header{
+  font-family: "Public Sans";
+  font-size:15px;
+  font-weight: 800;
+  padding-bottom: 20px;
+  text-transform: uppercase;
+}
+
+
+.desktop-login{
+  display: none;
+}
+
+.left-side{
+  background-color: black;
+  width: 45%;
+  background: url("/assets/Twlinch_Studio.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.dark-overlay{
+  background-color: black;
+  opacity: 0.6;
+  width: 45%;
+  height: 100%;
+  position: absolute;
+  z-index: 0;
+}
+
+.left-content{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100% - 100px);
+  padding:50px;
+  font-size: 40px;
+  font-family: "Public Sans";
+  font-weight: 700;
+  line-height: 0.95;
+  align-items: flex-start;
+  color:white;
+  z-index: 2;
+}
+
+.right-side{
+  display: flex;
+  width: 55%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+@media only screen and (min-width: 1024px) {
+  .mobile-login{
+    display: none;
+  }
+
+  .login-header{
+    width:300px;
+  }
+
+  .desktop-login{
+    display: flex;
+  }
+}
+
+
+.twlinch-button{
+  width:300px;
+  padding:25px;
+  background-color: black;
+  color:white;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+// Remove arrows from field
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+

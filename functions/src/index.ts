@@ -13,6 +13,7 @@ setGlobalOptions({
 // export * from "./callable";
 // export * from "./auth";
 // export * from "./database";
-// export * from "./datastore";
+
+export * from "./datastore";
 export * from "./https";
 export * from "./services";

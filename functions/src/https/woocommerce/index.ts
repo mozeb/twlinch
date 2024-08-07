@@ -62,17 +62,32 @@ async function onOrderCreate(req: Request) {
     ) {
       _orderProcess.labelProcess = "waitingForUpload";
     }
+    if (element.wc_product_id == 4211) {
+      _orderProcess.pictureDiscProcess = "waitingForUpload";
+    }
   });
+
+  shopOrder.order_process = _orderProcess;
 
   await getFirestore()
     .collection("shopOrders")
     .doc(user.uid)
     .set(shopOrder, { merge: true });
+}
+
+async function onOrderUpdate(req: Request) {
+  const wcData = req.body as WCOrderJSON;
+  const shopOrder = shopOrderWCOrderConverter.toJSON(wcData);
+
+  const user = await getAuth().getUserByEmail(
+    shopOrder.wc_order_num + "." + shopOrder.address_billing.email,
+  );
+  shopOrder.auth_uid = user.uid;
 
   await getFirestore()
     .collection("shopOrders")
     .doc(user.uid)
-    .set({ order_process: _orderProcess }, { merge: true });
+    .set(shopOrder, { merge: true });
 }
 
 woocommerceRouter.post("/webhook", async (req: Request, res: Response) => {
@@ -80,9 +95,11 @@ woocommerceRouter.post("/webhook", async (req: Request, res: Response) => {
 
   switch (topic) {
     case "order.created":
-    case "order.updated":
-    case "order.restored":
       await onOrderCreate(req);
+      break;
+    case "order.restored":
+    case "order.updated":
+      await onOrderUpdate(req);
       break;
     case "order.deleted":
       // await orderDeleted((req.body.id as number).toString());

@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { ShopItemLineBase } from "./shopItemLine";
+import { OrderProcess } from "../services/interfaces";
 
 /**
  * Data model. Shop order data.
@@ -20,7 +21,7 @@ export interface ShopOrderBase {
    * Billing address. Order - Billing properties.
    * @see WCOrderBillingProperties
    */
-  address_billing: string;
+  address_billing: WCOrderBilling;
 
   /**
    * Shipping address. Order - Shipping properties.
@@ -53,6 +54,12 @@ export interface ShopOrderBase {
   item_lines: ShopItemLineBase[];
 
   auth_uid?: string;
+
+  order_process: OrderProcess;
+
+  artworkZip: string;
+
+  musicZip: string;
 }
 
 /**
@@ -79,4 +86,61 @@ export interface ShopOrder extends ShopOrderBase {
 export interface ShopOrderJSON extends ShopOrderBase {
   date_created: string;
   date_completed?: string;
+}
+
+export interface WCOrderBilling {
+  /**
+   * Address line 1.
+   */
+  address_1: string;
+
+  /**
+   * Address line 2.
+   */
+  address_2: string;
+
+  /**
+   * City name.
+   */
+  city: string;
+
+  /**
+   * Company name.
+   */
+  company: string;
+
+  /**
+   * Country code in ISO 3166-1 alpha-2 format.
+   */
+  country: string;
+
+  /**
+   * Email address.
+   */
+  email: string;
+
+  /**
+   * First name.
+   */
+  first_name: string;
+
+  /**
+   * Last name.
+   */
+  last_name: string;
+
+  /**
+   * Phone number.
+   */
+  phone: string;
+
+  /**
+   * Postal code.
+   */
+  postcode: string;
+
+  /**
+   * ISO code or name of the state, province or district.
+   */
+  state: string;
 }

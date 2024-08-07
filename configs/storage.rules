@@ -5,7 +5,12 @@ service firebase.storage {
 
     // User can read and write their order files.
     match /orders/{userId}/{allPaths=**} {
-      allow read, write: if request.auth.uid == userId;
+      allow read, write: if request.auth.uid == userId || request.auth.uid == 'xfhyHCFuVYOHRsZPmQsD79uc1A52';
+    }
+
+    // User can read and write their order files.
+    match /templates/{allPaths=**} {
+      allow read;
     }
   }
 }

@@ -1,0 +1,128 @@
+.order-details-card{
+  background-color: white;
+  border-radius: 10px;
+  padding:20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  font-family: "Ubuntu Mono";
+  min-width: 600px;
+}
+
+.order-header{
+  font-family: "Public Sans";
+  font-weight: 700;
+  font-size: 20px;
+  padding-bottom: 10px;
+
+}
+
+.component-header{
+  font-family: "Ubuntu Mono";
+  font-weight: 700;
+  padding-bottom: 5px;
+  gap:2px;
+  align-items: center;
+  display:flex;
+  justify-content: space-between;
+}
+
+.order-components{
+  display: flex;
+  flex-direction: column;
+  gap:10px;
+  width: 100%;
+}
+
+.component-icon{
+  cursor: pointer;
+  width:18px;
+  height:100%;
+  border-radius: 2px;
+  padding: 9px;
+  background-color: #aaf4aa;
+}
+
+.component-icon-nr{
+  cursor: pointer;
+  width:18px;
+  height:100%;
+  border-radius: 2px;
+  padding: 9px;
+  background-color: #fff0b3;
+}
+
+.main-content{
+  width: 100%;
+  height: calc(100% - 115px);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: #F0F0F0;
+  gap:20px;
+  justify-content: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.copy-link{
+  background-color:#e9e9e9;
+  color:black;
+}
+
+.chip-reset{
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  padding: 5px 10px 5px 10px;
+  font-size: 10px;
+  font-family: 'Ubuntu Mono';
+  background-color: #ffd0b3;
+  font-weight: 800;
+  gap:5px;
+}
+
+.reset-chips{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap:10px;
+}
+
+
+.component-line{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.component-title{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:10px;
+}
+
+.download-chips{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:10px;
+}
+
+.mat-icon-fix{
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 16px;
+}
+
+mat-mdc-cell{
+  display: flex;
+  justify-content: center;
+}

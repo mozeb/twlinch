@@ -1,0 +1,60 @@
+<div class="main-content" style="height: {{ innerHeight }}">
+  <div class="order-details-card">
+    <div class="order-header">Order #{{orderNumber}}
+      <div style="font-size:14px"> {{name}}</div>
+    </div>
+    <span>{{ vinylSize }}</span>
+    <span>{{ vinylColor }}</span>
+    <span>{{ label }}</span>
+    <span>{{ sleeve }}</span>
+    <span>{{ doubleAlbum }}</span>
+    <span>{{ slipmat }}</span>
+    <hr style="height:1px;border-width:0;color:black;background-color:black; width: 100%; margin: 20px 0px; ">
+
+    <div class="order-components">
+
+      <div class="component-line" *ngIf="musicLink === undefined || musicLink === ''">
+        <div class="component-title"><img src="/assets/music_icon.svg" class="component-icon-nr"/>Music not ready.</div>
+      </div>
+
+      <div class="component-line"  *ngIf="musicLink !== undefined && musicLink !== '' " >
+        <div class="component-title"><img src="/assets/music_icon.svg" class="component-icon"/>Music files ready!</div>
+        <div class="download-chips">
+          <span class="copy-link twl-app-small-button"  (click)="copyToClipboard('music')"><mat-icon class="mat-icon-fix">content_copy</mat-icon>copy link</span>
+          <span class="twl-app-small-button" (click)="downloadFiles('music')"><mat-icon class="mat-icon-fix">cloud_download</mat-icon>download</span>
+        </div>
+      </div>
+
+      <div *ngIf="justVinyl === false">
+        <div class="component-line" *ngIf="artworkLink === undefined || artworkLink === ''">
+          <div class="component-title"><img src="/assets/design_icon.svg" class="component-icon-nr"/>Artwork not ready.</div>
+        </div>
+
+        <div class="component-group">
+        <div class="component-line"  *ngIf="artworkLink !== undefined && artworkLink !== '' " >
+          <div class="component-title"><img src="/assets/design_icon.svg" class="component-icon"/>Artwork files ready!</div>
+          <div class="download-chips">
+            <span class="copy-link twl-app-small-button"  (click)="copyToClipboard('artwork')"><mat-icon class="mat-icon-fix">content_copy</mat-icon>copy link</span>
+            <span class="twl-app-small-button" (click)="downloadFiles('artwork')"><mat-icon class="mat-icon-fix">cloud_download</mat-icon>download</span>
+          </div>
+        </div>
+          <div class="reset-chips">
+            <span *ngIf="this._orderProcess.sleeveProcess === 'uploadFinished'" class="chip-reset" (click)="downloadFiles('artwork')">reset sleeve</span>
+            <span *ngIf="this._orderProcess.labelProcess === 'uploadFinished'" class="chip-reset" (click)="downloadFiles('artwork')">reset label</span>
+            <span *ngIf="this._orderProcess.pictureDiscProcess === 'uploadFinished'" class="chip-reset" (click)="downloadFiles('artwork')">reset picture disc</span>
+            <span *ngIf="this._orderProcess.slipmatProcess === 'uploadFinished'" class="chip-reset" (click)="downloadFiles('artwork')">reset slipmat</span>
+          </div>
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+  </div>
+  </div>
+
