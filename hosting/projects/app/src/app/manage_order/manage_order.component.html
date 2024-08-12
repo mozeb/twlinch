@@ -48,10 +48,10 @@
       </div>
       <div class="main-content">
         <div class="top-menu">
-          <span class="finish">Finish your record</span>
+          <span class="finish">Hey, {{ customerName }}!</span>
           <div class="mobile-logo"><img src="/assets/Twlinch_Logo.svg" style="width: 80px;"/></div>
           <div class="right-side">
-            <span>No. : </span><span style="font-size: 14px">#{{ orderNumber }}</span>
+            <span>Order : </span><span style="font-size: 14px">#{{ orderNumber }}</span>
             <button class="logout-button" (click)="this.logOut()">
               <img src="/assets/Exit_Icon.svg" style="width: 18px;"/>
             </button>

@@ -41,6 +41,7 @@ export class Manage_orderComponent implements OnInit {
 
   public innerHeight: string | undefined;
   public orderNumber: string | undefined;
+  public customerName: string | undefined;
 
   protected firestore: Firestore = inject(Firestore);
 
@@ -73,6 +74,7 @@ export class Manage_orderComponent implements OnInit {
       return;
     }
     this.orderNumber = order.wc_order_num;
+    this.customerName = order.address_billing.first_name;
     console.log(order.item_lines[0].name);
   }
 

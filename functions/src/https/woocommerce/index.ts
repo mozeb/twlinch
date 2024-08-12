@@ -43,6 +43,15 @@ async function onOrderCreate(req: Request) {
     pictureDiscProcess: "notOrdered",
   };
 
+  const _orderAddOns: OrderAddOns = {
+    sleeveAddOn: "notAdded",
+    labelAddOn: "notAdded",
+    slipmatAddOn: "notAdded",
+    doubleAlbumAddOn: "notAdded",
+    designServicesAddOn: "notAdded",
+    onlineDesignerAddOn: "notAdded",
+  };
+
   // Search which element were purchased and have to be uploaded
   shopOrder.item_lines.forEach((element) => {
     if (
@@ -67,6 +76,7 @@ async function onOrderCreate(req: Request) {
     }
   });
 
+  shopOrder.order_add_ons = _orderAddOns;
   shopOrder.order_process = _orderProcess;
 
   await getFirestore()
@@ -78,6 +88,16 @@ async function onOrderCreate(req: Request) {
 async function onOrderUpdate(req: Request) {
   const wcData = req.body as WCOrderJSON;
   const shopOrder = shopOrderWCOrderConverter.toJSON(wcData);
+
+  // const _orderAddOns: OrderAddOns = {
+  //   sleeveAddOn: "notAdded",
+  //   labelAddOn: "notAdded",
+  //   slipmatAddOn: "notAdded",
+  //   doubleAlbumAddOn: "notAdded",
+  //   designServicesAddOn: "notAdded",
+  //   onlineDesignerAddOn: "notAdded",
+  // };
+  // shopOrder.order_add_ons = _orderAddOns;
 
   const user = await getAuth().getUserByEmail(
     shopOrder.wc_order_num + "." + shopOrder.address_billing.email,
@@ -109,6 +129,8 @@ woocommerceRouter.post("/webhook", async (req: Request, res: Response) => {
   res.status(200).json({});
 });
 
+export type orderState = "notOrdered" | "waitingForUpload" | "uploadFinished";
+
 export interface OrderProcess {
   musicProcess: orderState;
   sleeveProcess: orderState;
@@ -117,4 +139,13 @@ export interface OrderProcess {
   pictureDiscProcess: orderState;
 }
 
-export type orderState = "notOrdered" | "waitingForUpload" | "uploadFinished";
+export type addOnState = "added" | "notAdded";
+
+export interface OrderAddOns {
+  doubleAlbumAddOn: addOnState;
+  sleeveAddOn: addOnState;
+  labelAddOn: addOnState;
+  slipmatAddOn: addOnState;
+  designServicesAddOn: addOnState;
+  onlineDesignerAddOn: addOnState;
+}

@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { ShopItemLineBase } from "./shopItemLine";
-import { OrderProcess } from "../services/interfaces";
+import { addOnState, OrderAddOns, OrderProcess } from "../services/interfaces";
 
 /**
  * Data model. Shop order data.
@@ -60,6 +60,9 @@ export interface ShopOrderBase {
   artworkZip: string;
 
   musicZip: string;
+
+  // If an additional prduct are added later
+  order_add_ons: OrderAddOns;
 }
 
 /**

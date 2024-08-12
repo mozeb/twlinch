@@ -38,6 +38,12 @@ export const routes: Routes = [
     component: AdminLoginComponent,
   },
   {
+    path: "home",
+    component: HomeComponent,
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin },
+  },
+  {
     path: "admin-dashboard",
     component: Admin_dashboardComponent,
     canActivate: [AuthGuard],

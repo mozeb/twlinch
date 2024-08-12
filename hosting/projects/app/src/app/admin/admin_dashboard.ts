@@ -64,6 +64,10 @@ export class Admin_dashboardComponent implements OnInit {
     void this._router.navigate(["/admin-dashboard/admin-orders", id]);
   }
 
+  navigateTo(path: string): void {
+    this._router.navigate([path]);
+  }
+
   // resize event listener for window adapting
   @HostListener("window:resize", ["$event"])
   onResize($event: Event) {

@@ -3,12 +3,14 @@
   <div class="outter-div">
     <div class="order-details-card">
       <span class="order-header">Your order:</span>
-      <span>{{ vinylSize }}</span>
-      <span>{{ vinylColor }}</span>
-      <span>{{ label }}</span>
-      <span>{{ sleeve }}</span>
-      <span>{{ doubleAlbum }}</span>
-      <span>{{ slipmat }}</span>
+      <span *ngIf="vinylSize !== undefined">{{ vinylSize }}</span>
+      <span *ngIf="vinylColor !== undefined">{{ vinylColor }}</span>
+      <span *ngIf="label !== undefined">{{ label }}</span>
+      <span *ngIf="sleeve !== undefined">{{ sleeve }}</span>
+      <span *ngIf="doubleAlbum !== undefined">{{ doubleAlbum }}</span>
+      <span *ngIf="slipmat !== undefined">{{ slipmat }}</span>
+      <span *ngIf="designServices !== undefined">{{ designServices }}</span>
+      <span *ngIf="onlineDesigner !== undefined">{{ onlineDesigner }}</span>
       <img src="/assets/black_cl_cs.png" class="vinyl-record-image" />
     </div>
   </div>

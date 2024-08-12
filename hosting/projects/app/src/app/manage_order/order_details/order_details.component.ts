@@ -40,6 +40,8 @@ export class Order_detailsComponent implements OnInit {
   public label: string | undefined;
   public doubleAlbum: string | undefined;
   public slipmat: string | undefined;
+  public designServices: string | undefined;
+  public onlineDesigner: string | undefined;
 
   ngOnInit() {
     this.innerHeight = window.innerHeight + "px";
@@ -148,6 +150,16 @@ export class Order_detailsComponent implements OnInit {
       if (element.wc_product_id == 691) {
         this.slipmat = "Custom Slipmat";
       }
+
+      // Design Services
+      if (element.wc_product_id == 686) {
+        this.designServices = "Design Services";
+      }
+
+      // Online Designer
+      /*if (element.wc_product_id == ??) {
+        this.onlineDesigner = "Online Designer";
+      }*/
     });
   }
 

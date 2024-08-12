@@ -6,6 +6,17 @@ export interface OrderProcess {
   pictureDiscProcess: orderState;
 }
 
+export type addOnState = "added" | "notAdded";
+
+export interface OrderAddOns {
+  doubleAlbumAddOn: addOnState;
+  sleeveAddOn: addOnState;
+  labelAddOn: addOnState;
+  slipmatAddOn: addOnState;
+  designServicesAddOn: addOnState;
+  onlineDesignerAddOn: addOnState;
+}
+
 export enum op {
   notOrdered,
   waitingForUpload,

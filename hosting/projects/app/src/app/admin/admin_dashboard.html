@@ -5,8 +5,8 @@
     <div class="drawr-inner">
         <div class="admin-header">TWLINCH<br><span style="font-size: 20px; text-align: right; line-height: 0.5em">ADMIN PORTAL</span></div>
         <div class="submenu">
-          <div class="submenu-item" [routerLink]="'processing-orders'">Processing Orders > </div>
-          <div class="submenu-item" [routerLink]="'shipped-orders'">Shipped Orders ></div>
+          <div class="submenu-item" (click)="navigateTo('/admin-dashboard/processing-orders')">Processing Orders > </div>
+          <div class="submenu-item" (click)="navigateTo('/admin-dashboard/shipped-orders')">Shipped Orders ></div>
           <div class="submenu-item">Templates ></div>
           <div class="submenu-item">Payment Links ></div>
         </div>

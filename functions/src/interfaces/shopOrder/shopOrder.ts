@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { ShopItemLineBase } from "./shopItemLine";
 import { WCOrderBilling, WCOrderShipping, WCOrderStatus } from "../WCOrder";
-import { OrderProcess } from "../../https/woocommerce";
+import { OrderAddOns, OrderProcess } from "../../https/woocommerce";
 
 /**
  * Data model. Shop order data.
@@ -57,6 +57,8 @@ export interface ShopOrderBase {
   auth_uid?: string;
 
   order_process?: OrderProcess;
+
+  order_add_ons?: OrderAddOns;
 }
 
 /**

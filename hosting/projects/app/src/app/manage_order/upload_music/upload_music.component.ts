@@ -175,6 +175,18 @@ export class Upload_musicComponent implements OnInit {
           break;
       }
 
+      // Picture disc size
+      switch (element.wc_product_id) {
+        case 5049:
+          this.vinylSize = "7' record - max 6 minutes on side A";
+          this.maxDuration = 420;
+          break;
+        case 5052:
+          this.vinylSize = "12' record - max 20 minutes on side A";
+          this.maxDuration = 1200;
+          break;
+      }
+
       // Double album
       if (element.wc_product_id == 5617) {
         this.doubleAlbum = true;

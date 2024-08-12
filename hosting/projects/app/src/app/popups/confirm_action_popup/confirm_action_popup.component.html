@@ -1,0 +1,24 @@
+<div class="dialog">
+  <img src="/assets/Warning_Icon.svg" style="width: 80px;padding-bottom:20px;" >
+  <span class="upload-header">
+    Are you sure you want to proceed?
+  </span>
+  <span class="upload-subheader">
+    {{content_text}}
+  </span>
+  <div style="display: flex; justify-content: center; align-items: center; gap:15px;">
+    <button (click)="closeDialog(false)"
+            class="twl-app-gray-button"
+            style="margin-top: 20px"
+    >
+      No, Go Back
+    </button>
+    <button (click)="closeDialog(true)"
+            class="twl-app-button"
+            style="margin-top: 20px"
+    >
+      Yes, Proceed
+    </button>
+
+  </div>
+</div>

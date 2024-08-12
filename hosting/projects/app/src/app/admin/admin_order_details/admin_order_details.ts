@@ -5,6 +5,8 @@ import { ShopOrderJSON } from "../../interfaces/shopOrder";
 import { NgForOf, NgIf, NgStyle } from "@angular/common";
 import { MatTableDataSource, MatTableModule } from "@angular/material/table";
 import {
+  addOnState,
+  OrderAddOns,
   OrderProcess,
   orderProcessBackgroundColor,
   statusBackgroundColor,
@@ -12,6 +14,13 @@ import {
 import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
 import { MatIcon } from "@angular/material/icon";
 import { AuthService } from "../../services/auth.service";
+import { ConfirmActionPopupComponent } from "../../popups/confirm_action_popup/confirm_action_popup.component";
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogClose,
+} from "@angular/material/dialog";
+import { user } from "@angular/fire/auth";
 
 @Component({
   selector: "admin-orders",
@@ -43,12 +52,31 @@ export class Admin_orderDetailsComponent implements OnInit {
   label: string | undefined;
   doubleAlbum: string | undefined;
   slipmat: string | undefined;
+  designServices: string | undefined;
+  onlineDesigner: string | undefined;
   name: string | undefined;
   orderNumber: string | undefined;
+
+  // Add-ons
+  doubleAlbumAdd: string | undefined;
+  sleeveAdd: string | undefined;
+  labelAdd: string | undefined;
+  designServicesAdd: string | undefined;
+  onlineDesignerAdd: string | undefined;
+  slipmatAdd: string | undefined;
 
   justVinyl: boolean = false;
 
   protected firestore: Firestore = inject(Firestore);
+
+  _orderAddOns: OrderAddOns = {
+    doubleAlbumAddOn: "notAdded",
+    sleeveAddOn: "notAdded",
+    labelAddOn: "notAdded",
+    slipmatAddOn: "notAdded",
+    designServicesAddOn: "notAdded",
+    onlineDesignerAddOn: "notAdded",
+  };
 
   _orderProcess: OrderProcess = {
     musicProcess: "notOrdered",
@@ -61,12 +89,15 @@ export class Admin_orderDetailsComponent implements OnInit {
   constructor(
     private _firestoreApiService: FirestoreApiService,
     private _route: ActivatedRoute,
+    private dialog: MatDialog,
     protected _authService: AuthService,
   ) {}
 
   async ngOnInit(): Promise<void> {
     this.innerHeight = window.innerHeight + "px";
     this.orderId = this._route.snapshot.paramMap.get("id") as string;
+
+    this.getProcessData();
 
     const order = await this._firestoreApiService.getShopOrderAdmin(
       this.orderId,
@@ -76,10 +107,18 @@ export class Admin_orderDetailsComponent implements OnInit {
       return;
     }
 
+    this.artworkLink = order?.artworkZip;
+    this.musicLink = order?.musicZip;
+    this.name =
+      order.address_billing.first_name + " " + order.address_billing.last_name;
+    this.orderNumber = order.wc_order_num;
+    this.getOrderData(order);
+  }
+
+  getProcessData() {
     // Watch values
-    const user = await this._authService.currentUser;
     const unsub = onSnapshot(
-      doc(this.firestore, `shopOrders/${user?.uid as string}`),
+      doc(this.firestore, `shopOrders/${this.orderId as string}`),
       (doc) => {
         this._orderProcess = doc.get("order_process") as OrderProcess;
         // Check if there is nothing for design
@@ -93,18 +132,54 @@ export class Admin_orderDetailsComponent implements OnInit {
         }
       },
     );
-    console.log(this._orderProcess);
 
-    this.artworkLink = order?.artworkZip;
-    this.musicLink = order?.musicZip;
-    this.name =
-      order.address_billing.first_name + " " + order.address_billing.last_name;
-    this.orderNumber = order.wc_order_num;
-    this.getOrderData(order);
+    // Check for add ons
+    const unsub1 = onSnapshot(
+      doc(this.firestore, `shopOrders/${this.orderId as string}`),
+      (doc) => {
+        this._orderAddOns = doc.get("order_add_ons") as OrderAddOns;
+        if (this._orderAddOns.doubleAlbumAddOn == "added") {
+          this.doubleAlbumAdd = "Double Album";
+        } else {
+          this.doubleAlbumAdd = undefined;
+        }
+
+        if (this._orderAddOns.slipmatAddOn == "added") {
+          this.slipmatAdd = "Custom Slipmat";
+        } else {
+          this.slipmatAdd = undefined;
+        }
+
+        if (this._orderAddOns.labelAddOn == "added") {
+          this.labelAdd = "Custom Label";
+        } else {
+          this.labelAdd = undefined;
+        }
+
+        if (this._orderAddOns.sleeveAddOn == "added") {
+          this.sleeveAdd = "Custom Sleeve";
+        } else {
+          this.sleeveAdd = undefined;
+        }
+
+        if (this._orderAddOns.designServicesAddOn == "added") {
+          this.designServicesAdd = "Design Services";
+        } else {
+          this.designServicesAdd = undefined;
+        }
+
+        if (this._orderAddOns.onlineDesignerAddOn == "added") {
+          this.onlineDesigner = "Online Designer";
+        } else {
+          this.onlineDesignerAdd = undefined;
+        }
+      },
+    );
   }
 
   async getOrderData(order: ShopOrderJSON) {
     this._orderProcess = order.order_process;
+
     order.item_lines.forEach((element) => {
       // Check for size of the record
       switch (element.wc_product_id) {
@@ -183,6 +258,16 @@ export class Admin_orderDetailsComponent implements OnInit {
       if (element.wc_product_id == 691) {
         this.slipmat = "Custom Slipmat";
       }
+
+      // Design Services
+      if (element.wc_product_id == 686) {
+        this.designServices = "Design Services";
+      }
+
+      // Online Designer
+      /*if (element.wc_product_id == ??) {
+        this.onlineDesigner = "Online Designer";
+      }*/
     });
   }
 
@@ -200,6 +285,167 @@ export class Admin_orderDetailsComponent implements OnInit {
     } else if (type == "artwork") {
       navigator.clipboard.writeText(this.artworkLink!);
     }
+  }
+
+  openConfirmActionPopup(action: string) {
+    const dialogRef = this.dialog.open(ConfirmActionPopupComponent, {
+      data: {
+        action_name: action,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (action == "music unlock" && result == true) {
+        this._orderProcess.musicProcess = "waitingForUpload";
+        this.musicLink = undefined;
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: { musicProcess: "waitingForUpload" },
+            musicZip: "",
+          },
+        );
+      }
+
+      // Unlock sleeve design
+      if (action == "sleeve unlock" && result == true) {
+        this._orderProcess.sleeveProcess = "waitingForUpload";
+        this.artworkLink = undefined;
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: { sleeveProcess: "waitingForUpload" },
+            artworkZip: "",
+          },
+        );
+      }
+
+      // Unlock label design
+      if (action == "label unlock" && result == true) {
+        this._orderProcess.labelProcess = "waitingForUpload";
+        this.artworkLink = undefined;
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: { labelProcess: "waitingForUpload" },
+            artworkZip: "",
+          },
+        );
+      }
+
+      // Unlock slipmat design
+      if (action == "slipmat unlock" && result == true) {
+        this._orderProcess.slipmatProcess = "waitingForUpload";
+        this.artworkLink = undefined;
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: { slipmatProcess: "waitingForUpload" },
+            artworkZip: "",
+          },
+        );
+      }
+
+      // Unlock picture disc design
+      if (action == "picture disc unlock" && result == true) {
+        this._orderProcess.pictureDiscProcess = "waitingForUpload";
+        this.artworkLink = undefined;
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: { pictureDiscProcess: "waitingForUpload" },
+            artworkZip: "",
+          },
+        );
+      }
+
+      // Add double album add-on
+      if (action == "add double album" && result == true) {
+        this._orderProcess.musicProcess = "waitingForUpload";
+        this._orderProcess.sleeveProcess = "waitingForUpload";
+        this._orderProcess.labelProcess = "waitingForUpload";
+
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: {
+              musicProcess: "waitingForUpload",
+              sleeveProcess: "waitingForUpload",
+              labelProcess: "waitingForUpload",
+            },
+            order_add_ons: { doubleAlbumAddOn: "added" },
+          },
+        );
+      }
+
+      // Add sleeve
+      if (action == "add sleeve" && result == true) {
+        this._orderProcess.sleeveProcess = "waitingForUpload";
+        this.artworkLink = undefined;
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: {
+              sleeveProcess: "waitingForUpload",
+              artworkZip: "",
+            },
+            order_add_ons: { sleeveAddOn: "added" },
+          },
+        );
+      }
+
+      // Add label
+      if (action == "add label" && result == true) {
+        this._orderProcess.labelProcess = "waitingForUpload";
+        this.artworkLink = undefined;
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: {
+              labelProcess: "waitingForUpload",
+              artworkZip: "",
+            },
+            order_add_ons: { labelAddOn: "added" },
+          },
+        );
+      }
+
+      // Add slipmat
+      if (action == "add slipmat" && result == true) {
+        this._orderProcess.slipmatProcess = "waitingForUpload";
+        this.artworkLink = undefined;
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_process: {
+              slipmatProcess: "waitingForUpload",
+              artworkZip: "",
+            },
+            order_add_ons: { slipmatAddOn: "added" },
+          },
+        );
+      }
+
+      // Add design services
+      if (action == "add design services" && result == true) {
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_add_ons: { designServicesAddOn: "added" },
+          },
+        );
+      }
+
+      // Add online designer
+      if (action == "add online designer" && result == true) {
+        this._firestoreApiService.mergeDoc(
+          `shopOrders/${this.orderId as string}`,
+          {
+            order_add_ons: { onlineDesignerAddOn: "added" },
+          },
+        );
+      }
+    });
   }
 
   // resize event listener for window adapting

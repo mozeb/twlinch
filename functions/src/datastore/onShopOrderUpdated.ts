@@ -48,7 +48,7 @@ async function onShopOrderUpdated(
     logger.info("ℹ️ Starting to create music zip folder");
     const zipFileUrl = await createZipFromFolder(
       `orders/${orderId}/music/`,
-      `Order_${orderAfter.wc_order_num}_Music.zip`,
+      `Order_${orderAfter.wc_order_num}_${orderAfter.address_billing.first_name}_${orderAfter.address_billing.last_name}_Music.zip`,
     );
 
     await getFirestore().collection("shopOrders").doc(orderId).update({
@@ -135,7 +135,7 @@ async function onShopOrderUpdated(
     logger.info("ℹ️ Starting to create music zip folder");
     const zipFileUrl = await createZipFromFolder(
       `orders/${orderId}/artwork/`,
-      `Order_${orderAfter.wc_order_num}_Artwork.zip`,
+      `Order_${orderAfter.wc_order_num}_${orderAfter.address_billing.first_name}_${orderAfter.address_billing.last_name}_Artwork.zip`,
     );
 
     await getFirestore().collection("shopOrders").doc(orderId).update({

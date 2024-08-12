@@ -16,7 +16,7 @@ import {
 import { filter, orderBy, sortBy } from "lodash";
 
 @Component({
-  selector: "admin-dashboard",
+  selector: "processing-orders",
   standalone: true,
   imports: [RouterOutlet, NgForOf, MatTableModule, NgStyle, RouterLink],
   templateUrl: "processiing_orders.html",
