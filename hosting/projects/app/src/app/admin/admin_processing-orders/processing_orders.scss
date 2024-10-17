@@ -83,3 +83,27 @@
   border-top:1px solid white;
   padding-top: 20px;
 }
+
+.order-status{
+  background-color: #ffdc7c;
+  border-radius: 100px;
+  padding:3px 10px;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:5px;
+  cursor: pointer;
+  font-family: "Ubuntu Mono";
+  font-weight: 800;
+  font-size:9px;
+  text-transform: uppercase;
+;
+}
+td {
+  //height: fit-content;
+  //border-collapse: separate;
+  //border-spacing: 5px;
+  display: table-cell;
+  vertical-align: middle;
+}

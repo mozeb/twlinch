@@ -1,7 +1,12 @@
 import { DateTime } from "luxon";
 import { ShopItemLineBase } from "./shopItemLine";
 import { WCOrderBilling, WCOrderShipping, WCOrderStatus } from "../WCOrder";
-import { OrderAddOns, OrderProcess } from "../../https/woocommerce";
+import {
+  OrderAddOns,
+  OrderProcess,
+  twDesignStatus,
+  twRecordingStatus,
+} from "../../https/woocommerce";
 
 /**
  * Data model. Shop order data.
@@ -59,6 +64,12 @@ export interface ShopOrderBase {
   order_process?: OrderProcess;
 
   order_add_ons?: OrderAddOns;
+
+  tw_design_order_status?: twDesignStatus;
+
+  tw_recording_order_status?: twRecordingStatus;
+
+  isGift?: boolean;
 }
 
 /**

@@ -1,0 +1,67 @@
+
+//.mat-mdc-dialog-surface ,mdc-dialog__surface{
+//  background-color: transparent !important;
+//  box-shadow: none !important;
+//}
+
+.cdk-overlay-dark-backdrop{
+  background-color: rgba(0, 0, 0, 0.72) !important;
+}
+
+.warning{
+  filter: brightness(0) saturate(100%) invert(83%) sepia(63%) saturate(2357%) hue-rotate(1deg) brightness(105%) contrast(106%);
+}
+
+button:focus {outline:0;}
+
+
+.limit{
+  font-family: 'Ubuntu Mono';
+  font-weight: 600;
+  font-size:14px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.dialog{
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding:30px;
+  gap:10px;
+}
+
+.upload-header{
+  font-family: "Public Sans";
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.upload-subheader{
+  font-family: "Public Sans";
+  font-weight: 400;
+  font-size: 12px;
+  color:black;
+}
+
+.order-status{
+  background-color: #ffdc7c;
+  border-radius: 100px;
+  padding:10px;
+  height: fit-content;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-family: 'Ubuntu Mono';
+  width: fit-content;
+  cursor: pointer;
+}
+
+.statuses{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:10px;
+}

@@ -18,6 +18,12 @@
       <div *ngIf="_orderProcess.slipmatProcess === 'uploadFinished'" class="completed-tag"><img src="/assets/Upload_Complete_Icon.svg" style="width: 20px;"/>Completed</div>
       <button *ngIf="_orderProcess.slipmatProcess === 'waitingForUpload'" class="upload-button twl-app-button" (click)="goToUploader('slipmat')">START NOW</button>
     </div>
+    <div *ngIf="_orderProcess.pictureDiscProcess !== 'notOrdered'" class="upload-card">
+      <img src="/assets/Picture_Disc_Artwork.jpg" class="artwork-image" />
+      <div class="upload-header">upload picture disc design</div>
+      <div *ngIf="_orderProcess.pictureDiscProcess === 'uploadFinished'" class="completed-tag"><img src="/assets/Upload_Complete_Icon.svg" style="width: 20px;"/>Completed</div>
+      <button *ngIf="_orderProcess.pictureDiscProcess === 'waitingForUpload'" class="upload-button twl-app-button" (click)="goToUploader('pictureDisc')">START NOW</button>
+    </div>
   </div>
 </div>
 

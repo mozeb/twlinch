@@ -43,6 +43,9 @@ export class Manage_orderComponent implements OnInit {
   public orderNumber: string | undefined;
   public customerName: string | undefined;
 
+  // Is gift order
+  isGift = false;
+
   protected firestore: Firestore = inject(Firestore);
 
   ngOnInit() {
@@ -73,6 +76,12 @@ export class Manage_orderComponent implements OnInit {
     if (order === undefined) {
       return;
     }
+
+    // Check if it is gift order
+    if (order.isGift && order.isGift == true) {
+      this.isGift = true;
+    }
+
     this.orderNumber = order.wc_order_num;
     this.customerName = order.address_billing.first_name;
     console.log(order.item_lines[0].name);

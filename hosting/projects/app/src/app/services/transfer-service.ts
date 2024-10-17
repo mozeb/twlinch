@@ -33,4 +33,6 @@ export type artworkType =
   | "slipmat"
   | "music"
   | "undefined"
-  | "pictureDisc";
+  | "pictureDisc"
+  | "pictureDisc12"
+  | "pictureDisc7";

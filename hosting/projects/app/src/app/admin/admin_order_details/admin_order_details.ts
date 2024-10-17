@@ -10,17 +10,19 @@ import {
   OrderProcess,
   orderProcessBackgroundColor,
   statusBackgroundColor,
+  twDesignOrderStatusColor,
+  twDesignOrderStatusText,
+  twDesignStatus,
+  twRecordingOrderStatusColor,
+  twRecordingOrderStatusText,
+  twRecordingStatus,
 } from "../../services/interfaces";
 import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
 import { MatIcon } from "@angular/material/icon";
 import { AuthService } from "../../services/auth.service";
 import { ConfirmActionPopupComponent } from "../../popups/confirm_action_popup/confirm_action_popup.component";
-import {
-  MatDialog,
-  MatDialogModule,
-  MatDialogClose,
-} from "@angular/material/dialog";
-import { user } from "@angular/fire/auth";
+import { MatDialog } from "@angular/material/dialog";
+import { TwOrderStatusChangeComponent } from "../../popups/twlinch-order-status-change/tw_order_status_change_popup.component";
 
 @Component({
   selector: "admin-orders",
@@ -40,6 +42,11 @@ export class Admin_orderDetailsComponent implements OnInit {
   ];
   statusColor = statusBackgroundColor;
   orderProcessColor = orderProcessBackgroundColor;
+  twDesignStatusColor = twDesignOrderStatusColor;
+  twDesignStatusText = twDesignOrderStatusText;
+  twRecordingStatusColor = twRecordingOrderStatusColor;
+  twRecordingStatusText = twRecordingOrderStatusText;
+
   innerHeight: string | undefined;
   orderId: string | undefined;
 
@@ -56,6 +63,7 @@ export class Admin_orderDetailsComponent implements OnInit {
   onlineDesigner: string | undefined;
   name: string | undefined;
   orderNumber: string | undefined;
+  email: string | undefined;
 
   // Add-ons
   doubleAlbumAdd: string | undefined;
@@ -66,6 +74,9 @@ export class Admin_orderDetailsComponent implements OnInit {
   slipmatAdd: string | undefined;
 
   justVinyl: boolean = false;
+
+  _tw_Design_Order_Status: twDesignStatus = "waitingUploads";
+  _tw_Recording_Order_Status: twRecordingStatus = "waitingUploads";
 
   protected firestore: Firestore = inject(Firestore);
 
@@ -112,6 +123,9 @@ export class Admin_orderDetailsComponent implements OnInit {
     this.name =
       order.address_billing.first_name + " " + order.address_billing.last_name;
     this.orderNumber = order.wc_order_num;
+    this.email = order.address_billing.email;
+    this._tw_Design_Order_Status = order.tw_design_order_status;
+    this._tw_Recording_Order_Status = order.tw_recording_order_status;
     this.getOrderData(order);
   }
 
@@ -137,7 +151,19 @@ export class Admin_orderDetailsComponent implements OnInit {
     const unsub1 = onSnapshot(
       doc(this.firestore, `shopOrders/${this.orderId as string}`),
       (doc) => {
+        // Get nodes
         this._orderAddOns = doc.get("order_add_ons") as OrderAddOns;
+
+        // Listen to order status changes
+        this._tw_Design_Order_Status = doc.get(
+          "tw_design_order_status",
+        ) as twDesignStatus;
+
+        this._tw_Recording_Order_Status = doc.get(
+          "tw_recording_order_status",
+        ) as twRecordingStatus;
+
+        // Add ons checker
         if (this._orderAddOns.doubleAlbumAddOn == "added") {
           this.doubleAlbumAdd = "Double Album";
         } else {
@@ -448,9 +474,22 @@ export class Admin_orderDetailsComponent implements OnInit {
     });
   }
 
+  openTwStatusChangeDialog(type: string, header: string) {
+    const dialogRef = this.dialog.open(TwOrderStatusChangeComponent, {
+      data: {
+        change_type: type,
+        orderId: this.orderId,
+        header_text: header,
+      },
+    });
+  }
+
   // resize event listener for window adapting
   @HostListener("window:resize", ["$event"])
   onResize($event: Event) {
     this.innerHeight = window.innerHeight + "px";
   }
+
+  protected readonly twRecordingOrderStatusColor = twRecordingOrderStatusColor;
+  protected readonly twRecordingOrderStatusText = twRecordingOrderStatusText;
 }

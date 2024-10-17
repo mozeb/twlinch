@@ -7,7 +7,7 @@ import {
 import { Router, RouterLink, RouterOutlet } from "@angular/router";
 import { FirestoreApiService } from "../../services/firestore-api.service";
 import { ShopOrderJSON } from "../../interfaces/shopOrder";
-import { NgForOf, NgStyle } from "@angular/common";
+import { DatePipe, NgForOf, NgStyle } from "@angular/common";
 import { MatTableDataSource, MatTableModule } from "@angular/material/table";
 import {
   orderProcessBackgroundColor,
@@ -18,12 +18,20 @@ import { filter, orderBy, sortBy } from "lodash";
 @Component({
   selector: "shipped-orders",
   standalone: true,
-  imports: [RouterOutlet, NgForOf, MatTableModule, NgStyle, RouterLink],
+  imports: [
+    RouterOutlet,
+    NgForOf,
+    MatTableModule,
+    NgStyle,
+    RouterLink,
+    DatePipe,
+  ],
   templateUrl: "shipped_orders.html",
   styleUrls: ["./shipped_orders.scss"],
 })
 export class ShippedOrdersComponent implements OnInit {
-  dataSource: MatTableDataSource<ShopOrderJSON> | undefined;
+  // @ts-ignore
+  dataSource: MatTableDataSource<ShopOrderJSON>;
   displayedColumns = [
     "wc_order_num",
     "address_billing",
@@ -40,13 +48,17 @@ export class ShippedOrdersComponent implements OnInit {
     private _router: Router,
   ) {}
 
-  async ngOnInit(): Promise<void> {
+  async ngOnInit() {
+    this.dataSource = new MatTableDataSource<ShopOrderJSON>([]);
     this.innerHeight = window.innerHeight + "px";
-    let orders = await this._firestoreApiService.getAllOrders();
+    await this.loadData();
+  }
+
+  async loadData() {
+    let orders = await this._firestoreApiService.getShippedOrders();
     if (orders) {
       orders = orderBy(orders, "date_created", "desc");
-      orders = filter(orders, (order) => order.wc_status == "completed");
-      this.dataSource = new MatTableDataSource<ShopOrderJSON>(orders);
+      this.dataSource.data = orders;
       console.log(orders);
     }
   }

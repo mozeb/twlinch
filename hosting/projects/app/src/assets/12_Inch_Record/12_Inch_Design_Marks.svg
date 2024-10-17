@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1807.06 912.76">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-dasharray: 6.98 6.98;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6 {
+        fill: none;
+        stroke: #ec008c;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        stroke-dasharray: 6.99 6.99;
+      }
+
+      .cls-3 {
+        stroke-dasharray: 7.02 7.02;
+      }
+
+      .cls-5 {
+        stroke-dasharray: 7.02 7.02;
+      }
+
+      .cls-6 {
+        stroke-dasharray: 7.04 7.04;
+      }
+    </style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 28.6.0, SVG Export Plug-In . SVG Version: 1.2.0 Build 709)  -->
+  <g>
+    <g id="CUT_INDICATORS">
+      <g>
+        <g>
+          <polyline class="cls-4" points="908.49 889.41 908.49 892.91 904.99 892.91"/>
+          <polyline class="cls-4" points="902.07 892.91 898.57 892.91 898.57 889.41"/>
+          <line class="cls-6" x1="898.57" y1="882.37" x2="898.57" y2="26.86"/>
+          <polyline class="cls-4" points="898.57 23.34 898.57 19.84 902.07 19.84"/>
+          <polyline class="cls-4" points="904.99 19.84 908.49 19.84 908.49 23.34"/>
+          <line class="cls-6" x1="908.49" y1="30.38" x2="908.49" y2="885.89"/>
+        </g>
+        <g>
+          <line class="cls-4" x1="908.49" y1="892.91" x2="911.99" y2="892.91"/>
+          <line class="cls-5" x1="919.01" y1="892.91" x2="1785.89" y2="892.91"/>
+          <polyline class="cls-4" points="1789.4 892.91 1792.9 892.91 1792.9 889.41"/>
+          <line class="cls-6" x1="1792.9" y1="882.37" x2="1792.9" y2="26.86"/>
+          <line class="cls-4" x1="1792.9" y1="23.34" x2="1792.9" y2="19.84"/>
+        </g>
+        <g>
+          <line class="cls-4" x1="1792.9" y1="19.84" x2="1789.4" y2="19.84"/>
+          <line class="cls-5" x1="1782.38" y1="19.84" x2="915.5" y2="19.84"/>
+          <line class="cls-4" x1="911.99" y1="19.84" x2="908.49" y2="19.84"/>
+        </g>
+        <g>
+          <polyline class="cls-4" points="912.05 9.92 908.55 9.92 908.55 13.42"/>
+          <polyline class="cls-4" points="908.55 16.34 908.55 19.84 905.05 19.84"/>
+          <line class="cls-2" x1="898.07" y1="19.84" x2="21.15" y2="19.84"/>
+          <polyline class="cls-4" points="17.66 19.84 14.16 19.84 14.16 23.34"/>
+          <line class="cls-6" x1="14.16" y1="30.38" x2="14.16" y2="885.89"/>
+          <polyline class="cls-4" points="14.16 889.41 14.16 892.91 17.66 892.91"/>
+          <polyline class="cls-2" points="24.65 892.91 898.51 892.91 901.56 892.91"/>
+          <polyline class="cls-4" points="905.05 892.91 908.55 892.91 908.55 896.41"/>
+          <polyline class="cls-4" points="908.55 899.33 908.55 902.83 912.05 902.83"/>
+          <line class="cls-3" x1="919.07" y1="902.83" x2="1785.89" y2="902.83"/>
+          <polyline class="cls-4" points="1789.4 902.83 1792.9 902.83 1792.9 899.33"/>
+          <polyline class="cls-1" points="1792.9 892.36 1792.9 19.84 1792.9 16.91"/>
+          <polyline class="cls-4" points="1792.9 13.42 1792.9 9.92 1789.4 9.92"/>
+          <line class="cls-3" x1="1782.38" y1="9.92" x2="915.56" y2="9.92"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -48,10 +48,12 @@
       </div>
       <div class="main-content">
         <div class="top-menu">
-          <span class="finish">Hey, {{ customerName }}!</span>
+          <span *ngIf="isGift" class="finish">Fulfill your gift!</span>
+          <span *ngIf="isGift === false" class="finish">Hey, {{ customerName }}!</span>
           <div class="mobile-logo"><img src="/assets/Twlinch_Logo.svg" style="width: 80px;"/></div>
           <div class="right-side">
-            <span>Order : </span><span style="font-size: 14px">#{{ orderNumber }}</span>
+            <span *ngIf="isGift">Gift code: </span>
+            <span *ngIf="isGift === false">Order: </span><span style="font-size: 14px">#{{ orderNumber }}</span>
             <button class="logout-button" (click)="this.logOut()">
               <img src="/assets/Exit_Icon.svg" style="width: 18px;"/>
             </button>

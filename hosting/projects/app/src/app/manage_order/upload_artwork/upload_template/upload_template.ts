@@ -165,10 +165,39 @@ export class Upload_templateComponent implements OnInit {
       this.fPath = "slipmat";
     }
 
-    // Set links for picturedisc
-    if (this.tempType == "pictureDisc") {
+    // Set links for picturedisc 12 inch
+    if (this.tempType == "pictureDisc12") {
       this.downloadText = "Download picture disc template";
       this.uploadText = "Upload picture disc design";
+      this.fPath = "picture-disc";
+
+      this.PDFUrl = await this._baseStorageService.getStorageDownloadLink(
+        "templates/picturedisc/12inch/pdf/Twlinch_12_Inch_Picture_Disc.pdf",
+      );
+      this.AIUrl = await this._baseStorageService.getStorageDownloadLink(
+        "templates/picturedisc/12inch/ai/Twlinch_12_Inch_Picture_Disc.ai",
+      );
+      this.PSDUrl = await this._baseStorageService.getStorageDownloadLink(
+        "templates/picturedisc/12inch/psd/Twlinch_12_Inch_Picture_Disc.psd",
+      );
+      this.fPath = "picture-disc";
+    }
+
+    // Set links for picturedisc 7 inch
+    if (this.tempType == "pictureDisc7") {
+      this.downloadText = "Download picture disc template";
+      this.uploadText = "Upload picture disc design";
+      this.fPath = "picture-disc";
+
+      this.PDFUrl = await this._baseStorageService.getStorageDownloadLink(
+        "templates/picturedisc/7inch/pdf/Twlinch_7_Inch_Picture_Disc.pdf",
+      );
+      this.AIUrl = await this._baseStorageService.getStorageDownloadLink(
+        "templates/picturedisc/7inch/ai/Twlinch_7_Inch_Picture_Disc.ai",
+      );
+      this.PSDUrl = await this._baseStorageService.getStorageDownloadLink(
+        "templates/picturedisc/7inch/psd/Twlinch_7_Inch_Picture_Disc.psd",
+      );
       this.fPath = "picture-disc";
     }
 

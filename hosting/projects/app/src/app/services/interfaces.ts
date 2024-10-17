@@ -25,6 +25,47 @@ export enum op {
 
 export type orderState = "notOrdered" | "waitingForUpload" | "uploadFinished";
 
+export type twDesignStatus =
+  | "waitingUploads"
+  | "uploadsFinished"
+  | "uploadsVerified"
+  | "printing";
+
+export type twRecordingStatus =
+  | "waitingUploads"
+  | "uploadsFinished"
+  | "uploadsVerified"
+  | "recorded";
+
+export const twDesignOrderStatusColor: { [key: string]: string } = {
+  waitingUploads: "#ffd62c",
+  uploadsFinished: "#f5eb2d",
+  uploadsVerified: "#cdff90",
+  printing: "#97ff90",
+};
+
+export const twRecordingOrderStatusText: { [key: string]: string } = {
+  waitingUploads: "waiting uploads",
+  uploadsFinished: "uploads finished",
+  uploadsVerified: "uploads verified",
+  recorded: "recorded",
+};
+
+export const twRecordingOrderStatusColor: { [key: string]: string } = {
+  waitingUploads: "#ffd62c",
+  uploadsFinished: "#f5eb2d",
+  uploadsVerified: "#cdff90",
+  recorded: "#97ff90",
+};
+
+export const twDesignOrderStatusText: { [key: string]: string } = {
+  waitingUploads: "waiting uploads",
+  uploadsFinished: "uploads finished",
+  uploadsVerified: "uploads verified",
+  printing: "printing",
+  completed: "completed",
+};
+
 export const statusBackgroundColor: { [key: string]: string } = {
   waitingForUpload: "#fff0b3",
   notOrdered: "#d3d3d3",

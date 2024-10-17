@@ -1,0 +1,147 @@
+<div class="dialog">
+  <img src="/assets/Add_Shipping_Address.svg" style="width: 80px;padding-bottom:20px;">
+  <span class="upload-header">
+    Add shipping details
+  </span>
+  <span class="upload-subheader">
+    {{ content_text }}
+  </span>
+
+  <div class="form-container">
+
+
+    <form class="form-class" [formGroup]="form">
+      <mat-form-field  class="mfield" >
+        <mat-label>First Name</mat-label>
+        <input
+          matInput
+          required
+          formControlName="First_Name"
+          type="text"
+        />
+        @if (form.controls["First_Name"].hasError("required")) {
+          <mat-error> Missing First Name.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="mfield" >
+        <mat-label>Last Name</mat-label>
+        <input
+          matInput
+          required
+          formControlName="Last_Name"
+          type="text"
+        />
+        @if (form.controls["Last_Name"].hasError("required")) {
+          <mat-error> Missing Last Name.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="mfield" >
+        <mat-label>Street Address</mat-label>
+        <input
+          matInput
+          required
+          formControlName="Street_Address"
+          type="text"
+        />
+        @if (form.controls["Street_Address"].hasError("required")) {
+          <mat-error> Missing Street Address.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="mfield" [hideRequiredMarker]="true">
+        <mat-label>Apartment, Suite...</mat-label>
+        <input
+          matInput
+          formControlName="Street_Address2"
+          type="text"
+        />
+      </mat-form-field>
+      <mat-form-field class="mfield">
+        <mat-label>Post Code / Zip</mat-label>
+        <input
+          matInput
+          required
+          formControlName="Post_Code"
+          type="text"
+        />
+        @if (form.controls["Post_Code"].hasError("required")) {
+          <mat-error> Missing Post Code.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="mfield" >
+        <mat-label>City/Town</mat-label>
+        <input
+          matInput
+          required
+          formControlName="Town"
+          type="text"
+        />
+        @if (form.controls["Town"].hasError("required")) {
+          <mat-error> Missing Town.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="mfield" >
+        <mat-label>Country</mat-label>
+        <input
+          matInput
+          required
+          formControlName="Country"
+          type="text"
+        />
+        @if (form.controls["Country"].hasError("required")) {
+          <mat-error> Missing Country.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="mfield" [hideRequiredMarker]="true">
+        <mat-label>State</mat-label>
+        <input
+          matInput
+          formControlName="State"
+          type="text"
+        />
+      </mat-form-field>
+      <mat-form-field class="mfield">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          required
+          formControlName="Email_Address"
+          autocomplete="email"
+          type="email"
+        />
+        @if (form.controls["Email_Address"].hasError("required")) {
+          <mat-error> Missing Email.</mat-error>
+        }
+        @if (form.controls["Email_Address"].hasError("email")) {
+          <mat-error> Email not valid.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="mfield">
+        <mat-label>Phone Number</mat-label>
+        <input
+          matInput
+          required
+          formControlName="Phone_Number"
+          type="tel"
+        />
+        @if (form.controls["Phone_Number"].hasError("required")) {
+          <mat-error> Missing Phone Number.</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  </div>
+  <div style="display: flex; justify-content: center; align-items: center; gap:15px;">
+    <button (click)="closeDialog(false)"
+            class="twl-app-gray-button"
+            style="margin-top: 20px"
+    >
+      Close
+    </button>
+    <button (click)="addShipping()"
+            class="twl-app-button"
+            style="margin-top: 20px"
+    >
+      Update shipping details
+    </button>
+
+  </div>
+</div>

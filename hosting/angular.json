@@ -51,7 +51,7 @@
             "tsConfig": "projects/app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/app/src/favicon.ico",
+              "projects/app/src/Twlinch_Fav_Black.png",
               "projects/app/src/assets"
             ],
             "styles": [

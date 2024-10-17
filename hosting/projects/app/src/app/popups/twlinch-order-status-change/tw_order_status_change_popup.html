@@ -1,0 +1,32 @@
+<div class="dialog">
+  <img src="/assets/Refresh.svg" style="width: 80px;padding-bottom:20px;" >
+  <span class="upload-header">
+        {{header_text}}
+  </span>
+  <span class="upload-subheader">
+    Update status for this order
+  </span>
+
+  <div *ngIf="data.change_type === 'recording'" class="statuses">
+    <div class="order-status" [ngStyle]="{'background-color': twRecordingStatusColor['waitingUploads']}" (click)="updateRecordingStatus('waitingUploads')"> {{twRecordingStatusText["waitingUploads"]}} </div>
+    <div class="order-status" [ngStyle]="{'background-color': twRecordingStatusColor['uploadsFinished']}" (click)="updateRecordingStatus('uploadsFinished')"> {{twRecordingStatusText["uploadsFinished"]}} </div>
+    <div class="order-status" [ngStyle]="{'background-color': twRecordingStatusColor['uploadsVerified']}" (click)="updateRecordingStatus('uploadsVerified')"> {{twRecordingStatusText["uploadsVerified"]}}</div>
+    <div class="order-status" [ngStyle]="{'background-color': twRecordingStatusColor['recorded']}" (click)="updateRecordingStatus('recorded')"> {{twRecordingStatusText["recorded"]}} </div>
+  </div>
+
+  <div *ngIf="data.change_type === 'design'" class="statuses">
+    <div class="order-status" [ngStyle]="{'background-color': twDesignStatusColor['waitingUploads']}" (click)="updateDesignStatus('waitingUploads')"> {{twDesignStatusText["waitingUploads"]}} </div>
+    <div class="order-status" [ngStyle]="{'background-color': twDesignStatusColor['uploadsFinished']}" (click)="updateDesignStatus('uploadsFinished')"> {{twDesignStatusText["uploadsFinished"]}} </div>
+    <div class="order-status" [ngStyle]="{'background-color': twDesignStatusColor['uploadsVerified']}" (click)="updateDesignStatus('uploadsVerified')"> {{twDesignStatusText["uploadsVerified"]}}</div>
+    <div class="order-status" [ngStyle]="{'background-color': twDesignStatusColor['printing']}" (click)="updateDesignStatus('printing')"> {{twDesignStatusText["printing"]}} </div>
+  </div>
+
+  <div style="display: flex; justify-content: center; align-items: center; gap:15px;">
+    <button (click)="closeDialog(true)"
+            class="twl-app-button"
+            style="margin-top: 20px" >
+      Close
+    </button>
+
+  </div>
+</div>

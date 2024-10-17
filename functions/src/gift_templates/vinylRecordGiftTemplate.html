@@ -1,0 +1,279 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Twlinch Gift Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="voucher-part">
+      <div class="gift-card">
+        <img
+          src="https://twlinch.com/wp-content/uploads/2022/07/Twlinch_Logo_white.svg"
+          style="padding: 20px; width: 40%"
+        />
+        <img
+          src="https://twlinch.com/wp-content/uploads/2024/08/Gift_Card_Text.svg"
+          style="padding: 20px"
+        />
+      </div>
+      <div class="content">
+        <div class="gift-icon">
+          <img
+            src="https://twlinch.com/wp-content/uploads/2024/08/Gift_Vinyl_Twlinch.svg"
+          />
+        </div>
+        <div></div>
+        <div class="content-info">
+          <span class="product">{{product}}</span>
+          <span class="code-header">REDEEM CODE</span>
+          <div class="code-bg">{{code_id}}</div>
+        </div>
+        <div class="qr-part">
+          <div class="qr-text">
+            With this gift card you can create your personalised vinyl record.
+            Scan the QR code or visit
+            <b>app.twlinch.com/redeem-gift</b> and redeem this gift card. After
+            redeeming the card you will be directed to the content uploader for
+            your personalised Twlinch gift!
+          </div>
+          <div class="qr">
+            <img
+              src="https://twlinch.com/wp-content/uploads/2024/08/Redeem_Gift_Code_QR.svg"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr style="border-top: dashed 1px" />
+    <div class="sizers">
+      <img
+        src="https://twlinch.com/wp-content/uploads/2024/08/Sizers_Icon.svg"
+      />
+    </div>
+    <div style="padding: 20px">
+      <h1>Twlinch Gift Card Terms of Use</h1>
+
+      <h3>Eligibility and Activation:</h3>
+
+      <p>
+        The Twlinch Gift Card ("Gift Card") can be redeemed exclusively for
+        custom vinyl records or slipmat products available on the Twlinch
+        platform. To activate the Gift Card, users must follow the activation
+        process provided at the time of purchase, which requires linking the
+        Gift Card to a valid email address. The email address used during the
+        activation process will be permanently associated with the Gift Card and
+        cannot be changed.
+      </p>
+
+      <h3>Validity and Expiration:</h3>
+
+      <p>
+        The Gift Card is valid for one (1) year from the date of purchase. After
+        this period, any remaining balance on the Gift Card will be forfeited
+        and cannot be redeemed or refunded. It is the responsibility of the Gift
+        Card holder to utilize the balance before the expiration date.
+      </p>
+
+      <h3>Redemption:</h3>
+
+      <p>
+        The Gift Card may only be redeemed by the person whose email address is
+        linked to the card. The balance of the Gift Card can be applied toward
+        the purchase of custom vinyl records or slipmat products on the Twlinch
+        platform. The Gift Card cannot be used to purchase additional Gift Cards
+        or to cover any shipping or handling fees, unless explicitly stated
+        otherwise.
+      </p>
+
+      <h3>Non-Transferability and Non-Refundability:</h3>
+
+      <p>
+        The Gift Card is non-transferable and non-refundable. Once activated, it
+        cannot be exchanged for cash, credit, or other forms of currency, except
+        where required by law. Twlinch is not responsible for any lost, stolen,
+        or unauthorized use of the Gift Card after activation.
+      </p>
+
+      <h3>Balance and Usage:</h3>
+
+      <p>
+        he balance on the Gift Card can be checked by logging into the Twlinch
+        account associated with the activation email. The remaining balance will
+        be automatically applied to future purchases until it is depleted or the
+        card expires. If a purchase exceeds the balance of the Gift Card, the
+        remaining amount must be paid using another valid payment method.
+      </p>
+
+      <h3>Fraud Prevention:</h3>
+
+      <p>
+        Twlinch reserves the right to deactivate or refuse to honor any Gift
+        Card suspected of being obtained fraudulently or in violation of these
+        terms.
+      </p>
+
+      <h3>Changes to Terms:</h3>
+
+      <p>
+        Twlinch reserves the right to amend these terms and conditions at any
+        time. Any changes will be communicated via the email associated with the
+        Gift Card or through the Twlinch website. Continued use of the Gift Card
+        after any such changes constitutes acceptance of the revised terms.
+      </p>
+
+      <h3>Governing Law:</h3>
+
+      <p>
+        These terms and conditions are governed by the laws of the jurisdiction
+        in which Twlinch operates. Any disputes arising from the use of the Gift
+        Card shall be resolved in accordance with local law. By activating and
+        using the Twlinch Gift Card, you agree to these terms and conditions. If
+        you do not agree, please refrain from activating or using the Gift Card
+        and contact Twlinch customer support for assistance.
+      </p>
+    </div>
+  </body>
+</html>
+
+<style>
+  @media print {
+    body {
+      -webkit-print-color-adjust: exact;
+    }
+  }
+
+  @media print {
+    body {
+      width: 21.6cm;
+      height: 29.7cm;
+      margin: 20px;
+      /* change the margins as you want them to be. */
+    }
+  }
+
+  @page {
+    size: A4;
+  }
+
+  body {
+    width: 21.6cm;
+    height: 29.7cm;
+    margin: 0px;
+    /* change the margins as you want them to be. */
+  }
+
+  .voucher-part {
+    height: 85mm;
+    background-color: #efefef;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10mm;
+  }
+
+  .gift-card {
+    background-color: black;
+    width: 45mm;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .content {
+    flex: 1;
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
+    background: url("https://twlinch.com/wp-content/uploads/2024/08/Vinyl_Pattern_bright_2.svg");
+    background-repeat: repeat;
+    background-size: 200px;
+  }
+
+  .content-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product {
+    font-size: 25px;
+    font-weight: 800;
+    font-family: "Public Sans";
+  }
+
+  .code-header {
+    font-size: 15px;
+    font-family: "Ubuntu Mono";
+    font-weight: 500;
+    padding-top: 10px;
+    padding-bottom: 5px;
+  }
+
+  .code-bg {
+    background-color: white;
+    width: 50mm;
+    height: 11mm;
+    display: flex;
+    justify-content: center;
+    font-family: "Public Sans";
+    font-size: 22px;
+    align-items: center;
+    font-weight: 900;
+  }
+
+  .qr-text {
+    font-family: "Public Sans";
+    font-size: 12px;
+    flex: 1;
+  }
+  .qr-part {
+    background-color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+  }
+  .qr {
+    width: 15mm;
+    height: 15mm;
+    background-color: white;
+  }
+
+  .gift-icon {
+    width: 12mm;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+  }
+
+  .sizers {
+    width: 30px;
+  }
+
+  h3 {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: "Public Sans";
+  }
+
+  h1 {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: "Public Sans";
+  }
+
+  p {
+    font-size: 8px;
+    font-weight: 500;
+    font-family: "Public Sans";
+  }
+</style>

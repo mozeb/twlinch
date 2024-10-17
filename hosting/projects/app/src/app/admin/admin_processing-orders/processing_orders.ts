@@ -1,35 +1,49 @@
+import { Component, HostListener, OnInit } from "@angular/core";
 import {
-  Component,
-  HostListener,
-  OnInit,
-  ViewEncapsulation,
-} from "@angular/core";
-import { Router, RouterLink, RouterOutlet } from "@angular/router";
+  ActivatedRoute,
+  Router,
+  RouterLink,
+  RouterOutlet,
+} from "@angular/router";
 import { FirestoreApiService } from "../../services/firestore-api.service";
 import { ShopOrderJSON } from "../../interfaces/shopOrder";
-import { NgForOf, NgStyle } from "@angular/common";
+import { DatePipe, NgForOf, NgStyle } from "@angular/common";
 import { MatTableDataSource, MatTableModule } from "@angular/material/table";
 import {
   orderProcessBackgroundColor,
   statusBackgroundColor,
+  twDesignOrderStatusColor,
+  twDesignOrderStatusText,
+  twRecordingOrderStatusColor,
+  twRecordingOrderStatusText,
 } from "../../services/interfaces";
 import { filter, orderBy, sortBy } from "lodash";
 
 @Component({
   selector: "processing-orders",
   standalone: true,
-  imports: [RouterOutlet, NgForOf, MatTableModule, NgStyle, RouterLink],
+  imports: [
+    RouterOutlet,
+    NgForOf,
+    MatTableModule,
+    NgStyle,
+    RouterLink,
+    DatePipe,
+  ],
   templateUrl: "processiing_orders.html",
   styleUrls: ["./processing_orders.scss"],
 })
 export class ProcessosingOrdersComponent implements OnInit {
-  dataSource: MatTableDataSource<ShopOrderJSON> | undefined;
+  // @ts-ignore
+  dataSource: MatTableDataSource<ShopOrderJSON>;
   displayedColumns = [
     "wc_order_num",
     "address_billing",
     "order_process",
     "date_created",
-    "wc_status",
+    //"wc_status",
+    "tw_recording_status",
+    "tw_design_status",
   ];
   statusColor = statusBackgroundColor;
   orderProcessColor = orderProcessBackgroundColor;
@@ -40,13 +54,17 @@ export class ProcessosingOrdersComponent implements OnInit {
     private _router: Router,
   ) {}
 
-  async ngOnInit(): Promise<void> {
+  async ngOnInit() {
+    this.dataSource = new MatTableDataSource<ShopOrderJSON>([]);
     this.innerHeight = window.innerHeight + "px";
-    let orders = await this._firestoreApiService.getAllOrders();
+    await this.loadData();
+  }
+
+  async loadData() {
+    let orders = await this._firestoreApiService.getProcessingOrders();
     if (orders) {
       orders = orderBy(orders, "date_created", "desc");
-      orders = filter(orders, (order) => order.wc_status == "processing");
-      this.dataSource = new MatTableDataSource<ShopOrderJSON>(orders);
+      this.dataSource.data = orders;
       console.log(orders);
     }
   }
@@ -60,4 +78,9 @@ export class ProcessosingOrdersComponent implements OnInit {
   onResize($event: Event) {
     this.innerHeight = window.innerHeight + "px";
   }
+
+  protected readonly twRecordingOrderStatusText = twRecordingOrderStatusText;
+  protected readonly twRecordingOrderStatusColor = twRecordingOrderStatusColor;
+  protected readonly twDesignOrderStatusText = twDesignOrderStatusText;
+  protected readonly twDesignOrderStatusColor = twDesignOrderStatusColor;
 }

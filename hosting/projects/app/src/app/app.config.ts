@@ -71,13 +71,13 @@ export const appConfig: ApplicationConfig = {
     //   }
     //   return database;
     // }),
-    // provideFunctions(() => {
-    //   const functions = getFunctions();
-    //   if (useEmulators && location.hostname === "localhost") {
-    //     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
-    //   }
-    //   return functions;
-    // }),
+    provideFunctions(() => {
+      const functions = getFunctions();
+      if (useEmulators && location.hostname === "localhost") {
+        connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+      }
+      return functions;
+    }),
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: "outline", floatLabel: "always" },

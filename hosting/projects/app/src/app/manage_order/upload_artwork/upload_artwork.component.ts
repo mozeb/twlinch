@@ -33,6 +33,7 @@ export class Upload_artworkComponent implements OnInit {
 
   innerHeight: string | undefined;
   vinylSize: artworkType = "sleeve12";
+  pictureDiscSize: artworkType = "pictureDisc12";
 
   _orderProcess: OrderProcess = {
     musicProcess: "notOrdered",
@@ -80,6 +81,18 @@ export class Upload_artworkComponent implements OnInit {
           this.vinylSize = "sleeveDouble";
       }
     });
+
+    order.item_lines.forEach((element) => {
+      // Check for size of the record
+      switch (element.wc_product_id) {
+        case 5052:
+          this.pictureDiscSize = "pictureDisc12";
+          break;
+        case 5049:
+          this.pictureDiscSize = "pictureDisc7";
+          break;
+      }
+    });
   }
 
   goToUploader(goTo: string) {
@@ -93,7 +106,7 @@ export class Upload_artworkComponent implements OnInit {
     } else if (goTo == "slipmat") {
       this._transferService.setType("slipmat");
     } else if (goTo == "pictureDisc") {
-      this._transferService.setType("pictureDisc");
+      this._transferService.setType(this.pictureDiscSize);
     }
 
     this._router.navigateByUrl("/manage-order/upload-template");

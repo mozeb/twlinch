@@ -14,6 +14,7 @@ import {
 } from "@angular/fire/firestore";
 import { firstValueFrom } from "rxjs";
 import { ProgressIndicatorService } from "../progress-indicator.service";
+import { filter } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -96,8 +97,10 @@ export class FirestoreBaseService {
     this._baseProgress.show();
 
     const ref = collection(this.firestore, path);
-    const snap = await firstValueFrom(collectionData(ref));
-
+    const obs = collectionData(ref);
+    //const sub = obs.subscribe((data) => console.log(data));
+    const snap = await firstValueFrom(obs);
+    //sub.unsubscribe();
     this._baseProgress.hide();
     return snap as T[];
   }
@@ -114,7 +117,9 @@ export class FirestoreBaseService {
     this._baseProgress.show();
 
     const ref = query(collection(this.firestore, path), ...queryConstraints);
-    const jsonValues = await firstValueFrom(collectionData(ref));
+    const obs = collectionData(ref);
+    obs.subscribe((data) => console.log(data));
+    const jsonValues = await firstValueFrom(obs);
 
     this._baseProgress.hide();
     return jsonValues as T[];

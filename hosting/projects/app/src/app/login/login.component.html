@@ -36,7 +36,8 @@
           required
           formControlName="password"
           autocomplete="current-password"
-          type="number"
+          type="text"
+          style="text-transform: uppercase"
         />
         @if (form.controls["password"].hasError("required")) {
           <mat-error> Missing Order Number.</mat-error>
@@ -123,7 +124,8 @@
           required
           formControlName="password"
           (keydown.enter)="formSubmit()"
-          type="number"
+          type="text"
+          style="text-transform: uppercase"
         />
         @if (form.controls["password"].hasError("required")) {
           <mat-error> Missing Order Number.</mat-error>

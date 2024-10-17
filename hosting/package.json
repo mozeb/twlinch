@@ -25,9 +25,13 @@
     "@sreyaj/ng-shimmer": "^2.0.0",
     "fabric": "^6.0.2",
     "file-saver": "^2.0.5",
+    "jspdf": "^2.5.2",
     "jszip": "^3.10.1",
+    "konva": "^9.3.14",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
+    "ng2-konva": "^8.0.0",
+    "pdf-lib": "^1.17.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"

@@ -18,6 +18,8 @@ import { Admin_orderDetailsComponent } from "./admin/admin_order_details/admin_o
 import { ProcessosingOrdersComponent } from "./admin/admin_processing-orders/processing_orders";
 import { pipe, map } from "rxjs";
 import { ShippedOrdersComponent } from "./admin/admin_shipped_orders/shipped_orders";
+import { RedeemGiftComponent } from "./gift/redeem-gift.component";
+import { Sleeve_designerComponent } from "./manage_order/upload_artwork/sleeve_designer/sleeve_designer.component";
 
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(["login"]);
 const redirectNotAdminToLogin = () => redirectNotAdminTo(["login"]);
@@ -36,6 +38,10 @@ export const routes: Routes = [
   {
     path: "admin-login",
     component: AdminLoginComponent,
+  },
+  {
+    path: "redeem-gift-card",
+    component: RedeemGiftComponent,
   },
   {
     path: "home",
@@ -72,6 +78,12 @@ export const routes: Routes = [
       {
         path: "order-details",
         component: Order_detailsComponent,
+        canActivate: [AuthGuard],
+        data: { authGuardPipe: redirectUnauthorizedToLogin },
+      },
+      {
+        path: "sleeve-designer",
+        component: Sleeve_designerComponent,
         canActivate: [AuthGuard],
         data: { authGuardPipe: redirectUnauthorizedToLogin },
       },

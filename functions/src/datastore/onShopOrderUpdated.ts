@@ -132,7 +132,7 @@ async function onShopOrderUpdated(
     onSlipmatChange ||
     onPictureDiscChange
   ) {
-    logger.info("ℹ️ Starting to create music zip folder");
+    logger.info("ℹ️ Starting to create zip from folder");
     const zipFileUrl = await createZipFromFolder(
       `orders/${orderId}/artwork/`,
       `Order_${orderAfter.wc_order_num}_${orderAfter.address_billing.first_name}_${orderAfter.address_billing.last_name}_Artwork.zip`,
@@ -150,11 +150,12 @@ async function onShopOrderUpdated(
  * @param zipFileName Zip file name.
  */
 async function createZipFromFolder(folderPath: string, zipFileName: string) {
-  const bucket = getStorage().bucket();
+  const mainBucket = getStorage().bucket();
+  const bucket = getStorage().bucket("twlinch-records-order-zips");
   const zipFile = bucket.file(folderPath + zipFileName);
 
   // Get all files from bucket.
-  const [fileRefs] = await bucket.getFiles({
+  const [fileRefs] = await mainBucket.getFiles({
     prefix: folderPath,
     delimiter: ".zip",
   });
@@ -162,7 +163,7 @@ async function createZipFromFolder(folderPath: string, zipFileName: string) {
   // Create writable stream to zipFile and pipe in archiver output.
   const outputStreamBuffer = zipFile.createWriteStream({
     gzip: true,
-    contentType: "application/zip",
+    metadata: { cacheControl: "no-cache" },
   });
   const archive = archiver("zip", {
     gzip: true,
@@ -183,7 +184,10 @@ async function createZipFromFolder(folderPath: string, zipFileName: string) {
     });
   }
 
-  let zipUrl: string = "";
+  const zipUrl: string =
+    "https://storage.googleapis.com/twlinch-records-order-zips/" +
+    folderPath +
+    zipFileName;
 
   archive.on("finish", async () => {
     logger.log("✅ Finished uploading zip.");
@@ -191,12 +195,14 @@ async function createZipFromFolder(folderPath: string, zipFileName: string) {
 
   await archive.finalize();
 
-  zipUrl = (
-    await zipFile.getSignedUrl({
-      expires: "03-09-2491",
-      action: "read",
-    })
-  )[0];
+  // zipUrl = (
+  //   await zipFile.getSignedUrl({
+  //     expires: new Date(2050, 12, 31),
+  //     action: "read",
+  //   })
+  // )[0];
+
+  // Get the download URL
 
   return zipUrl;
 }

@@ -1,0 +1,149 @@
+<div class="mobile-login" id="mobileLogin" style="height:{{ innerHeight }}">
+  <div class="mobile-login-upper">
+    <div class="dark-overlay-mobile"></div>
+    <img src="/assets/Twlinch_Logo.svg" style="width: 100px; padding:20px; filter: brightness(0) invert(1)" />
+    <div style="padding: 20px">
+      Redeem your<br />Twlinch<br />gift card!
+      <!--<div style="font-size:15px; font-weight: 500; padding-top:15px;line-height: 1;">Upload music and/or artwork to complete your cutom vinyl record order!</div>-->
+    </div>
+
+    <div></div>
+  </div>
+  <div class="mobile-login-lower">
+    <div class="redeem-header">Redeem your gift:</div>
+    <form [formGroup]="form" style="width: 100%">
+      <mat-form-field style="width: 100%" [hideRequiredMarker]="true">
+        <mat-label>Your Email</mat-label>
+        <input
+          matInput
+          required
+          formControlName="email"
+          autocomplete="email"
+          type="email"
+        />
+        @if (form.controls["email"].hasError("required")) {
+          <mat-error> Missing Email.</mat-error>
+        }
+        @if (form.controls["email"].hasError("email")) {
+          <mat-error> Email not valid.</mat-error>
+        }
+      </mat-form-field>
+      <br />
+      <mat-form-field style="width: 100%" [hideRequiredMarker]="true">
+        <mat-label>Redeem code</mat-label>
+        <input
+          matInput
+          required
+          formControlName="password"
+          autocomplete="current-password"
+          type="text"
+          style="text-transform: uppercase"
+        />
+        @if (form.controls["password"].hasError("required")) {
+          <mat-error> Missing Card Code.</mat-error>
+        }
+        @if (form.controls["password"].hasError("minLength")) {
+          <mat-error> Order number is too short (min. 4 characters)</mat-error>
+        }
+      </mat-form-field>
+    </form>
+    <button
+      style="
+        width: 100%;
+        padding: 25px;
+        background-color: black;
+        color: white;
+        text-transform: uppercase;
+        font-weight: 700;
+      "
+      mat-raised-button
+      color="primary"
+      (click)="formSubmit()"
+      [disabled]="!form.valid"
+    >
+      Redeem Gift
+    </button>
+  </div>
+</div>
+
+<!-- Desktop order login -->
+
+<div
+  class="desktop-login"
+  style="height:{{ innerHeight }}"
+  (window:resize)="onResize($event)"
+>
+
+  <div class="left-side">
+    <div class="dark-overlay"></div>
+    <div class="left-content">
+      <img
+        src="/assets/Twlinch_Logo.svg"
+        style="width: 100px; filter: brightness(0) invert(1)"
+      />
+      <div>
+        Redeem your<br />Twlinch<br />gift card!
+        <!-- <div style="font-size:15px; font-weight: 300; padding-top:15px;line-height: 1;">Upload music and/or artwork to complete your cutom vinyl record order!</div>-->
+      </div>
+      <div
+        style="
+          font-size: 10px;
+          font-weight: 700;
+          padding-top: 15px;
+          line-height: 1;
+          font-family: Ubuntu Mono;
+        "
+      >
+        app.twlinch.com
+      </div>
+    </div>
+  </div>
+  <div class="redeem">
+    <div class="redeem-header">Redeem your gift:</div>
+    <form [formGroup]="form">
+      <mat-form-field style="width: 300px" [hideRequiredMarker]="true">
+        <mat-label>Your Email</mat-label>
+        <input
+          matInput
+          required
+          formControlName="email"
+          autocomplete="email"
+          type="email"
+        />
+        @if (form.controls["email"].hasError("required")) {
+          <mat-error> Missing Email.</mat-error>
+        }
+        @if (form.controls["email"].hasError("email")) {
+          <mat-error> Email not valid.</mat-error>
+        }
+      </mat-form-field>
+      <br />
+      <mat-form-field style="width: 300px" [hideRequiredMarker]="true">
+        <mat-label>Gift Card Code</mat-label>
+        <input
+          matInput
+          required
+          formControlName="password"
+          (keydown.enter)="formSubmit()"
+          type="text"
+          style="text-transform: uppercase"
+        />
+        @if (form.controls["password"].hasError("required")) {
+          <mat-error> Missing Card Code.</mat-error>
+        }
+        @if (form.controls["password"].hasError("minLength")) {
+          <mat-error> Gift card code is too short (min. 6 characters)</mat-error>
+        }
+      </mat-form-field>
+    </form>
+    <button
+      class="twlinch-button"
+      mat-raised-button
+      color="primary"
+      (click)="formSubmit()"
+      [disabled]="!form.valid"
+    >
+      REDEEM GIFT
+    </button>
+  </div>
+</div>
