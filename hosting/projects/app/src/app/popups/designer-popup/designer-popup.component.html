@@ -5,9 +5,9 @@
       <span class="designer-button-text">Upload</span>
     </button>
     <input  type="file" #fileInput (change)="onFileSelected($event)" style="display:none;"/>
-    <button class="designer-button">
+    <button class="designer-button" (click)="addTextNode()">
       <img class="designer-button-icon" src="./assets/Designer_Assets/add_text_icon.svg"/>
-      <span class="designer-button-text">Text</span>
+      <span class="designer-button-text">Add Text</span>
     </button>
     <button id="shapesToggleButon" #shapesToggleButon class="designer-button" (click)="toggleShapes($event)" >
       <img class="designer-button-icon" src="./assets/Designer_Assets/add_shape_icon.svg"/>
@@ -16,10 +16,6 @@
     <button class="designer-button">
       <img class="designer-button-icon" src="./assets/Designer_Assets/change_color_icon.svg"/>
       <span class="designer-button-text">Color</span>
-    </button>
-    <button class="designer-button">
-      <img class="designer-button-icon" src="./assets/Designer_Assets/layers_icon.svg"/>
-      <span class="designer-button-text">Layers</span>
     </button>
   </div>
 

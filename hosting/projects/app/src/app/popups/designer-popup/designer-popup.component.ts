@@ -19,6 +19,8 @@ import Konva from "konva";
 import { PDFDocument, rgb } from "pdf-lib";
 import { DeisgnTemplatesService } from "../../services/deisgn-templates.service";
 import { object } from "@angular/fire/database";
+import { interval } from "rxjs";
+import * as events from "events";
 
 @Component({
   selector: "designer-popup",
@@ -42,6 +44,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   transformer!: Konva.Transformer; // Transformer for moving objects and rotating them
   imageNodes: Konva.Image[] = []; // Array to hold multiple images uploaded
   shapeNondes: Konva.Shape[] = []; // Array to hold multiple images uploaded
+  textNodes: Konva.Text[] = []; // Array to hold multiple images uploaded
   elements: KonvaElement[] = [];
   selectedObject: Konva.Node | null = null;
 
@@ -54,6 +57,8 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   clipPath: any;
   sizeInfo: any;
+
+  scale: number = 1;
 
   @ViewChild("cont") container!: ElementRef;
 
@@ -136,13 +141,13 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Calculate scaling factors to match the SVG dimensions to the stage
     const scaleX = this.stageWidth / this.sizeInfo.width;
     const scaleY = this.stageHeight / this.sizeInfo.height;
-    const scale = Math.min(scaleX, scaleY);
+    this.scale = Math.min(scaleX, scaleY);
 
     // Create the Konva path for the mask background coloring
     this.maskedPath = new Konva.Path({
       data: this._designTemplatesService.twelveInchTemplate.maskPath,
       fill: "lightgray",
-      scale: { x: scale, y: scale },
+      scale: { x: this.scale, y: this.scale },
       x: 0,
       y: 0,
     });
@@ -189,11 +194,16 @@ export class DesignerPopupComponent implements AfterViewInit {
       // Check if clicked target is NOT an image
       if (
         !this.imageNodes.includes(e.target as Konva.Image) &&
-        !this.shapeNondes.includes(e.target as Konva.Shape)
+        !this.shapeNondes.includes(e.target as Konva.Shape) &&
+        !this.textNodes.includes(e.target as Konva.Text)
       ) {
         this.transformer.nodes([]); // Clear selection
         this.objectActions.nativeElement.style.display = "none"; // Remove actions
         this.layer.draw();
+
+        // Remove text edit stuff
+        this.caret.destroy();
+        clearInterval(this.caretInterval);
       }
     });
 
@@ -650,8 +660,221 @@ export class DesignerPopupComponent implements AfterViewInit {
     }
   }
 
-  // Undo and redo states save and actions ///
+  // Add Text node and methods ////
+  addTextNode(): void {
+    const textNode = new Konva.Text({
+      text: "Double Click To Edit",
+      x: 50, // Initial x position
+      y: 50, // Initial y position
+      fontSize: 20,
+      fontFamily: "Ubuntu Mono",
+      fill: "black",
+      draggable: true,
+      padding: 10,
+    });
 
+    this.layer.add(textNode);
+    this.layer.draw();
+
+    // Add click event to image for selecting and attaching transformer
+    textNode.on("click", () => {
+      this.transformer.show();
+      this.transformer.nodes([]);
+      this.transformer.nodes([textNode]);
+      this.layer.draw();
+      this.selectObject(textNode);
+      this.updateActionsPosition();
+    });
+
+    // Add drag event to shape for selecting and attaching transformer
+    textNode.on("dragmove", () => {
+      // Detach transformer from previous node
+      this.transformer.hide();
+      this.objectActions.nativeElement.style.display = "none";
+      this.selectObject(textNode);
+    });
+
+    //Add drag end event to shape for selecting and attaching transformer
+    textNode.on("dragend", () => {
+      this.transformer.show();
+      this.transformer.nodes([]);
+      this.transformer.nodes([textNode]);
+      this.layer.draw();
+      this.selectObject(textNode);
+      this.updateActionsPosition();
+    });
+
+    //Hide the Transformer when rotating
+    textNode.on("transformstart", () => {
+      this.transformer.hide(); // Hide transformer when rotation starts
+      this.objectActions.nativeElement.style.display = "none";
+      this.selectObject(textNode);
+      this.layer.draw();
+    });
+
+    //Show the Transformer again after rotation ends
+    textNode.on("transformend", () => {
+      this.transformer.show(); // Show transformer after rotation ends
+      this.updateActionsPosition();
+      this.selectObject(textNode);
+      this.layer.draw();
+    });
+
+    textNode.on("dblclick", () => {
+      this.selectObject(textNode);
+      this.editText();
+    });
+
+    // Set up at the begining
+    this.transformer.nodes([]);
+    this.transformer.nodes([textNode]);
+    this.textNodes.push(textNode);
+    this.selectObject(textNode);
+    this.transformer.show();
+  }
+
+  caret!: Konva.Line;
+  caretInterval: any;
+
+  editText() {
+    let isEditing = false;
+    const textNode = this.selectedObject as Konva.Text;
+    const scale = textNode.getAbsoluteScale(); // Get both X and Y scales
+    const lineHeight = textNode.fontSize() * scale.x; // Get both X and Y scales
+    let onKeyDown: (event: KeyboardEvent) => void;
+
+    const endEditing = () => {
+      isEditing = false;
+      if (this.caret) {
+        this.caret.destroy();
+      }
+      clearInterval(this.caretInterval);
+      window.removeEventListener("keydown", onKeyDown);
+      this.layer.draw();
+    };
+
+    // Blink caret
+    this.caretInterval = setInterval(() => {
+      this.caret.visible(!this.caret.visible());
+      this.layer.draw();
+    }, 500);
+
+    if (!isEditing) {
+      isEditing = true;
+      const originalText = textNode.text();
+
+      const getCurrentLineWidth = () => {
+        const lines = textNode.text().split("\n");
+        const currentLine = lines[lines.length - 1]; // Get the last line
+        const context = this.layer.getContext()._context; // Canvas 2D context
+        context.font = `${textNode.fontSize() * scale.x}px ${textNode.fontFamily()}`;
+        return (
+          context.measureText(currentLine).width + textNode.padding() * scale.x
+        );
+      };
+
+      const lines = textNode.text().split("\n");
+      const textWidth = getCurrentLineWidth();
+
+      // Create a caret (blinking cursor)
+      this.caret = new Konva.Line({
+        points: [
+          textNode.x() + textWidth,
+          textNode.y() + lineHeight * lines.length - 10,
+          textNode.x() + textWidth,
+          textNode.y() + lineHeight * lines.length + lineHeight - 10,
+        ],
+        stroke: "black",
+        strokeWidth: 1,
+        visible: true,
+      });
+
+      this.layer.add(this.caret);
+      this.layer.draw();
+
+      onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Enter") {
+          // Finish editing
+          // Add a line break
+          textNode.text(textNode.text() + "\n");
+
+          // Move caret to the new line
+          const lines = textNode.text().split("\n");
+          const textWidth = getCurrentLineWidth();
+
+          this.caret.points([
+            textNode.x() + textWidth,
+            textNode.y() + lineHeight * lines.length - 10,
+            textNode.x() + textWidth,
+            textNode.y() + lineHeight * lines.length + lineHeight - 10,
+          ]);
+
+          this.layer.draw();
+        } else if (event.key === "Escape") {
+          // Cancel editing
+          textNode.text(originalText);
+          isEditing = false;
+          window.removeEventListener("keydown", onKeyDown);
+          endEditing();
+
+          // Update transformer to revert to original text
+          this.transformer.forceUpdate();
+          this.layer.draw();
+        } else {
+          // Handle text typing
+          if (event.key.length === 1 || event.key === "Backspace") {
+            if (event.key === "Backspace") {
+              textNode.text(textNode.text().slice(0, -1));
+            } else {
+              textNode.text(textNode.text() + event.key);
+            }
+
+            // Move caret
+            const textWidth = getCurrentLineWidth();
+            const lines = textNode.text().split("\n");
+            // Update caret position dynamicallydth;
+            this.caret.points([
+              textNode.x() + textWidth,
+              textNode.y() + lineHeight * lines.length - 10,
+              textNode.x() + textWidth,
+              textNode.y() + lineHeight * lines.length + lineHeight - 10,
+            ]);
+
+            // Update transformer
+            this.transformer.forceUpdate();
+            this.layer.draw();
+          }
+        }
+      };
+
+      // Listen to typing events
+      window.addEventListener("keydown", onKeyDown);
+    }
+
+    // Detect drag events to finish editing
+    textNode.on("dragstart", () => {
+      if (isEditing) {
+        window.removeEventListener("keydown", onKeyDown);
+        endEditing();
+      }
+    });
+
+    // Detect resize events to finish editing
+    textNode.on("transform", () => {
+      if (isEditing) {
+        window.removeEventListener("keydown", onKeyDown);
+        endEditing();
+      }
+    });
+
+    // End editing text if user clicks outside the text node
+    this.stage.on("click", (e) => {
+      // Check if clicked target is NOT an image
+      endEditing();
+    });
+  }
+
+  // Undo and redo states save and actions ///
   saveState() {
     // Save the current state of the content layer
     this.undoStack.push(this.layer.toJSON());
