@@ -15,9 +15,11 @@
     "update": "npm-check-updates -i"
   },
   "dependencies": {
+    "@types/busboy": "^1.5.4",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "archiver": "^7.0.1",
     "axios": "^1.6.8",
+    "busboy": "^1.6.0",
     "express": "^4.19.2",
     "firebase-admin": "^12.1.0",
     "firebase-functions": "^5.0.1",

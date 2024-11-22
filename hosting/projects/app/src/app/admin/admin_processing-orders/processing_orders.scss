@@ -6,13 +6,25 @@
   justify-content: center;
   align-items: flex-start;
   flex-direction: column;
+  max-height: calc(100vh - 150px);
+}
+
+.header{
+  display: flex;
+  flex-direction: column;
+  gap:0px;
+  padding-bottom: 20px;
+}
+.subheader{
+  font-family: "Public Sans";
+  font-size:12px;
+  font-weight: 700;
 }
 
 .orders-header{
   font-family: "Public Sans";
   font-weight: 700;
   font-size: 25px;
-  padding-bottom: 20px;
 }
 
 .main-content{
@@ -106,4 +118,10 @@ td {
   //border-spacing: 5px;
   display: table-cell;
   vertical-align: middle;
+}
+
+
+.mat-mdc-table {
+  overflow-y: scroll;
+  max-height: 100%;
 }

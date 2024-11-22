@@ -24,6 +24,9 @@
       <div *ngIf="_orderProcess.pictureDiscProcess === 'uploadFinished'" class="completed-tag"><img src="/assets/Upload_Complete_Icon.svg" style="width: 20px;"/>Completed</div>
       <button *ngIf="_orderProcess.pictureDiscProcess === 'waitingForUpload'" class="upload-button twl-app-button" (click)="goToUploader('pictureDisc')">START NOW</button>
     </div>
+    <div>
+      <button (click)="openDesigner()">Start Sleeve Design</button>
+    </div>
   </div>
 </div>
 

@@ -48,6 +48,7 @@ export class Music_summaryComponent implements OnInit {
   ngOnInit() {
     this.innerHeight = window.innerHeight + "px";
     this.getFiles();
+    this.getOrderData();
   }
 
   public async getFiles() {

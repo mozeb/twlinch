@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatButton } from "@angular/material/button";
 import { artworkType, TransferService } from "../../services/transfer-service";
@@ -15,6 +15,7 @@ import { Route, Router } from "@angular/router";
 import { FirestoreApiService } from "../../services/firestore-api.service";
 import { OrderProcess } from "../../services/interfaces";
 import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
+import { DesignerPopupComponent } from "../../popups/designer-popup/designer-popup.component";
 
 @Component({
   selector: "upload-artwork",
@@ -29,6 +30,7 @@ export class Upload_artworkComponent implements OnInit {
     protected _transferService: TransferService,
     protected _router: Router,
     protected _firestoreService: FirestoreApiService,
+    protected dialog: MatDialog,
   ) {}
 
   innerHeight: string | undefined;
@@ -48,6 +50,7 @@ export class Upload_artworkComponent implements OnInit {
   ngOnInit() {
     this.innerHeight = window.innerHeight + "px";
     this.getOrderData();
+    this.openDesigner();
   }
 
   async getOrderData() {
@@ -110,6 +113,14 @@ export class Upload_artworkComponent implements OnInit {
     }
 
     this._router.navigateByUrl("/manage-order/upload-template");
+  }
+
+  openDesigner() {
+    this.dialog.open(DesignerPopupComponent, {
+      disableClose: true,
+      width: "100vw",
+      height: "100vh",
+    });
   }
 
   // resize event listener for window adapting

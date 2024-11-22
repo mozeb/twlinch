@@ -1,7 +1,10 @@
 @if(dataSource){
       <div class="main-content" style="height: 100%;">
         <div class="orders">
-          <span class="orders-header">Processing Orders</span>
+          <div class="header">
+            <span class="orders-header">Processing Orders</span>
+            <span class="subheader">{{dataSource.data.length}} orders to complete</span>
+          </div>
           <mat-table [dataSource]="dataSource">
             <!-- WC Order num -->
             <ng-container matColumnDef="wc_order_num">
