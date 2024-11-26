@@ -985,7 +985,6 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
   updateTextAlignment(alignment: "left" | "center" | "right"): void {
     this.fontAlign = alignment + ".svg";
-    this.updateCaretPosition();
     // End editing if text editing opened
     this.endEditing();
     if (["left", "center", "right"].includes(alignment)) {
@@ -996,6 +995,7 @@ export class DesignerPopupComponent implements AfterViewInit {
         //console.error(`No font Selected`);
       }
     }
+    this.showTextAlignSelect = !this.showTextAlignSelect; // Toggle the options div visibility
   }
 
   openTextAlignOptions() {
