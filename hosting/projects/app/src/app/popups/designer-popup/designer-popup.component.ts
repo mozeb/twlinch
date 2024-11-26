@@ -62,8 +62,6 @@ export class DesignerPopupComponent implements AfterViewInit {
   @ViewChild("cont") container!: ElementRef;
 
   // Object actions element - delete/rotate object
-  @ViewChild("objectActions", { static: false })
-  objectActions!: ElementRef<HTMLDivElement>;
   @ViewChild("colorPicker") colorPicker!: ElementRef<HTMLInputElement>;
   @ViewChild("colorPickerButton", { static: false })
   colorPickerButton!: ElementRef<HTMLDivElement>;
@@ -71,7 +69,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   optionsDiv!: ElementRef<HTMLDivElement>;
 
   @ViewChild("optionsToggle", { static: false })
-  toggleButton!: ElementRef<HTMLButtonElement>;
+  layerPositionButton!: ElementRef<HTMLButtonElement>;
 
   @ViewChild("shapesSelectDiv", { static: false })
   shapesSelectDiv!: ElementRef<HTMLDivElement>;
@@ -102,6 +100,18 @@ export class DesignerPopupComponent implements AfterViewInit {
   @ViewChild("textAlignButton", { static: false })
   textAlignButton!: ElementRef<HTMLDivElement>;
 
+  // Text thickness Button
+  @ViewChild("textThicknessButton", { static: false })
+  textThicknessButton!: ElementRef<HTMLDivElement>;
+
+  // Delete object Button
+  @ViewChild("deleteObjectButton", { static: false })
+  deleteObjectButton!: ElementRef<HTMLDivElement>;
+
+  // Delete object Button
+  @ViewChild("duplicateObjectButton", { static: false })
+  duplicateObjectButton!: ElementRef<HTMLDivElement>;
+
   selectedColor: string = "#ff0000"; // Default color
   fontAlign = "left.svg";
 
@@ -122,6 +132,22 @@ export class DesignerPopupComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.createMask();
     this.loadFonts();
+    this.listenOffStageClick();
+  }
+
+  listenOffStageClick() {
+    // Add global click event to hide transformer when clicking outside the stage
+    document.addEventListener("click", (event: MouseEvent) => {
+      const container = this.stage.container(); // Get the stage container element
+      const clickedNode = event.target as HTMLElement;
+
+      if (container === clickedNode) {
+        // If the clicked element is the container but not a stage object
+        this.transformer.hide();
+        this.selectedObject = this.maskedPath;
+        this.setAvailableTools();
+      }
+    });
   }
 
   async createMask() {
@@ -228,8 +254,9 @@ export class DesignerPopupComponent implements AfterViewInit {
         !this.textNodes.includes(e.target as Konva.Text)
       ) {
         this.transformer.nodes([]); // Clear selection
-        this.objectActions.nativeElement.style.display = "none"; // Remove actions
         this.layer.draw();
+        this.selectedObject = this.maskedPath;
+        this.setAvailableTools();
 
         // Remove text edit stuff
         if (this.caret) {
@@ -319,14 +346,13 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.nodes([shape]);
       this.layer.draw();
       this.selectObject(shape);
-      this.updateActionsPosition();
+      this.setAvailableTools();
     });
 
     // Add drag event to shape for selecting and attaching transformer
     shape.on("dragmove", () => {
       // Detach transformer from previous node
       this.transformer.hide();
-      this.objectActions.nativeElement.style.display = "none";
       this.selectObject(shape);
     });
 
@@ -337,13 +363,12 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.nodes([shape]);
       this.layer.draw();
       this.selectObject(shape);
-      this.updateActionsPosition();
+      this.setAvailableTools();
     });
 
     // Hide the Transformer when rotating
     shape.on("transformstart", () => {
       this.transformer.hide(); // Hide transformer when rotation starts
-      this.objectActions.nativeElement.style.display = "none";
       this.selectObject(shape);
       this.layer.draw();
     });
@@ -351,7 +376,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Show the Transformer again after rotation ends
     shape.on("transformend", () => {
       this.transformer.show(); // Show transformer after rotation ends
-      this.updateActionsPosition();
       this.selectObject(shape);
       this.layer.draw();
     });
@@ -370,12 +394,13 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.transformer.nodes([shape]);
     this.selectObject(shape);
     this.transformer.show();
-    this.updateActionsPosition();
 
     // Add shape to the layer
     this.maskedGroup.add(shape);
     this.shapeNondes.push(shape); // Add image to array for later reference
     this.layer.draw();
+
+    this.setAvailableTools();
 
     const layersList = document.getElementById(
       "layers-list",
@@ -433,10 +458,43 @@ export class DesignerPopupComponent implements AfterViewInit {
 
           // Add click event to image for selecting and attaching transformer
           konvaImage.on("click", () => {
+            this.selectObject(konvaImage);
             // Detach transformer from previous node
             this.transformer.nodes([]);
             // Attach transformer to clicked image
             this.transformer.nodes([konvaImage]);
+            this.transformer.show(); // Show transformer after rotation ends
+            this.layer.draw();
+          });
+
+          // Add drag event to shape for selecting and attaching transformer
+          konvaImage.on("dragmove", () => {
+            this.selectObject(konvaImage);
+            // Detach transformer from previous node
+            this.transformer.hide();
+          });
+
+          // Add drag end event to shape for selecting and attaching transformer
+          konvaImage.on("dragend", () => {
+            this.selectObject(konvaImage);
+            this.transformer.show();
+            this.transformer.nodes([]);
+            this.transformer.nodes([konvaImage]);
+            this.setAvailableTools();
+            this.layer.draw();
+          });
+
+          // Hide the Transformer when rotating
+          konvaImage.on("transformstart", () => {
+            this.selectObject(konvaImage);
+            this.transformer.hide(); // Hide transformer when rotation starts
+            this.layer.draw();
+          });
+
+          // Show the Transformer again after rotation ends
+          konvaImage.on("transformend", () => {
+            this.selectObject(konvaImage);
+            this.transformer.show(); // Show transformer after rotation ends
             this.layer.draw();
           });
 
@@ -453,7 +511,10 @@ export class DesignerPopupComponent implements AfterViewInit {
           );
 
           // Automatically attach transformer to the latest uploaded image
+          this.selectObject(konvaImage);
+          this.transformer.nodes([]);
           this.transformer.nodes([konvaImage]);
+          this.transformer.show();
           this.layer.draw();
         };
       };
@@ -572,33 +633,16 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   ////////// Object actions ///////////
 
-  // Delete object
-  deleteObjectAction() {
-    this.selectedObject?.remove();
-    this.transformer.hide();
-    this.objectActions.nativeElement.style.display = "none";
-  }
-
-  // Object position update
-  updateActionsPosition() {
-    let box = this.transformer.getClientRect();
-    if (this.selectedObject) {
-      box = this.selectedObject.getClientRect(); // Get the bounding box of the Transformer
-    }
-    const containerBox = this.stage.container().getBoundingClientRect(); // Get the container's bounding box
-
-    this.objectActions.nativeElement.style.display = "block";
-    this.objectActions.nativeElement.style.left = `${box.x + (this.stage.container().clientWidth - this.stage.width()) / 2 + this.transformer.width() / 2 - this.objectActions.nativeElement.clientWidth / 2}px`;
-    this.objectActions.nativeElement.style.top = `${box.y + (this.stage.container().clientHeight - this.stage.height()) / 2 - this.objectActions.nativeElement.clientHeight - 20}px`;
-  }
-
   // Call when selecting another object
-  selectObject(object: Konva.Shape | Konva.Stage) {
+  selectObject(object: Konva.Shape | Konva.Stage | Konva.Image) {
     this.selectedObject = object;
-    const fillColor = (object as Konva.Shape).fill();
-    this.colorPicker.nativeElement.value = fillColor.toString();
-    this.colorPickerButton.nativeElement.style.backgroundColor =
-      fillColor.toString();
+
+    if (!(object instanceof Konva.Image)) {
+      const fillColor = (object as Konva.Shape).fill();
+      this.colorPicker.nativeElement.value = fillColor.toString();
+      this.colorPickerButton.nativeElement.style.backgroundColor =
+        fillColor.toString();
+    }
   }
 
   // Open the color select
@@ -688,8 +732,8 @@ export class DesignerPopupComponent implements AfterViewInit {
     if (
       this.optionsDiv &&
       !this.optionsDiv.nativeElement.contains(target) &&
-      this.toggleButton &&
-      !this.toggleButton.nativeElement.contains(target)
+      this.layerPositionButton &&
+      !this.layerPositionButton.nativeElement.contains(target)
     ) {
       //console.log("Clicked outside of the toggle");
       this.showOptions = false;
@@ -759,6 +803,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.selectedObject.fontFamily(this.selectedFont);
       this.showFontSelect = false;
       this.transformer.forceUpdate();
+      this.updateCaretPosition();
       this.layer.draw();
     }
   }
@@ -786,14 +831,13 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.nodes([textNode]);
       this.layer.draw();
       this.selectObject(textNode);
-      this.updateActionsPosition();
+      this.setAvailableTools();
     });
 
     // Add drag event to shape for selecting and attaching transformer
     textNode.on("dragmove", () => {
       // Detach transformer from previous node
       this.transformer.hide();
-      this.objectActions.nativeElement.style.display = "none";
       this.selectObject(textNode);
     });
 
@@ -804,13 +848,12 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.nodes([textNode]);
       this.layer.draw();
       this.selectObject(textNode);
-      this.updateActionsPosition();
+      this.setAvailableTools();
     });
 
     //Hide the Transformer when rotating
     textNode.on("transformstart", () => {
       this.transformer.hide(); // Hide transformer when rotation starts
-      this.objectActions.nativeElement.style.display = "none";
       this.selectObject(textNode);
       this.layer.draw();
     });
@@ -818,7 +861,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     //Show the Transformer again after rotation ends
     textNode.on("transformend", () => {
       this.transformer.show(); // Show transformer after rotation ends
-      this.updateActionsPosition();
       this.selectObject(textNode);
       this.layer.draw();
     });
@@ -835,6 +877,9 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.selectObject(textNode);
     this.transformer.show();
     this.maskedGroup.add(textNode);
+
+    // Set available tools
+    this.setAvailableTools();
   }
 
   caret!: Konva.Line;
@@ -973,7 +1018,6 @@ export class DesignerPopupComponent implements AfterViewInit {
   changeFont(event: MouseEvent) {
     const targetButton = event.target as HTMLButtonElement; // Assert the type
     this.showFontSelect = !this.showFontSelect; // Toggle the options div visibility
-    this.updateCaretPosition();
     if (this.showFontSelect) {
       // Get the button's position
       const buttonRect = targetButton.getBoundingClientRect();
@@ -983,6 +1027,7 @@ export class DesignerPopupComponent implements AfterViewInit {
         targetButton.getBoundingClientRect().bottom + "px";
     }
   }
+
   updateTextAlignment(alignment: "left" | "center" | "right"): void {
     this.fontAlign = alignment + ".svg";
     // End editing if text editing opened
@@ -1007,6 +1052,80 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.textAlignDiv.nativeElement.style.top =
         this.textAlignButton.nativeElement.getBoundingClientRect().bottom +
         "px";
+    }
+  }
+
+  //////////////////// END OF TEXT ////////////
+
+  // Delete object
+  deleteObject() {
+    if (this.selectedObject !== this.maskedPath) {
+      this.selectedObject?.destroy();
+      this.transformer.hide();
+      this.selectedObject = this.maskedPath;
+      this.setAvailableTools();
+      if (this.caret) {
+        this.caret.destroy();
+        clearInterval(this.caretInterval);
+      }
+    }
+  }
+
+  // Set available tools
+  setAvailableTools() {
+    if (this.selectedObject == this.maskedPath) {
+      console.log(this.selectedObject);
+      this.deleteObjectButton.nativeElement.classList.add("unclickable-button");
+      this.duplicateObjectButton.nativeElement.classList.add(
+        "unclickable-button",
+      );
+      this.textAlignButton.nativeElement.classList.add("unclickable-button");
+      this.fontSelectButton.nativeElement.classList.add("unclickable-button");
+      this.colorPickerButton.nativeElement.classList.add("unclickable-button");
+      this.layerPositionButton.nativeElement.classList.add(
+        "unclickable-button",
+      );
+      this.textThicknessButton.nativeElement.classList.add(
+        "unclickable-button",
+      );
+    } else if (this.selectedObject instanceof Konva.Text) {
+      this.textAlignButton.nativeElement.classList.remove("unclickable-button");
+      this.fontSelectButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.duplicateObjectButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.deleteObjectButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.colorPickerButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.layerPositionButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.textThicknessButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+    } else if (this.selectedObject instanceof Konva.Shape) {
+      this.textAlignButton.nativeElement.classList.add("unclickable-button");
+      this.fontSelectButton.nativeElement.classList.add("unclickable-button");
+      this.textThicknessButton.nativeElement.classList.add(
+        "unclickable-button",
+      );
+      this.deleteObjectButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.duplicateObjectButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.colorPickerButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.layerPositionButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
     }
   }
 

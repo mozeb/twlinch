@@ -17,7 +17,7 @@
       <img class="designer-button-icon" src="./assets/Designer_Assets/change_color_icon.svg"/>
       <span class="designer-button-text">Canvas<br>Color</span>
       <input type="color" #colorPickerBackground id="colorPickerBackground" (input)="onColorChange($event)"
-             style="opacity: 0"/>
+             style="opacity: 0; height: 0px;"/>
     </button>
   </div>
 
@@ -30,10 +30,10 @@
           Selected object action:
         </span>
         <div class="design-options-sector">
-          <button class="top-bar-button">
+          <button id="deleteObjectButton" #deleteObjectButton class="top-bar-button" (click)="deleteObject()">
             <img class="object-edit-button-icon" src="./assets/Designer_Assets/bin_icon.svg"/>
           </button>
-          <button class="top-bar-button">
+          <button id="duplicateObjectButton" #duplicateObjectButton class="top-bar-button">
             <img class="object-edit-button-icon" src="./assets/Designer_Assets/duplicate_icon.svg"/>
           </button>
           <button id="optionsToggle" #optionsToggle class="top-bar-button" (click)="toggleOptions($event)">
@@ -56,7 +56,7 @@
             <img class="object-edit-button-icon" src="./assets/Designer_Assets/{{ this.fontAlign }}"/>
           </button>
 
-          <button id="textDecorationButton" #textDecorationButton class="top-bar-button">
+          <button id="textThicknessButton" #textThicknessButton class="top-bar-button">
           <img class="object-edit-button-icon" src="./assets/Designer_Assets/Text_Decoration_Icon.svg"/>
           </button>
         </div>
@@ -77,10 +77,6 @@
       <div
         style=" position: relative; width:100%; position:relative; height: 100%; display: flex; justify-content: center; align-items: center"
         id="cont" #cont>
-      </div>
-      <div id="objectActions" #objectActions class="object-actions" style="display:none;">
-        <img id="delete-button" class="object-delete-button" (click)="deleteObjectAction()"
-             src="./assets/Designer_Assets/bin_icon.svg"/>
       </div>
     </div>
   </div>

@@ -159,7 +159,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   cursor: pointer;
   display: inline-block;
 }
@@ -283,4 +283,11 @@
   flex-direction: row;
   border-right: 1px solid #d9d9d9;
   height:100%;
+}
+
+
+.unclickable-button {
+  pointer-events: none; /* Disables mouse clicks */
+  opacity: 0.2; /* Optional: Makes the button look disabled */
+  cursor: not-allowed; /* Optional: Change the cursor style */
 }
