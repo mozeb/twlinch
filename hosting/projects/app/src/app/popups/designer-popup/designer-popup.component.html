@@ -52,8 +52,8 @@
             {{ this.selectedFont }}
           </button>
 
-          <button id="textAlignButton" #textAlignButton class="top-bar-button">
-            <img class="object-edit-button-icon" src="./assets/Designer_Assets/Left_Align.svg"/>
+          <button id="textAlignButton" #textAlignButton class="top-bar-button" (click)="openTextAlignOptions()">
+            <img class="object-edit-button-icon" src="./assets/Designer_Assets/{{ this.fontAlign }}"/>
           </button>
 
           <button id="textDecorationButton" #textDecorationButton class="top-bar-button">
@@ -99,6 +99,25 @@
   <div class="option-button" (click)="moveLayer('down')">
     <button class="option-sel-button">Move Layer Down</button>
     <img class="arrow" src="./assets/Designer_Assets/down.svg">
+  </div>
+</div>
+
+<!-- popup for setting text aligment -->
+<div id="textAlignDiv" #textAlignDiv class="options-div" [style.display]="showTextAlignSelect ? 'grid' : 'none'">
+  <div class="options-header">
+    Align Text
+  </div>
+  <div class="option-button" (click)="updateTextAlignment('left')" >
+    <button class="option-sel-button">Align text left</button>
+    <img class="arrow" src="../../../assets/Designer_Assets/left.svg">
+  </div>
+  <div class="option-button" (click)="updateTextAlignment('center')" >
+    <button class="option-sel-button">Align text center</button>
+    <img class="arrow" src="../../../assets/Designer_Assets/center.svg">
+  </div>
+  <div class="option-button" (click)="updateTextAlignment('right')" >
+    <button class="option-sel-button">Align text right</button>
+    <img class="arrow" src="../../../assets/Designer_Assets/right.svg">
   </div>
 </div>
 

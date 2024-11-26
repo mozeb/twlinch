@@ -86,18 +86,30 @@ export class DesignerPopupComponent implements AfterViewInit {
   @ViewChild("colorPickerBackground")
   colorPickerBackground!: ElementRef<HTMLInputElement>;
 
-  // Setup font
+  // Font select div
   @ViewChild("fontsSelectDiv", { static: false })
   fontsSelectDiv!: ElementRef<HTMLDivElement>;
 
-  // Setup font
+  // Font Select Button
   @ViewChild("fontSelectButton", { static: false })
   fontSelectButton!: ElementRef<HTMLDivElement>;
 
+  // text align div
+  @ViewChild("textAlignDiv", { static: false })
+  textAlignDiv!: ElementRef<HTMLDivElement>;
+
+  // Text align Button
+  @ViewChild("textAlignButton", { static: false })
+  textAlignButton!: ElementRef<HTMLDivElement>;
+
   selectedColor: string = "#ff0000"; // Default color
+  fontAlign = "left.svg";
+
+  // Bools to display differnt options selector
   showOptions = false; // Controls the visibility of the options div
   showShapesSelect = false; // Controls the visibility of the shapes select div
   showFontSelect = false; // Controls the visibility of the font select div
+  showTextAlignSelect = false; // Controls the visibility of the font select div
 
   // Undo and redo stack
   undoStack: string[] = [];
@@ -733,9 +745,12 @@ export class DesignerPopupComponent implements AfterViewInit {
       google: {
         families: fontFamilies,
       },
+      active: () => {
+        setTimeout(() => {
+          this.fonts = fontFamilies.map((font) => font.split(":")[0]);
+        });
+      },
     });
-    // Store the font family names for selection (exclude weights for display)
-    this.fonts = fontFamilies.map((font) => font.split(":")[0]);
   }
 
   selectFont(font: string): void {
@@ -759,6 +774,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       fill: "black",
       draggable: true,
       padding: 10,
+      align: this.fontAlign.slice(0, -4),
     });
 
     this.layer.draw();
@@ -823,32 +839,25 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   caret!: Konva.Line;
   caretInterval: any;
+  private onKeyDown: (event: KeyboardEvent) => void = () => {}; // Default value
+  isEditing = false;
 
   editText() {
-    let isEditing = false;
     const textNode = this.selectedObject as Konva.Text;
     const scale = textNode.getAbsoluteScale(); // Get both X and Y scales
     const lineHeight = textNode.fontSize() * scale.x; // Get both X and Y scales
     let onKeyDown: (event: KeyboardEvent) => void;
 
-    const endEditing = () => {
-      isEditing = false;
-      if (this.caret) {
-        this.caret.destroy();
-      }
-      clearInterval(this.caretInterval);
-      window.removeEventListener("keydown", onKeyDown);
-      this.layer.draw();
-    };
-
     // Blink caret
     this.caretInterval = setInterval(() => {
-      this.caret.visible(!this.caret.visible());
-      this.layer.draw();
+      if (this.caret) {
+        this.caret.visible(!this.caret.visible());
+        this.layer.draw();
+      }
     }, 500);
 
-    if (!isEditing) {
-      isEditing = true;
+    if (!this.isEditing) {
+      this.isEditing = true;
       const originalText = textNode.text();
 
       const getCurrentLineWidth = () => {
@@ -856,122 +865,115 @@ export class DesignerPopupComponent implements AfterViewInit {
         const currentLine = lines[lines.length - 1]; // Get the last line
         const context = this.layer.getContext()._context; // Canvas 2D context
         context.font = `${textNode.fontSize() * scale.x}px ${textNode.fontFamily()}`;
-        return (
-          context.measureText(currentLine).width + textNode.padding() * scale.x
-        );
+        return context.measureText(currentLine).width;
       };
-
-      const lines = textNode.text().split("\n");
-      const textWidth = getCurrentLineWidth();
 
       // Create a caret (blinking cursor)
       this.caret = new Konva.Line({
-        points: [
-          textNode.x() + textWidth,
-          textNode.y() + lineHeight * lines.length - 10 * scale.x,
-          textNode.x() + textWidth,
-          textNode.y() + lineHeight * lines.length + lineHeight - 10 * scale.x,
-        ],
+        points: [0, 0, 0, 0], // Will be updated dynamically
         stroke: "black",
         strokeWidth: 1,
         visible: true,
       });
 
       this.layer.add(this.caret);
+      this.updateCaretPosition();
       this.layer.draw();
 
-      onKeyDown = (event: KeyboardEvent) => {
+      this.onKeyDown = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
-          // Finish editing
-          // Add a line break
           textNode.text(textNode.text() + "\n");
-
-          // Move caret to the new line
-          const lines = textNode.text().split("\n");
-          const textWidth = getCurrentLineWidth();
-
-          this.caret.points([
-            textNode.x() + textWidth,
-            textNode.y() + lineHeight * lines.length - 10 * scale.x,
-            textNode.x() + textWidth,
-            textNode.y() +
-              lineHeight * lines.length +
-              lineHeight -
-              10 * scale.x,
-          ]);
-
+          this.updateCaretPosition();
           this.layer.draw();
         } else if (event.key === "Escape") {
-          // Cancel editing
           textNode.text(originalText);
-          isEditing = false;
-          window.removeEventListener("keydown", onKeyDown);
-          endEditing();
-
-          // Update transformer to revert to original text
+          this.isEditing = false;
+          window.removeEventListener("keydown", this.onKeyDown);
+          this.endEditing();
           this.transformer.forceUpdate();
           this.layer.draw();
-        } else {
-          // Handle text typing
-          if (event.key.length === 1 || event.key === "Backspace") {
-            if (event.key === "Backspace") {
-              textNode.text(textNode.text().slice(0, -1));
-            } else {
-              textNode.text(textNode.text() + event.key);
-            }
-
-            // Move caret
-            const textWidth = getCurrentLineWidth();
-            const lines = textNode.text().split("\n");
-            // Update caret position dynamicallydth;
-            this.caret.points([
-              textNode.x() + textWidth,
-              textNode.y() + lineHeight * lines.length - 10 * scale.x,
-              textNode.x() + textWidth,
-              textNode.y() +
-                lineHeight * lines.length +
-                lineHeight -
-                10 * scale.x,
-            ]);
-
-            // Update transformer
-            this.transformer.forceUpdate();
-            this.layer.draw();
+        } else if (event.key.length === 1 || event.key === "Backspace") {
+          if (event.key === "Backspace") {
+            textNode.text(textNode.text().slice(0, -1));
+          } else {
+            textNode.text(textNode.text() + event.key);
           }
+          this.updateCaretPosition();
+          this.transformer.forceUpdate();
+          this.layer.draw();
         }
       };
 
-      // Listen to typing events
-      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keydown", this.onKeyDown);
     }
 
-    // Detect drag events to finish editing
     textNode.on("dragstart", () => {
-      if (isEditing) {
-        window.removeEventListener("keydown", onKeyDown);
-        endEditing();
+      if (this.isEditing) {
+        window.removeEventListener("keydown", this.onKeyDown);
+        this.endEditing();
       }
     });
 
-    // Detect resize events to finish editing
     textNode.on("transform", () => {
-      if (isEditing) {
+      if (this.isEditing) {
         window.removeEventListener("keydown", onKeyDown);
-        endEditing();
+        this.endEditing();
       }
     });
 
-    // End editing text if user clicks outside the text node
-    this.stage.on("click", (e) => {
-      // Check if clicked target is NOT an image
-      endEditing();
+    this.stage.on("click", () => {
+      this.endEditing();
     });
   }
+
+  updateCaretPosition = () => {
+    const textNode = this.selectedObject as Konva.Text;
+    const scale = textNode.getAbsoluteScale(); // Get both X and Y scales
+    const lines = textNode.text().split("\n");
+    const currentLine = lines[lines.length - 1]; // Get the last line
+    const context = this.layer.getContext()._context; // Canvas 2D context
+    const lineHeight = textNode.fontSize() * scale.x; // Get both X and Y scales
+
+    // Update the font for the context to match the text node
+    context.font = `${textNode.fontSize() * scale.x}px ${textNode.fontFamily()}`;
+
+    // Measure the scaled width of the current line
+    const textWidth = context.measureText(currentLine).width;
+
+    // Calculate alignment offset
+    const alignmentOffset =
+      textNode.align() === "center"
+        ? (textNode.width() * scale.x - textWidth) / 2
+        : textNode.align() === "right"
+          ? textNode.width() * scale.x - textWidth - 10 * scale.x
+          : 10 * scale.x;
+
+    // Update caret position
+    this.caret.points([
+      textNode.x() + alignmentOffset + textWidth,
+      textNode.y() + lineHeight * lines.length - 10 * scale.y,
+      textNode.x() + alignmentOffset + textWidth,
+      textNode.y() + lineHeight * lines.length + lineHeight - 10 * scale.y,
+    ]);
+
+    this.layer.draw();
+  };
+
+  endEditing = () => {
+    this.isEditing = false;
+    if (this.caret) {
+      this.caret.destroy();
+    }
+    clearInterval(this.caretInterval);
+    window.removeEventListener("keydown", this.onKeyDown);
+    this.layer.draw();
+  };
 
   // Show options
   changeFont(event: MouseEvent) {
     const targetButton = event.target as HTMLButtonElement; // Assert the type
     this.showFontSelect = !this.showFontSelect; // Toggle the options div visibility
+    this.updateCaretPosition();
     if (this.showFontSelect) {
       // Get the button's position
       const buttonRect = targetButton.getBoundingClientRect();
@@ -979,6 +981,32 @@ export class DesignerPopupComponent implements AfterViewInit {
         targetButton.getBoundingClientRect().left + "px";
       this.fontsSelectDiv.nativeElement.style.top =
         targetButton.getBoundingClientRect().bottom + "px";
+    }
+  }
+  updateTextAlignment(alignment: "left" | "center" | "right"): void {
+    this.fontAlign = alignment + ".svg";
+    this.updateCaretPosition();
+    // End editing if text editing opened
+    this.endEditing();
+    if (["left", "center", "right"].includes(alignment)) {
+      if (this.selectedObject instanceof Konva.Text) {
+        this.selectedObject.align(alignment); // Update alignment
+        this.layer.draw(); // Redraw the layer to apply changes
+      } else {
+        //console.error(`No font Selected`);
+      }
+    }
+  }
+
+  openTextAlignOptions() {
+    this.showTextAlignSelect = !this.showTextAlignSelect; // Toggle the options div visibility
+    if (this.showTextAlignSelect) {
+      // Get the button's position
+      this.textAlignDiv.nativeElement.style.left =
+        this.textAlignButton.nativeElement.getBoundingClientRect().left + "px";
+      this.textAlignDiv.nativeElement.style.top =
+        this.textAlignButton.nativeElement.getBoundingClientRect().bottom +
+        "px";
     }
   }
 
