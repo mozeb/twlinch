@@ -107,14 +107,12 @@
 .selected-object-actions{
   display: flex;
   flex-direction: row;
-  gap:10px;
   align-items: center;
   font-family: "Ubuntu Mono";
   font-weight: 700;
   text-transform: uppercase;
   font-size:12px;
   height: 100%;
-  border-right: 1px solid #d9d9d9;
 }
 
 .object-edit-button-icon{
@@ -136,7 +134,23 @@
   min-width: 50px;
 }
 
-.top-bar-button:hover{
+.top-bar-button-font{
+  background-color: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap:3px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 0px 15px;
+  font-size: 12px;
+  font-family: "Ubuntu Mono";
+  width: fit-content;
+  font-weight:700
+}
+
+.top-bar-button:hover, .top-bar-button-font:hover{
   background-color: #eaeaea;
 }
 
@@ -160,6 +174,13 @@
   overflow: hidden;
 }
 
+.options-scroll{
+  max-height: 500px;
+  overflow: scroll;
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer */
+}
+
 .move-layer-button{
   font-family: "Ubuntu Mono";
   font-weight: 700;
@@ -180,6 +201,17 @@
   flex: 1;
   padding:20px;
 }
+
+.option-button-font{
+  display: flex;
+  justify-content:  space-between;
+  align-items: center;
+  gap:20px;
+  flex: 1;
+  padding:20px;
+  font-size: 14px;
+}
+
 
 .arrow{
   width: 10px;
@@ -244,4 +276,11 @@
   display: flex;
   justify-content: center;
   align-items:  center;
+}
+
+.design-options-sector{
+  display: flex;
+  flex-direction: row;
+  border-right: 1px solid #d9d9d9;
+  height:100%;
 }

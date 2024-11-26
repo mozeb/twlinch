@@ -9,7 +9,11 @@
   },
   "license": "UNLICENSED",
   "devDependencies": {
+    "@types/webfontloader": "^1.6.38",
     "concurrently": "^8.2.2",
     "prettier": "^3.2.5"
+  },
+  "dependencies": {
+    "webfontloader": "^1.6.28"
   }
 }

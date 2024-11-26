@@ -18,14 +18,13 @@ import { Inject } from "@angular/core";
 import Konva from "konva";
 import { PDFDocument, rgb } from "pdf-lib";
 import { DeisgnTemplatesService } from "../../services/deisgn-templates.service";
-import { object } from "@angular/fire/database";
-import { interval } from "rxjs";
-import * as events from "events";
+import WebFont from "webfontloader";
+import { CommonModule } from "@angular/common"; // Import CommonModule
 
 @Component({
   selector: "designer-popup",
   standalone: true,
-  imports: [AsyncPipe, NgIf, MatDialogContent, MatDialogClose],
+  imports: [AsyncPipe, NgIf, MatDialogContent, MatDialogClose, CommonModule],
   templateUrl: "./designer-popup.component.html",
   styleUrl: "./designer-popup.component.scss",
   encapsulation: ViewEncapsulation.None,
@@ -76,22 +75,41 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   @ViewChild("shapesSelectDiv", { static: false })
   shapesSelectDiv!: ElementRef<HTMLDivElement>;
+
   @ViewChild("shapesToggleButon", { static: false })
   shapesToggleButton!: ElementRef<HTMLButtonElement>;
 
   @ViewChild("sides", { static: false })
   sleeveSidesDiv!: ElementRef<HTMLDivElement>;
 
+  // Color Picker For Background
+  @ViewChild("colorPickerBackground")
+  colorPickerBackground!: ElementRef<HTMLInputElement>;
+
+  // Setup font
+  @ViewChild("fontsSelectDiv", { static: false })
+  fontsSelectDiv!: ElementRef<HTMLDivElement>;
+
+  // Setup font
+  @ViewChild("fontSelectButton", { static: false })
+  fontSelectButton!: ElementRef<HTMLDivElement>;
+
   selectedColor: string = "#ff0000"; // Default color
   showOptions = false; // Controls the visibility of the options div
   showShapesSelect = false; // Controls the visibility of the shapes select div
+  showFontSelect = false; // Controls the visibility of the font select div
 
   // Undo and redo stack
   undoStack: string[] = [];
   redoStack: string[] = [];
 
+  // Fonts Selection
+  fonts: string[] = [];
+  selectedFont: string = "Ubuntu Mono"; // To store the selected font
+
   ngAfterViewInit() {
     this.createMask();
+    this.loadFonts();
   }
 
   async createMask() {
@@ -202,8 +220,10 @@ export class DesignerPopupComponent implements AfterViewInit {
         this.layer.draw();
 
         // Remove text edit stuff
-        this.caret.destroy();
-        clearInterval(this.caretInterval);
+        if (this.caret) {
+          this.caret.destroy();
+          clearInterval(this.caretInterval);
+        }
       }
     });
 
@@ -575,18 +595,29 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.colorPicker.nativeElement.click();
   }
 
+  openBackgroundColorPicker() {
+    // Trigger the hidden color picker input
+    this.selectedObject = this.maskedPath;
+    this.colorPickerBackground.nativeElement.click();
+  }
+
   // Change the color
   onColorChange(event: Event) {
     // Update the selected color
     const input = event.target as HTMLInputElement;
     this.selectedColor = input.value;
 
+    // If shape color picker
     if (this.selectedObject instanceof Konva.Shape) {
       (this.selectedObject as Konva.Shape).fill(input.value);
+      // Update the custom button's background color
+      this.colorPickerButton.nativeElement.style.backgroundColor =
+        this.selectedColor;
     }
-    // Update the custom button's background color
-    this.colorPickerButton.nativeElement.style.backgroundColor =
-      this.selectedColor;
+    // If background color picker
+    else if (input.id == "colorPickerBackground") {
+      this.maskedPath.fill(this.selectedColor);
+    }
   }
 
   // Show options
@@ -624,9 +655,12 @@ export class DesignerPopupComponent implements AfterViewInit {
       console.error("Layer is undefined.");
       return;
     }
+
     if (direction === "up") {
       this.selectedObject.moveUp(); // Moves the layer up by one step in the rendering order
     } else if (direction === "down") {
+      // Prevent moving below the background layer
+
       this.selectedObject.moveDown(); // Moves the layer down by one step in the rendering order
     } else {
       console.error('Invalid direction. Use "up" or "down".');
@@ -658,6 +692,60 @@ export class DesignerPopupComponent implements AfterViewInit {
       //console.log("Clicked outside of the toggle");
       this.showShapesSelect = false;
     }
+
+    if (
+      this.fontSelectButton &&
+      !this.fontSelectButton.nativeElement.contains(target)
+    ) {
+      //console.log("Clicked outside of the toggle");
+      this.showFontSelect = false;
+    }
+  }
+
+  ////////////////////////////////  All fonts related stuff   ////////////////////////////////////
+
+  // Method to load needded fonts
+  loadFonts() {
+    const fontFamilies = [
+      "Montserrat:400,700",
+      "Ubuntu Mono:400,700",
+      "Roboto:400,700",
+      "Open Sans:400,700",
+      "Lato:400,700",
+      "Raleway:400,700",
+      "Oswald:400,700",
+      "Source Sans Pro:400,700",
+      "Poppins:400,700",
+      "Playfair Display:400,700",
+      "Merriweather:400,700",
+      "Nunito:400,700",
+      "Quicksand:400,700",
+      "Comfortaa:400,700",
+      "Lobster:400",
+      "Pacifico:400",
+      "Dancing Script:400",
+      "Amatic SC:400,700",
+      "Shadows Into Light:400",
+      "Caveat:400,700",
+    ];
+
+    WebFont.load({
+      google: {
+        families: fontFamilies,
+      },
+    });
+    // Store the font family names for selection (exclude weights for display)
+    this.fonts = fontFamilies.map((font) => font.split(":")[0]);
+  }
+
+  selectFont(font: string): void {
+    this.selectedFont = font; // Update the selected font
+    if (this.selectedObject instanceof Konva.Text) {
+      this.selectedObject.fontFamily(this.selectedFont);
+      this.showFontSelect = false;
+      this.transformer.forceUpdate();
+      this.layer.draw();
+    }
   }
 
   // Add Text node and methods ////
@@ -667,13 +755,12 @@ export class DesignerPopupComponent implements AfterViewInit {
       x: 50, // Initial x position
       y: 50, // Initial y position
       fontSize: 20,
-      fontFamily: "Ubuntu Mono",
+      fontFamily: this.selectedFont,
       fill: "black",
       draggable: true,
       padding: 10,
     });
 
-    this.layer.add(textNode);
     this.layer.draw();
 
     // Add click event to image for selecting and attaching transformer
@@ -731,6 +818,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.textNodes.push(textNode);
     this.selectObject(textNode);
     this.transformer.show();
+    this.maskedGroup.add(textNode);
   }
 
   caret!: Konva.Line;
@@ -780,9 +868,9 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.caret = new Konva.Line({
         points: [
           textNode.x() + textWidth,
-          textNode.y() + lineHeight * lines.length - 10,
+          textNode.y() + lineHeight * lines.length - 10 * scale.x,
           textNode.x() + textWidth,
-          textNode.y() + lineHeight * lines.length + lineHeight - 10,
+          textNode.y() + lineHeight * lines.length + lineHeight - 10 * scale.x,
         ],
         stroke: "black",
         strokeWidth: 1,
@@ -804,9 +892,12 @@ export class DesignerPopupComponent implements AfterViewInit {
 
           this.caret.points([
             textNode.x() + textWidth,
-            textNode.y() + lineHeight * lines.length - 10,
+            textNode.y() + lineHeight * lines.length - 10 * scale.x,
             textNode.x() + textWidth,
-            textNode.y() + lineHeight * lines.length + lineHeight - 10,
+            textNode.y() +
+              lineHeight * lines.length +
+              lineHeight -
+              10 * scale.x,
           ]);
 
           this.layer.draw();
@@ -835,9 +926,12 @@ export class DesignerPopupComponent implements AfterViewInit {
             // Update caret position dynamicallydth;
             this.caret.points([
               textNode.x() + textWidth,
-              textNode.y() + lineHeight * lines.length - 10,
+              textNode.y() + lineHeight * lines.length - 10 * scale.x,
               textNode.x() + textWidth,
-              textNode.y() + lineHeight * lines.length + lineHeight - 10,
+              textNode.y() +
+                lineHeight * lines.length +
+                lineHeight -
+                10 * scale.x,
             ]);
 
             // Update transformer
@@ -872,6 +966,20 @@ export class DesignerPopupComponent implements AfterViewInit {
       // Check if clicked target is NOT an image
       endEditing();
     });
+  }
+
+  // Show options
+  changeFont(event: MouseEvent) {
+    const targetButton = event.target as HTMLButtonElement; // Assert the type
+    this.showFontSelect = !this.showFontSelect; // Toggle the options div visibility
+    if (this.showFontSelect) {
+      // Get the button's position
+      const buttonRect = targetButton.getBoundingClientRect();
+      this.fontsSelectDiv.nativeElement.style.left =
+        targetButton.getBoundingClientRect().left + "px";
+      this.fontsSelectDiv.nativeElement.style.top =
+        targetButton.getBoundingClientRect().bottom + "px";
+    }
   }
 
   // Undo and redo states save and actions ///

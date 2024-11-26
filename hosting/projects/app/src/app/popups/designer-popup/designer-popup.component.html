@@ -2,22 +2,25 @@
   <div class="left-toolbar">
     <button (click)="triggerFileInput()" class="designer-button">
       <img class="designer-button-icon" src="./assets/Designer_Assets/upload_image_icon.svg"/>
-      <span class="designer-button-text">Upload</span>
+      <span class="designer-button-text">Add<br>Image</span>
     </button>
-    <input  type="file" #fileInput (change)="onFileSelected($event)" style="display:none;"/>
+    <input type="file" #fileInput (change)="onFileSelected($event)" style="display:none;"/>
     <button class="designer-button" (click)="addTextNode()">
       <img class="designer-button-icon" src="./assets/Designer_Assets/add_text_icon.svg"/>
       <span class="designer-button-text">Add Text</span>
     </button>
-    <button id="shapesToggleButon" #shapesToggleButon class="designer-button" (click)="toggleShapes($event)" >
+    <button id="shapesToggleButon" #shapesToggleButon class="designer-button" (click)="toggleShapes($event)">
       <img class="designer-button-icon" src="./assets/Designer_Assets/add_shape_icon.svg"/>
-      <span class="designer-button-text">Element</span>
+      <span class="designer-button-text">Add<br>Shape</span>
     </button>
-    <button class="designer-button">
+    <button class="designer-button" (click)="openBackgroundColorPicker()">
       <img class="designer-button-icon" src="./assets/Designer_Assets/change_color_icon.svg"/>
-      <span class="designer-button-text">Color</span>
+      <span class="designer-button-text">Canvas<br>Color</span>
+      <input type="color" #colorPickerBackground id="colorPickerBackground" (input)="onColorChange($event)"
+             style="opacity: 0"/>
     </button>
   </div>
+
 
   <div class="right-content">
 
@@ -26,24 +29,44 @@
         <span class="selected-object-text">
           Selected object action:
         </span>
-        <button class="top-bar-button">
-          <img class="object-edit-button-icon" src="./assets/Designer_Assets/bin_icon.svg"/>
-        </button>
-        <button class="top-bar-button">
-          <img class="object-edit-button-icon" src="./assets/Designer_Assets/duplicate_icon.svg"/>
-        </button>
-        <button id="optionsToggle" #optionsToggle class="top-bar-button" (click)="toggleOptions($event)" >
-          <img  class="object-edit-button-icon" src="./assets/Designer_Assets/layers_icon.svg" />
-        </button>
-        <button class="top-bar-button">
-          <div id="colorPickerButton" #colorPickerButton class="color-picker-button" (click)="openColorPicker()">
-            <input type="color" #colorPicker id="colorPicker" (input)="onColorChange($event)" style="opacity: 0"/>
-          </div>
-        </button>
+        <div class="design-options-sector">
+          <button class="top-bar-button">
+            <img class="object-edit-button-icon" src="./assets/Designer_Assets/bin_icon.svg"/>
+          </button>
+          <button class="top-bar-button">
+            <img class="object-edit-button-icon" src="./assets/Designer_Assets/duplicate_icon.svg"/>
+          </button>
+          <button id="optionsToggle" #optionsToggle class="top-bar-button" (click)="toggleOptions($event)">
+            <img class="object-edit-button-icon" src="./assets/Designer_Assets/layers_icon.svg"/>
+          </button>
+          <button class="top-bar-button">
+            <div id="colorPickerButton" #colorPickerButton class="color-picker-button" (click)="openColorPicker()">
+              <input type="color" #colorPicker id="colorPicker" (input)="onColorChange($event)" style="opacity: 0"/>
+            </div>
+          </button>
+        </div>
+
+
+        <div class="design-options-sector">
+          <button id="fontSelectButton" #fontSelectButton class="top-bar-button-font" (click)="changeFont($event)">
+            {{ this.selectedFont }}
+          </button>
+
+          <button id="textAlignButton" #textAlignButton class="top-bar-button">
+            <img class="object-edit-button-icon" src="./assets/Designer_Assets/Left_Align.svg"/>
+          </button>
+
+          <button id="textDecorationButton" #textDecorationButton class="top-bar-button">
+          <img class="object-edit-button-icon" src="./assets/Designer_Assets/Text_Decoration_Icon.svg"/>
+          </button>
+        </div>
       </div>
 
+
       <div>
-        <button style="border-radius: 0px; height: 50px;" class="twl-app-button" (click)="saveSleevePDF()">Finish and upload</button>
+        <button style="border-radius: 0px; height: 50px;" class="twl-app-button" (click)="saveSleevePDF()">Finish and
+          upload
+        </button>
       </div>
     </div>
     <div class="designer">
@@ -51,14 +74,18 @@
         <div class="side">Back Side</div>
         <div class="side">Front side</div>
       </div>
-        <div style =" position: relative; width:100%; position:relative; height: 100%; display: flex; justify-content: center; align-items: center"  id="cont" #cont>
+      <div
+        style=" position: relative; width:100%; position:relative; height: 100%; display: flex; justify-content: center; align-items: center"
+        id="cont" #cont>
       </div>
       <div id="objectActions" #objectActions class="object-actions" style="display:none;">
-        <img id="delete-button" class="object-delete-button" (click)="deleteObjectAction()" src="./assets/Designer_Assets/bin_icon.svg"/>
+        <img id="delete-button" class="object-delete-button" (click)="deleteObjectAction()"
+             src="./assets/Designer_Assets/bin_icon.svg"/>
       </div>
     </div>
   </div>
 </div>
+
 
 <!--  popup with option to select layer position -->
 <div id="optionsDiv" #optionsDiv class="options-div" [style.display]="showOptions ? 'grid' : 'none'">
@@ -67,11 +94,11 @@
   </div>
   <div class="option-button" (click)="moveLayer('up')">
     <button class="option-sel-button">Move Layer Up</button>
-    <img class="arrow"  src="./assets/Designer_Assets/up.svg">
+    <img class="arrow" src="./assets/Designer_Assets/up.svg">
   </div>
   <div class="option-button" (click)="moveLayer('down')">
     <button class="option-sel-button">Move Layer Down</button>
-    <img class="arrow"  src="./assets/Designer_Assets/down.svg">
+    <img class="arrow" src="./assets/Designer_Assets/down.svg">
   </div>
 </div>
 
@@ -82,21 +109,35 @@
   </div>
   <div class="option-button" (click)="addShape('square')">
     <button class="option-sel-button">Rectangle</button>
-    <img class="shape-icon"  src="./assets/Designer_Assets/square_icon.svg">
+    <img class="shape-icon" src="./assets/Designer_Assets/square_icon.svg">
   </div>
   <div class="option-button" (click)="addShape('triangle')">
     <button class="option-sel-button">Triangle</button>
-    <img class="shape-icon"  src="./assets/Designer_Assets/triangle_icon.svg">
+    <img class="shape-icon" src="./assets/Designer_Assets/triangle_icon.svg">
   </div>
   <div class="option-button" (click)="addShape('circle')">
     <button class="option-sel-button">Circle</button>
-    <img class="shape-icon"  src="./assets/Designer_Assets/circle_icon.svg">
+    <img class="shape-icon" src="./assets/Designer_Assets/circle_icon.svg">
+  </div>
+</div>
+
+<!-- Font selection dropdown -->
+
+<!-- font-picker.component.html -->
+<div id="fontsSelectDiv" #fontsSelectDiv class="options-div" [style.display]="showFontSelect ? 'grid' : 'none'">
+  <div class="options-header">
+    Select font
+  </div>
+  <div class="options-scroll">
+    <div *ngFor="let font of fonts" class="option-button-font" [style.font-family]="font" (click)="selectFont(font)">
+      {{ font }}
+    </div>
   </div>
 </div>
 
 
-
-<div id="layers-panel" style="position: absolute; top: 20px; left: 20px; width: 200px; background: #f9f9f9; border: 1px solid #ccc; padding: 10px; display: none">
+<div id="layers-panel"
+     style="position: absolute; top: 20px; left: 20px; width: 200px; background: #f9f9f9; border: 1px solid #ccc; padding: 10px; display: none">
   <div id="drag-handle" style="cursor: move; background: #ddd; padding: 5px; text-align: center;">
     Layers Panel
   </div>
