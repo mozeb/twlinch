@@ -899,12 +899,30 @@ export class DesignerPopupComponent implements AfterViewInit {
   private onKeyDown: (event: KeyboardEvent) => void = () => {}; // Default value
   isEditing = false;
   caretPosition = { lineIndex: 0, charIndex: 0 };
-
   editText() {
     const textNode = this.selectedObject as Konva.Text;
     const scale = textNode.getAbsoluteScale(); // Get both X and Y scales
     const lineHeight = textNode.fontSize() * scale.x; // Get both X and Y scales
-    let onKeyDown: (event: KeyboardEvent) => void;
+    let originalText = textNode.text();
+
+    // Initialize caret position at the end of the text
+    const lines = textNode.text().split("\n");
+    this.caretPosition = {
+      lineIndex: lines.length - 1, // Last line
+      charIndex: lines[lines.length - 1].length, // End of last line
+    };
+
+    // Create a caret (blinking cursor)
+    this.caret = new Konva.Line({
+      points: [0, 0, 0, 0], // Will be updated dynamically
+      stroke: "black",
+      strokeWidth: 1,
+      visible: true,
+    });
+
+    this.layer.add(this.caret);
+    this.updateCaretPosition();
+    this.layer.draw();
 
     // Blink caret
     this.caretInterval = setInterval(() => {
@@ -914,56 +932,93 @@ export class DesignerPopupComponent implements AfterViewInit {
       }
     }, 500);
 
-    if (!this.isEditing) {
-      this.isEditing = true;
-      const originalText = textNode.text();
+    this.onKeyDown = (event: KeyboardEvent) => {
+      const lines = textNode.text().split("\n");
 
-      const getCurrentLineWidth = () => {
-        const lines = textNode.text().split("\n");
-        const currentLine = lines[lines.length - 1]; // Get the last line
-        const context = this.layer.getContext()._context; // Canvas 2D context
-        context.font = `${textNode.fontSize() * scale.x}px ${textNode.fontFamily()}`;
-        return context.measureText(currentLine).width;
-      };
+      if (event.key === "Enter") {
+        const currentLine = lines[this.caretPosition.lineIndex];
+        const beforeCaret = currentLine.slice(0, this.caretPosition.charIndex);
+        const afterCaret = currentLine.slice(this.caretPosition.charIndex);
 
-      // Create a caret (blinking cursor)
-      this.caret = new Konva.Line({
-        points: [0, 0, 0, 0], // Will be updated dynamically
-        stroke: "black",
-        strokeWidth: 1,
-        visible: true,
-      });
+        lines[this.caretPosition.lineIndex] = beforeCaret;
+        lines.splice(this.caretPosition.lineIndex + 1, 0, afterCaret);
 
-      this.layer.add(this.caret);
+        this.caretPosition.lineIndex++;
+        this.caretPosition.charIndex = 0;
+
+        textNode.text(lines.join("\n"));
+      } else if (event.key === "Backspace") {
+        if (this.caretPosition.charIndex > 0) {
+          // Remove the character behind the caret
+          const currentLine = lines[this.caretPosition.lineIndex];
+          lines[this.caretPosition.lineIndex] =
+            currentLine.slice(0, this.caretPosition.charIndex - 1) +
+            currentLine.slice(this.caretPosition.charIndex);
+          this.caretPosition.charIndex--;
+        } else if (this.caretPosition.lineIndex > 0) {
+          // Merge current line with the previous line
+          const currentLine = lines[this.caretPosition.lineIndex];
+          const previousLine = lines[this.caretPosition.lineIndex - 1];
+          this.caretPosition.charIndex = previousLine.length;
+
+          lines[this.caretPosition.lineIndex - 1] += currentLine;
+          lines.splice(this.caretPosition.lineIndex, 1);
+          this.caretPosition.lineIndex--;
+        }
+
+        textNode.text(lines.join("\n"));
+      } else if (event.key.length === 1) {
+        // Add character at caret position
+        const currentLine = lines[this.caretPosition.lineIndex];
+        lines[this.caretPosition.lineIndex] =
+          currentLine.slice(0, this.caretPosition.charIndex) +
+          event.key +
+          currentLine.slice(this.caretPosition.charIndex);
+
+        this.caretPosition.charIndex++;
+
+        textNode.text(lines.join("\n"));
+      } else if (event.key === "ArrowLeft") {
+        if (this.caretPosition.charIndex > 0) {
+          this.caretPosition.charIndex--;
+        } else if (this.caretPosition.lineIndex > 0) {
+          this.caretPosition.lineIndex--;
+          this.caretPosition.charIndex =
+            lines[this.caretPosition.lineIndex].length;
+        }
+      } else if (event.key === "ArrowRight") {
+        if (
+          this.caretPosition.charIndex <
+          lines[this.caretPosition.lineIndex].length
+        ) {
+          this.caretPosition.charIndex++;
+        } else if (this.caretPosition.lineIndex < lines.length - 1) {
+          this.caretPosition.lineIndex++;
+          this.caretPosition.charIndex = 0;
+        }
+      } else if (event.key === "ArrowUp") {
+        if (this.caretPosition.lineIndex > 0) {
+          this.caretPosition.lineIndex--;
+          this.caretPosition.charIndex = Math.min(
+            this.caretPosition.charIndex,
+            lines[this.caretPosition.lineIndex].length,
+          );
+        }
+      } else if (event.key === "ArrowDown") {
+        if (this.caretPosition.lineIndex < lines.length - 1) {
+          this.caretPosition.lineIndex++;
+          this.caretPosition.charIndex = Math.min(
+            this.caretPosition.charIndex,
+            lines[this.caretPosition.lineIndex].length,
+          );
+        }
+      }
+
       this.updateCaretPosition();
       this.layer.draw();
+    };
 
-      this.onKeyDown = (event: KeyboardEvent) => {
-        if (event.key === "Enter") {
-          textNode.text(textNode.text() + "\n");
-          this.updateCaretPosition();
-          this.layer.draw();
-        } else if (event.key === "Escape") {
-          textNode.text(originalText);
-          this.isEditing = false;
-          window.removeEventListener("keydown", this.onKeyDown);
-          this.endEditing();
-          this.transformer.forceUpdate();
-          this.layer.draw();
-        } else if (event.key.length === 1 || event.key === "Backspace") {
-          if (event.key === "Backspace") {
-            textNode.text(textNode.text().slice(0, -1));
-          } else {
-            textNode.text(textNode.text() + event.key);
-          }
-          this.updateCaretPosition();
-          this.transformer.forceUpdate();
-          this.layer.draw();
-        }
-      };
-
-      window.addEventListener("keydown", this.onKeyDown);
-    }
+    window.addEventListener("keydown", this.onKeyDown);
 
     textNode.on("dragstart", () => {
       if (this.isEditing) {
@@ -974,7 +1029,7 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     textNode.on("transform", () => {
       if (this.isEditing) {
-        window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keydown", this.onKeyDown);
         this.endEditing();
       }
     });
@@ -984,38 +1039,47 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
   }
 
-  updateCaretPosition = () => {
+  updateCaretPosition() {
     const textNode = this.selectedObject as Konva.Text;
     const scale = textNode.getAbsoluteScale(); // Get both X and Y scales
     const lines = textNode.text().split("\n");
-    const currentLine = lines[lines.length - 1]; // Get the last line
     const context = this.layer.getContext()._context; // Canvas 2D context
-    const lineHeight = textNode.fontSize() * scale.x; // Get both X and Y scales
+    const lineHeight = textNode.fontSize() * scale.x; // Calculate scaled line height
 
-    // Update the font for the context to match the text node
+    // Set the context font to match the text node
     context.font = `${textNode.fontSize() * scale.x}px ${textNode.fontFamily()}`;
 
-    // Measure the scaled width of the current line
-    const textWidth = context.measureText(currentLine).width;
+    const currentLine = lines[this.caretPosition.lineIndex];
+    const textWidth = context.measureText(
+      currentLine.slice(0, this.caretPosition.charIndex),
+    ).width;
 
     // Calculate alignment offset
-    const alignmentOffset =
-      textNode.align() === "center"
-        ? (textNode.width() * scale.x - textWidth) / 2
-        : textNode.align() === "right"
-          ? textNode.width() * scale.x - textWidth - 10 * scale.x
-          : 10 * scale.x;
+    const totalLineWidth = context.measureText(currentLine).width;
+    let alignmentOffset = 0;
 
-    // Update caret position
+    if (textNode.align() === "center") {
+      alignmentOffset = (textNode.width() * scale.x - totalLineWidth) / 2;
+    } else if (textNode.align() === "right") {
+      alignmentOffset =
+        textNode.width() * scale.x - totalLineWidth - 10 * scale.x;
+    } else {
+      alignmentOffset = 10 * scale.x; // Default for left alignment
+    }
+
+    // Update caret position points
     this.caret.points([
       textNode.x() + alignmentOffset + textWidth,
-      textNode.y() + lineHeight * lines.length - 10 * scale.y,
+      textNode.y() +
+        lineHeight * (this.caretPosition.lineIndex + 1) -
+        10 * scale.y,
       textNode.x() + alignmentOffset + textWidth,
-      textNode.y() + lineHeight * lines.length + lineHeight - 10 * scale.y,
+      textNode.y() +
+        lineHeight * (this.caretPosition.lineIndex + 1) +
+        lineHeight -
+        10 * scale.y,
     ]);
-
-    this.layer.draw();
-  };
+  }
 
   endEditing = () => {
     this.isEditing = false;
