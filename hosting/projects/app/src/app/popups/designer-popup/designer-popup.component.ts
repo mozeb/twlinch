@@ -537,7 +537,10 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.selectedColor = input.value;
 
     // If shape color picker
-    if (this.selectedObject instanceof Konva.Shape) {
+    if (
+      this.selectedObject instanceof Konva.Shape &&
+      !(input.id == "colorPickerBackground")
+    ) {
       (this.selectedObject as Konva.Shape).fill(input.value);
       // Update the custom button's background color
       this.colorPickerButton.nativeElement.style.backgroundColor =
@@ -1019,43 +1022,6 @@ export class DesignerPopupComponent implements AfterViewInit {
       }
     }
   }
-  //
-  // duplicateObject() {
-  //   if (!this.selectedObject || this.selectedObject == this.maskedPath) {
-  //     console.warn("No selected object to duplicate.");
-  //     return;
-  //   }
-  //
-  //   const duplicate = this.selectedObject.clone();
-  //   duplicate.id("kreneki");
-  //
-  //   // Offset the duplicate's position to make it visually distinguishable
-  //   duplicate.position({
-  //     x: this.selectedObject.x() + this.selectedObject.width() / 2, // Offset by 20 pixels horizontally
-  //     y: this.selectedObject.y() + this.selectedObject.height(), // Offset by 20 pixels vertically
-  //   });
-  //
-  //   // Add the duplicate to the same layer
-  //   this.maskedGroup.add(duplicate);
-  //   this.transformer.nodes([]);
-  //   this.transformer.nodes([duplicate]);
-  //   this.transformer.show();
-  //
-  //   if (
-  //     duplicate instanceof Konva.Shape &&
-  //     !(duplicate instanceof Konva.Text)
-  //   ) {
-  //     this.addShapeNodeEvents(duplicate);
-  //   } else if (duplicate instanceof Konva.Text) {
-  //    // this.addTextNodeEvents(duplicate);
-  //   }
-  //
-  //   // Redraw the layer to reflect the changes
-  //   this.layer.draw();
-  //
-  //   // Optionally select the new object
-  //   this.selectObject(duplicate);
-  // }
 
   duplicateObject() {
     if (!this.selectedObject || this.selectedObject === this.maskedPath) {
@@ -1253,59 +1219,7 @@ export class DesignerPopupComponent implements AfterViewInit {
         align: this.fontAlign.slice(0, -4),
       });
 
-      // Add click event to image for selecting and attaching transformer
-      textNode.on("click", () => {
-        this.selectedFont = textNode.fontFamily();
-        this.transformer.show();
-        this.transformer.nodes([]);
-        this.transformer.nodes([textNode]);
-        this.layer.draw();
-        this.selectObject(textNode);
-        this.setAvailableTools();
-      });
-
-      // Add drag event to shape for selecting and attaching transformer
-      textNode.on("dragmove", () => {
-        // Detach transformer from previous node
-        this.transformer.hide();
-        this.selectObject(textNode);
-        this.endEditing();
-      });
-
-      //Add drag end event to shape for selecting and attaching transformer
-      textNode.on("dragend", () => {
-        this.selectedFont = textNode.fontFamily();
-        this.editText();
-        this.transformer.show();
-        this.transformer.nodes([]);
-        this.transformer.nodes([textNode]);
-        this.layer.draw();
-        this.selectObject(textNode);
-        this.setAvailableTools();
-      });
-
-      //Hide the Transformer when rotating
-      textNode.on("transformstart", () => {
-        this.transformer.hide(); // Hide transformer when rotation starts
-        this.selectObject(textNode);
-        this.updateCaretPosition();
-        this.layer.draw();
-        this.endEditing();
-      });
-
-      //Show the Transformer again after rotation ends
-      textNode.on("transformend", () => {
-        this.transformer.show(); // Show transformer after rotation ends
-        this.editText();
-        this.selectObject(textNode);
-        this.layer.draw();
-      });
-
-      textNode.on("dblclick", () => {
-        this.selectedFont = textNode.fontFamily();
-        this.selectObject(textNode);
-        this.editText();
-      });
+      this.addTextNodeEvents(textNode);
 
       // Set up at the begining
       this.transformer.nodes([]);

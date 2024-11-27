@@ -21,6 +21,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background: url("../../../assets/Designer_Assets/canvas_dots.svg");
+  background-size:60px;
+  background-repeat: repeat;
 }
 
 .left-toolbar{
@@ -28,10 +31,11 @@
   flex-direction: column;
   gap:10px;
   width: fit-content;
-  background-color: #F0F0F0;
+  background-color: #000000;
   height: 100vh;
   justify-content: center;
   border-right: 1px solid #d9d9d9;
+  color:white;
 }
 
 .right-content{
@@ -57,16 +61,22 @@
   gap:3px;
   justify-content: center;
   align-items: center;
+  transition: scale .2s ease-in-out;
 }
 
 .designer-button:hover{
-  background-color: #cecece;
+  //background-color: #fedc00;
+  filter: brightness(0) saturate(100%) invert(90%) sepia(20%) saturate(6713%) hue-rotate(1deg) brightness(107%) contrast(103%);
+  scale: 1.1;
+
 }
+
 
 .designer-button-icon{
   width:30px;
   height:30px;
   pointer-events: none;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7487%) hue-rotate(213deg) brightness(111%) contrast(103%);
 }
 
 .designer-button-text{
@@ -75,6 +85,7 @@
   font-family: "Ubuntu Mono";
   text-transform: uppercase;
   pointer-events: none;
+  color:white;
 
 }
 
