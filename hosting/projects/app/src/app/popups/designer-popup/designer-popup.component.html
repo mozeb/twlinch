@@ -21,7 +21,11 @@
       <img class="designer-button-icon" src="./assets/Designer_Assets/change_color_icon.svg"/>
       <span class="designer-button-text">Canvas<br>Color</span>
       <input type="color" #colorPickerBackground id="colorPickerBackground" (input)="onColorChange($event)"
-             style="opacity: 0; height: 0px;"/>
+             style="opacity: 0; height: 0px; width: 0px;"/>
+    </button>
+    <button id="eraseButton" #eraseButton class="designer-button">
+      <img class="designer-button-icon" src="./assets/Designer_Assets/eraser_icon.svg"/>
+      <span class="designer-button-text">Clean<br>Canvas</span>
     </button>
   </div>
 
