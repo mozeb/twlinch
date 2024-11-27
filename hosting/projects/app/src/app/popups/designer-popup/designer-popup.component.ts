@@ -42,8 +42,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   maskedGroup!: Konva.Group; // The outline mask of the sleeve
   maskedPath!: Konva.Path; // The outline mask of the sleeve
   transformer!: Konva.Transformer; // Transformer for moving objects and rotating them
-  imageNodes: Konva.Image[] = []; // Array to hold multiple images uploaded
-  shapeNondes: Konva.Shape[] = []; // Array to hold multiple images uploaded
+  objectNodes: Konva.Node[] = [];
   textNodes: Konva.Text[] = []; // Array to hold multiple images uploaded
   selectedObject: Konva.Node | null = null;
 
@@ -242,11 +241,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Stage click event for deselecting when clicking away
     this.stage.on("click", (e) => {
       // Check if clicked target is NOT an image
-      if (
-        !this.imageNodes.includes(e.target as Konva.Image) &&
-        !this.shapeNondes.includes(e.target as Konva.Shape) &&
-        !this.textNodes.includes(e.target as Konva.Text)
-      ) {
+      if (!this.objectNodes.includes(e.target as Konva.Node)) {
         this.transformer.nodes([]); // Clear selection
         this.layer.draw();
         this.selectedObject = this.maskedPath;
@@ -326,7 +321,6 @@ export class DesignerPopupComponent implements AfterViewInit {
       });
     }
 
-    this.shapeNondes.push(shape);
     this.addShapeNodeEvents(shape);
 
     // Set up at the begining
@@ -345,6 +339,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   addShapeNodeEvents(shape: Konva.Shape) {
+    this.objectNodes.push(shape);
     // Add click event to image for selecting and attaching transformer
     shape.on("click", () => {
       this.transformer.show();
@@ -424,7 +419,6 @@ export class DesignerPopupComponent implements AfterViewInit {
             draggable: true,
           });
 
-          this.imageNodes.push(konvaImage); // Add image to array for later reference
           this.addShapeNodeEvents(konvaImage);
 
           // Add the image to the masked group
@@ -436,6 +430,7 @@ export class DesignerPopupComponent implements AfterViewInit {
           this.transformer.nodes([konvaImage]);
           this.transformer.show();
           this.layer.draw();
+          this.setAvailableTools();
         };
       };
 
@@ -707,7 +702,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Set up at the begining
     this.transformer.nodes([]);
     this.transformer.nodes([textNode]);
-    this.textNodes.push(textNode);
     this.selectObject(textNode);
     this.transformer.show();
     this.maskedGroup.add(textNode);
@@ -717,6 +711,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   addTextNodeEvents(textNode: Konva.Text) {
+    this.objectNodes.push(textNode);
     // Add click event to image for selecting and attaching transformer
     textNode.on("click", () => {
       this.selectedFont = textNode.fontFamily();
@@ -1085,7 +1080,6 @@ export class DesignerPopupComponent implements AfterViewInit {
         y: imageNode.y() + imageNode.height(),
       });
 
-      this.imageNodes.push(duplicate as Konva.Image); // Track in your image nodes array
       this.addShapeNodeEvents(duplicate as Konva.Image); // Reattach events if needed
     } else {
       // For other node types, use toJSON and recreate
@@ -1101,10 +1095,8 @@ export class DesignerPopupComponent implements AfterViewInit {
       if (duplicate instanceof Konva.Text) {
         console.log("Text");
         this.endEditing();
-        this.textNodes.push(duplicate as Konva.Text);
         this.addTextNodeEvents(duplicate as Konva.Text);
       } else if (duplicate instanceof Konva.Shape) {
-        this.shapeNondes.push(duplicate as Konva.Shape);
         this.addShapeNodeEvents(duplicate as Konva.Shape);
       }
     }
