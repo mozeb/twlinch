@@ -848,12 +848,13 @@ export class DesignerPopupComponent implements AfterViewInit {
       // Detach transformer from previous node
       this.transformer.hide();
       this.selectObject(textNode);
+      this.endEditing();
     });
 
     //Add drag end event to shape for selecting and attaching transformer
     textNode.on("dragend", () => {
       this.selectedFont = textNode.fontFamily();
-
+      this.editText();
       this.transformer.show();
       this.transformer.nodes([]);
       this.transformer.nodes([textNode]);
@@ -867,10 +868,12 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.hide(); // Hide transformer when rotation starts
       this.selectObject(textNode);
       this.layer.draw();
+      this.endEditing();
     });
 
     //Show the Transformer again after rotation ends
     textNode.on("transformend", () => {
+      this.editText();
       this.transformer.show(); // Show transformer after rotation ends
       this.selectObject(textNode);
       this.layer.draw();
@@ -1283,12 +1286,13 @@ export class DesignerPopupComponent implements AfterViewInit {
         // Detach transformer from previous node
         this.transformer.hide();
         this.selectObject(textNode);
+        this.endEditing();
       });
 
       //Add drag end event to shape for selecting and attaching transformer
       textNode.on("dragend", () => {
         this.selectedFont = textNode.fontFamily();
-
+        this.editText();
         this.transformer.show();
         this.transformer.nodes([]);
         this.transformer.nodes([textNode]);
@@ -1301,12 +1305,15 @@ export class DesignerPopupComponent implements AfterViewInit {
       textNode.on("transformstart", () => {
         this.transformer.hide(); // Hide transformer when rotation starts
         this.selectObject(textNode);
+        this.updateCaretPosition();
         this.layer.draw();
+        this.endEditing();
       });
 
       //Show the Transformer again after rotation ends
       textNode.on("transformend", () => {
         this.transformer.show(); // Show transformer after rotation ends
+        this.editText();
         this.selectObject(textNode);
         this.layer.draw();
       });
