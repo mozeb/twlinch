@@ -3,7 +3,6 @@ import {
   Component,
   ElementRef,
   HostListener,
-  OnInit,
   ViewChild,
   ViewEncapsulation,
 } from "@angular/core";
@@ -46,11 +45,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   imageNodes: Konva.Image[] = []; // Array to hold multiple images uploaded
   shapeNondes: Konva.Shape[] = []; // Array to hold multiple images uploaded
   textNodes: Konva.Text[] = []; // Array to hold multiple images uploaded
-  elements: KonvaElement[] = [];
   selectedObject: Konva.Node | null = null;
-
-  generateId = (): string =>
-    `element-${Math.random().toString(36).substr(2, 9)}`;
 
   // Default values of stage width and height
   stageWidth = 1200;
@@ -123,16 +118,12 @@ export class DesignerPopupComponent implements AfterViewInit {
   showFontSelect = false; // Controls the visibility of the font select div
   showTextAlignSelect = false; // Controls the visibility of the font select div
 
-  // Undo and redo stack
-  undoStack: string[] = [];
-  redoStack: string[] = [];
-
   // Fonts Selection
   fonts: string[] = [];
   selectedFont: string = "Ubuntu Mono"; // To store the selected font
 
   ngAfterViewInit() {
-    this.createMask();
+    this.createStage();
     this.loadFonts();
     this.listenOffStageClick();
   }
@@ -152,7 +143,8 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
   }
 
-  async createMask() {
+  //////////////// CREATING MAIN STAGE ////////////////
+  async createStage() {
     // Get the original size of svg path
     this.sizeInfo =
       await this._designTemplatesService.getWidthAndHeightOfPath("twelve");
@@ -168,7 +160,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.stageWidth = elementWidth - (elementWidth / 100) * 20;
 
     // Make sure there is at least 150px space on top and bottom
-    if (this.container.nativeElement.clientHeight - this.stageWidth < 300) {
+    if (this.container.nativeElement.clientHeight - this.stageHeight < 300) {
       this.stageWidth = elementWidth - (elementWidth / 100) * 30;
     }
 
@@ -283,14 +275,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Draw the main layer
     this.layer.draw();
 
-    // Add event listener to save state on changes
-    this.saveState();
-
-    // Save state on content layer changes
-    this.layer.on("mouseup touchend", () => {
-      this.saveState();
-    });
-
     // Setup sides position text
     const pos =
       (this.container.nativeElement.clientHeight - this.stageHeight) / 2 - 50;
@@ -305,9 +289,6 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   // Function to add different shapes
   addShape(type: string) {
-    // Save state for undo/redo
-    this.saveState();
-
     let shape;
     if (type === "circle") {
       shape = new Konva.Circle({
@@ -385,15 +366,6 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.selectObject(shape);
       this.layer.draw();
     });
-
-    // Create unique ID
-    const id = this.generateId();
-    const newElement: KonvaElement = {
-      id: id,
-      type: "Shape",
-      konvaObject: shape,
-    };
-    this.elements.push(newElement);
 
     // Set up at the begining
     this.transformer.nodes([]);
@@ -575,7 +547,7 @@ export class DesignerPopupComponent implements AfterViewInit {
           x: 0,
           y: this.sizeInfo.height,
           scale: 1,
-          color: rgb(0, 0, 0), // Set color for visibility
+          color: rgb(255, 0, 133), // Set color for visibility
         });
         console.log(`Path ${index + 1} drawn successfully.`);
       } catch (error) {
@@ -822,7 +794,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       text: "Double Click To Edit",
       x: 50, // Initial x position
       y: 50, // Initial y position
-      fontSize: 20,
+      fontSize: 30 * this.scale,
       fontFamily: this.selectedFont,
       fill: "black",
       draggable: true,
@@ -1262,7 +1234,7 @@ export class DesignerPopupComponent implements AfterViewInit {
         text: text,
         x: x,
         y: y,
-        fontSize: 20,
+        fontSize: 30 * this.scale,
         fontFamily: this.selectedFont,
         fill: "black",
         draggable: true,
@@ -1355,23 +1327,6 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   ///////// END MUSIC FILES ///////////////////
-
-  // Undo and redo states save and actions ///
-  saveState() {
-    // Save the current state of the content layer
-    this.undoStack.push(this.layer.toJSON());
-    this.redoStack = []; // Clear the redo stack
-  }
-
-  undo() {
-    if (this.undoStack.length > 1) {
-    }
-  }
-
-  redo() {
-    if (this.redoStack.length > 0) {
-    }
-  }
 }
 
 // Track elements globally
