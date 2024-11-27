@@ -326,6 +326,25 @@ export class DesignerPopupComponent implements AfterViewInit {
       });
     }
 
+    this.shapeNondes.push(shape);
+    this.addShapeNodeEvents(shape);
+
+    // Set up at the begining
+    this.transformer.nodes([]);
+    this.transformer.nodes([shape]);
+    this.selectObject(shape);
+    this.transformer.show();
+
+    // Add shape to the layer
+    this.maskedGroup.add(shape);
+    this.layer.draw();
+
+    this.setAvailableTools();
+
+    this.showShapesSelect = false;
+  }
+
+  addShapeNodeEvents(shape: Konva.Shape) {
     // Add click event to image for selecting and attaching transformer
     shape.on("click", () => {
       this.transformer.show();
@@ -366,33 +385,6 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.selectObject(shape);
       this.layer.draw();
     });
-
-    // Set up at the begining
-    this.transformer.nodes([]);
-    this.transformer.nodes([shape]);
-    this.selectObject(shape);
-    this.transformer.show();
-
-    // Add shape to the layer
-    this.maskedGroup.add(shape);
-    this.shapeNondes.push(shape); // Add image to array for later reference
-    this.layer.draw();
-
-    this.setAvailableTools();
-
-    const layersList = document.getElementById(
-      "layers-list",
-    ) as HTMLUListElement;
-
-    // Add to layers
-    this.addElementToLayersPanel(
-      shape,
-      this.layer,
-      this.transformer,
-      layersList,
-    );
-
-    this.showShapesSelect = false;
   }
 
   @ViewChild("fileInput") fileInput!: ElementRef<HTMLInputElement>;
@@ -432,63 +424,11 @@ export class DesignerPopupComponent implements AfterViewInit {
             draggable: true,
           });
 
+          this.imageNodes.push(konvaImage); // Add image to array for later reference
+          this.addShapeNodeEvents(konvaImage);
+
           // Add the image to the masked group
           this.maskedGroup.add(konvaImage);
-          this.imageNodes.push(konvaImage); // Add image to array for later reference
-
-          // Add click event to image for selecting and attaching transformer
-          konvaImage.on("click", () => {
-            this.selectObject(konvaImage);
-            // Detach transformer from previous node
-            this.setAvailableTools();
-            this.transformer.nodes([]);
-            // Attach transformer to clicked image
-            this.transformer.nodes([konvaImage]);
-            this.transformer.show(); // Show transformer after rotation ends
-            this.layer.draw();
-          });
-
-          // Add drag event to shape for selecting and attaching transformer
-          konvaImage.on("dragmove", () => {
-            this.selectObject(konvaImage);
-            // Detach transformer from previous node
-            this.transformer.hide();
-          });
-
-          // Add drag end event to shape for selecting and attaching transformer
-          konvaImage.on("dragend", () => {
-            this.selectObject(konvaImage);
-            this.transformer.show();
-            this.transformer.nodes([]);
-            this.transformer.nodes([konvaImage]);
-            this.layer.draw();
-          });
-
-          // Hide the Transformer when rotating
-          konvaImage.on("transformstart", () => {
-            this.selectObject(konvaImage);
-            this.transformer.hide(); // Hide transformer when rotation starts
-            this.layer.draw();
-          });
-
-          // Show the Transformer again after rotation ends
-          konvaImage.on("transformend", () => {
-            this.selectObject(konvaImage);
-            this.transformer.show(); // Show transformer after rotation ends
-            this.layer.draw();
-          });
-
-          const layersList = document.getElementById(
-            "layers-list",
-          ) as HTMLUListElement;
-
-          // Add to layers
-          this.addElementToLayersPanel(
-            konvaImage,
-            this.layer,
-            this.transformer,
-            layersList,
-          );
 
           // Automatically attach transformer to the latest uploaded image
           this.selectObject(konvaImage);
@@ -547,7 +487,7 @@ export class DesignerPopupComponent implements AfterViewInit {
           x: 0,
           y: this.sizeInfo.height,
           scale: 1,
-          color: rgb(255, 0, 133), // Set color for visibility
+          color: rgb(0, 0.7, 1), // Set color for visibility
         });
         console.log(`Path ${index + 1} drawn successfully.`);
       } catch (error) {
@@ -567,48 +507,6 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     // Show marks again
     this.designMarksLayer.show();
-  }
-
-  // Function to add any Konva element to the layers panel with delete functionality
-  addElementToLayersPanel(
-    element: Konva.Node,
-    layer: Konva.Layer,
-    transformer: Konva.Transformer,
-    layersList: HTMLUListElement,
-  ) {
-    // Create a list item for the element
-    const listItem = document.createElement("li");
-    listItem.classList.add("layer-item");
-    listItem.textContent = `${element.getClassName()} ${element._id}`; // Dynamically get the element type and ID
-
-    // Create a delete button for the element
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-    deleteButton.classList.add("delete-button");
-
-    // Set delete button functionality
-    deleteButton.onclick = function () {
-      element.destroy(); // Remove the element from the layer
-      transformer.detach(); // Detach the transformer if applied
-      layer.draw(); // Redraw the layer
-      listItem.remove(); // Remove the entry from the layers panel
-
-      // Hide the transformer if no other nodes are selected
-      if (transformer.nodes().length === 0) {
-        transformer.hide();
-        layer.draw();
-      }
-    };
-
-    listItem.appendChild(deleteButton);
-    layersList.appendChild(listItem);
-
-    // Optional: Add click functionality to focus on the selected element
-    listItem.onclick = function () {
-      transformer.nodes([element]); // Attach transformer to this element
-      transformer.show();
-      layer.draw(); // Redraw the layer
-    };
   }
 
   ////////// Object actions ///////////
@@ -804,6 +702,21 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     this.layer.draw();
 
+    this.addTextNodeEvents(textNode);
+
+    // Set up at the begining
+    this.transformer.nodes([]);
+    this.transformer.nodes([textNode]);
+    this.textNodes.push(textNode);
+    this.selectObject(textNode);
+    this.transformer.show();
+    this.maskedGroup.add(textNode);
+
+    // Set available tools
+    this.setAvailableTools();
+  }
+
+  addTextNodeEvents(textNode: Konva.Text) {
     // Add click event to image for selecting and attaching transformer
     textNode.on("click", () => {
       this.selectedFont = textNode.fontFamily();
@@ -856,17 +769,6 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.selectObject(textNode);
       this.editText();
     });
-
-    // Set up at the begining
-    this.transformer.nodes([]);
-    this.transformer.nodes([textNode]);
-    this.textNodes.push(textNode);
-    this.selectObject(textNode);
-    this.transformer.show();
-    this.maskedGroup.add(textNode);
-
-    // Set available tools
-    this.setAvailableTools();
   }
 
   caret!: Konva.Line;
@@ -1122,6 +1024,109 @@ export class DesignerPopupComponent implements AfterViewInit {
       }
     }
   }
+  //
+  // duplicateObject() {
+  //   if (!this.selectedObject || this.selectedObject == this.maskedPath) {
+  //     console.warn("No selected object to duplicate.");
+  //     return;
+  //   }
+  //
+  //   const duplicate = this.selectedObject.clone();
+  //   duplicate.id("kreneki");
+  //
+  //   // Offset the duplicate's position to make it visually distinguishable
+  //   duplicate.position({
+  //     x: this.selectedObject.x() + this.selectedObject.width() / 2, // Offset by 20 pixels horizontally
+  //     y: this.selectedObject.y() + this.selectedObject.height(), // Offset by 20 pixels vertically
+  //   });
+  //
+  //   // Add the duplicate to the same layer
+  //   this.maskedGroup.add(duplicate);
+  //   this.transformer.nodes([]);
+  //   this.transformer.nodes([duplicate]);
+  //   this.transformer.show();
+  //
+  //   if (
+  //     duplicate instanceof Konva.Shape &&
+  //     !(duplicate instanceof Konva.Text)
+  //   ) {
+  //     this.addShapeNodeEvents(duplicate);
+  //   } else if (duplicate instanceof Konva.Text) {
+  //    // this.addTextNodeEvents(duplicate);
+  //   }
+  //
+  //   // Redraw the layer to reflect the changes
+  //   this.layer.draw();
+  //
+  //   // Optionally select the new object
+  //   this.selectObject(duplicate);
+  // }
+
+  duplicateObject() {
+    if (!this.selectedObject || this.selectedObject === this.maskedPath) {
+      console.warn("No selected object to duplicate.");
+      return;
+    }
+
+    let duplicate: Konva.Node;
+
+    if (this.selectedObject instanceof Konva.Image) {
+      // Handle Konva.Image duplication
+      const imageNode = this.selectedObject as Konva.Image;
+
+      duplicate = new Konva.Image({
+        ...imageNode.attrs, // Copy all attributes
+        image: imageNode.image(), // Explicitly pass the original image object
+      });
+
+      // Offset the position of the duplicate
+      duplicate.position({
+        x: imageNode.x() + imageNode.width() / 2,
+        y: imageNode.y() + imageNode.height(),
+      });
+
+      this.imageNodes.push(duplicate as Konva.Image); // Track in your image nodes array
+      this.addShapeNodeEvents(duplicate as Konva.Image); // Reattach events if needed
+    } else {
+      // For other node types, use toJSON and recreate
+      const serialized = this.selectedObject.toJSON();
+      duplicate = Konva.Node.create(serialized);
+
+      duplicate.position({
+        x: this.selectedObject.x() + this.selectedObject.width() / 2,
+        y: this.selectedObject.y() + this.selectedObject.height(),
+      });
+
+      console.log(duplicate);
+      if (duplicate instanceof Konva.Text) {
+        console.log("Text");
+        this.endEditing();
+        this.textNodes.push(duplicate as Konva.Text);
+        this.addTextNodeEvents(duplicate as Konva.Text);
+      } else if (duplicate instanceof Konva.Shape) {
+        this.shapeNondes.push(duplicate as Konva.Shape);
+        this.addShapeNodeEvents(duplicate as Konva.Shape);
+      }
+    }
+
+    // Ensure the duplicate is a Shape or Group
+    if (duplicate instanceof Konva.Shape) {
+      // Add the duplicate to the masked group
+      this.maskedGroup.add(duplicate);
+
+      // Select the duplicate
+      this.selectedObject = duplicate;
+      this.selectObject(duplicate);
+
+      // Update the transformer to target the duplicate
+      this.transformer.nodes([duplicate]);
+
+      // Redraw the layer
+      this.layer.draw();
+    } else {
+      console.error("Duplicate is not a valid Shape or Group.");
+    }
+  }
 
   // Set available tools
   setAvailableTools() {
@@ -1160,7 +1165,10 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.textThicknessButton.nativeElement.classList.remove(
         "unclickable-button",
       );
-    } else if (this.selectedObject instanceof Konva.Shape) {
+    } else if (
+      this.selectedObject instanceof Konva.Shape &&
+      !(this.selectedObject instanceof Konva.Image)
+    ) {
       this.textAlignButton.nativeElement.classList.add("unclickable-button");
       this.fontSelectButton.nativeElement.classList.add("unclickable-button");
       this.textThicknessButton.nativeElement.classList.add(
@@ -1173,6 +1181,22 @@ export class DesignerPopupComponent implements AfterViewInit {
         "unclickable-button",
       );
       this.colorPickerButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.layerPositionButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+    } else if (this.selectedObject instanceof Konva.Image) {
+      this.colorPickerButton.nativeElement.classList.add("unclickable-button");
+      this.textAlignButton.nativeElement.classList.add("unclickable-button");
+      this.fontSelectButton.nativeElement.classList.add("unclickable-button");
+      this.textThicknessButton.nativeElement.classList.add(
+        "unclickable-button",
+      );
+      this.deleteObjectButton.nativeElement.classList.remove(
+        "unclickable-button",
+      );
+      this.duplicateObjectButton.nativeElement.classList.remove(
         "unclickable-button",
       );
       this.layerPositionButton.nativeElement.classList.remove(
@@ -1203,11 +1227,6 @@ export class DesignerPopupComponent implements AfterViewInit {
       `/orders/${user?.uid}/music/D`,
     );
 
-    console.log(this.sideA);
-    console.log(this.sideA);
-    console.log(this.sideA);
-    console.log(this.sideA);
-
     this.createPlaylistTextNode();
   }
 
@@ -1217,16 +1236,16 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     // Helper function to remove file extensions from an array of strings
     const removeExtensions = (tracks: string[]) => {
-      return tracks.map((track) =>
-        track.replace(/\.(wav|mp3|mp4|flac|aac|ogg|m4a|wma)$/i, ""),
+      return tracks.map(
+        (track) => track.replace(/\.(wav|mp3|mp4|flac|aac|ogg|m4a|wma)$/i, ""), // Remove file extensions
       );
     };
 
     // Remove extensions from all playlist sides
-    const cleanedSideA = removeExtensions(this.sideA);
-    const cleanedSideB = removeExtensions(this.sideB);
-    const cleanedSideC = removeExtensions(this.sideC);
-    const cleanedSideD = removeExtensions(this.sideD);
+    let cleanedSideA = removeExtensions(this.sideA);
+    let cleanedSideB = removeExtensions(this.sideB);
+    let cleanedSideC = removeExtensions(this.sideC);
+    let cleanedSideD = removeExtensions(this.sideD);
 
     // Helper function to create and add text nodes
     const createTextNode = (text: string, x: number, y: number) => {
