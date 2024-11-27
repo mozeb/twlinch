@@ -13,13 +13,13 @@ import {
   MatDialogRef,
 } from "@angular/material/dialog";
 import { AsyncPipe, NgIf } from "@angular/common";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Inject } from "@angular/core";
+import { AuthService } from "../../services/auth.service";
 import Konva from "konva";
 import { PDFDocument, rgb } from "pdf-lib";
 import { DeisgnTemplatesService } from "../../services/deisgn-templates.service";
 import WebFont from "webfontloader";
-import { CommonModule } from "@angular/common"; // Import CommonModule
+import { CommonModule } from "@angular/common";
+import { StorageBaseService } from "../../services/api-base/storage-base.service"; // Import CommonModule
 
 @Component({
   selector: "designer-popup",
@@ -33,6 +33,8 @@ export class DesignerPopupComponent implements AfterViewInit {
   constructor(
     public dialogRef: MatDialogRef<DesignerPopupComponent>,
     protected _designTemplatesService: DeisgnTemplatesService,
+    protected _authService: AuthService,
+    private _storageService: StorageBaseService,
   ) {}
 
   stage!: Konva.Stage; // The main stage
@@ -202,7 +204,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Create the Konva path for the mask background coloring
     this.maskedPath = new Konva.Path({
       data: this._designTemplatesService.twelveInchTemplate.maskPath,
-      fill: "lightgray",
+      fill: "#dcdcdc",
       scale: { x: this.scale, y: this.scale },
       x: 0,
       y: 0,
@@ -295,6 +297,10 @@ export class DesignerPopupComponent implements AfterViewInit {
     // set sides marks div
     this.sleeveSidesDiv.nativeElement.style.top = pos + "px";
     this.sleeveSidesDiv.nativeElement.style.width = this.stageWidth + "px";
+
+    // Set tools at the begining
+    this.selectedObject = this.maskedPath;
+    this.setAvailableTools();
   }
 
   // Function to add different shapes
@@ -445,10 +451,12 @@ export class DesignerPopupComponent implements AfterViewInit {
           // Create the Konva image
           const konvaImage = new Konva.Image({
             image: imageObj,
-            x: 100, // Adjusted position within masked area
-            y: 100,
-            width: imageObj.width / 2, // Initial width
-            height: imageObj.height / 2, // Initial height
+            x: this.stageWidth / 2 + this.stageWidth / 3 / 4, // Adjusted position within masked area
+            y:
+              this.stageHeight / 2 -
+              ((this.stageWidth / 3) * imageObj.height) / imageObj.width / 2,
+            width: this.stageWidth / 3, // Initial width
+            height: ((this.stageWidth / 3) * imageObj.height) / imageObj.width, // Initial height
             draggable: true,
           });
 
@@ -460,6 +468,7 @@ export class DesignerPopupComponent implements AfterViewInit {
           konvaImage.on("click", () => {
             this.selectObject(konvaImage);
             // Detach transformer from previous node
+            this.setAvailableTools();
             this.transformer.nodes([]);
             // Attach transformer to clicked image
             this.transformer.nodes([konvaImage]);
@@ -480,7 +489,6 @@ export class DesignerPopupComponent implements AfterViewInit {
             this.transformer.show();
             this.transformer.nodes([]);
             this.transformer.nodes([konvaImage]);
-            this.setAvailableTools();
             this.layer.draw();
           });
 
@@ -826,6 +834,7 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     // Add click event to image for selecting and attaching transformer
     textNode.on("click", () => {
+      this.selectedFont = textNode.fontFamily();
       this.transformer.show();
       this.transformer.nodes([]);
       this.transformer.nodes([textNode]);
@@ -843,6 +852,8 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     //Add drag end event to shape for selecting and attaching transformer
     textNode.on("dragend", () => {
+      this.selectedFont = textNode.fontFamily();
+
       this.transformer.show();
       this.transformer.nodes([]);
       this.transformer.nodes([textNode]);
@@ -866,6 +877,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
 
     textNode.on("dblclick", () => {
+      this.selectedFont = textNode.fontFamily();
       this.selectObject(textNode);
       this.editText();
     });
@@ -886,6 +898,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   caretInterval: any;
   private onKeyDown: (event: KeyboardEvent) => void = () => {}; // Default value
   isEditing = false;
+  caretPosition = { lineIndex: 0, charIndex: 0 };
 
   editText() {
     const textNode = this.selectedObject as Konva.Text;
@@ -1128,6 +1141,149 @@ export class DesignerPopupComponent implements AfterViewInit {
       );
     }
   }
+
+  ///// GET MUSIC FILES  AND CREATE PLAYLIST TEXT NODE //////
+
+  sideA: Array<string> = [];
+  sideB: Array<string> = [];
+  sideC: Array<string> = [];
+  sideD: Array<string> = [];
+
+  public async getMusicPlaylist() {
+    const user = await this._authService.currentUser;
+    this.sideA = await this._storageService.getFileName(
+      `/orders/${user?.uid}/music/A`,
+    );
+    this.sideB = await this._storageService.getFileName(
+      `/orders/${user?.uid}/music/B`,
+    );
+    this.sideC = await this._storageService.getFileName(
+      `/orders/${user?.uid}/music/C`,
+    );
+    this.sideD = await this._storageService.getFileName(
+      `/orders/${user?.uid}/music/D`,
+    );
+
+    console.log(this.sideA);
+    console.log(this.sideA);
+    console.log(this.sideA);
+    console.log(this.sideA);
+
+    this.createPlaylistTextNode();
+  }
+
+  createPlaylistTextNode() {
+    // Define starting position for the first text node
+    let yOffset = 50; // Initial y position
+
+    // Helper function to remove file extensions from an array of strings
+    const removeExtensions = (tracks: string[]) => {
+      return tracks.map((track) =>
+        track.replace(/\.(wav|mp3|mp4|flac|aac|ogg|m4a|wma)$/i, ""),
+      );
+    };
+
+    // Remove extensions from all playlist sides
+    const cleanedSideA = removeExtensions(this.sideA);
+    const cleanedSideB = removeExtensions(this.sideB);
+    const cleanedSideC = removeExtensions(this.sideC);
+    const cleanedSideD = removeExtensions(this.sideD);
+
+    // Helper function to create and add text nodes
+    const createTextNode = (text: string, x: number, y: number) => {
+      const textNode = new Konva.Text({
+        text: text,
+        x: x,
+        y: y,
+        fontSize: 20,
+        fontFamily: this.selectedFont,
+        fill: "black",
+        draggable: true,
+        padding: 10,
+        align: this.fontAlign.slice(0, -4),
+      });
+
+      // Add click event to image for selecting and attaching transformer
+      textNode.on("click", () => {
+        this.selectedFont = textNode.fontFamily();
+        this.transformer.show();
+        this.transformer.nodes([]);
+        this.transformer.nodes([textNode]);
+        this.layer.draw();
+        this.selectObject(textNode);
+        this.setAvailableTools();
+      });
+
+      // Add drag event to shape for selecting and attaching transformer
+      textNode.on("dragmove", () => {
+        // Detach transformer from previous node
+        this.transformer.hide();
+        this.selectObject(textNode);
+      });
+
+      //Add drag end event to shape for selecting and attaching transformer
+      textNode.on("dragend", () => {
+        this.selectedFont = textNode.fontFamily();
+
+        this.transformer.show();
+        this.transformer.nodes([]);
+        this.transformer.nodes([textNode]);
+        this.layer.draw();
+        this.selectObject(textNode);
+        this.setAvailableTools();
+      });
+
+      //Hide the Transformer when rotating
+      textNode.on("transformstart", () => {
+        this.transformer.hide(); // Hide transformer when rotation starts
+        this.selectObject(textNode);
+        this.layer.draw();
+      });
+
+      //Show the Transformer again after rotation ends
+      textNode.on("transformend", () => {
+        this.transformer.show(); // Show transformer after rotation ends
+        this.selectObject(textNode);
+        this.layer.draw();
+      });
+
+      textNode.on("dblclick", () => {
+        this.selectedFont = textNode.fontFamily();
+        this.selectObject(textNode);
+        this.editText();
+      });
+
+      // Set up at the begining
+      this.transformer.nodes([]);
+      this.transformer.nodes([textNode]);
+      this.textNodes.push(textNode);
+      this.maskedGroup.add(textNode);
+      this.transformer.hide();
+      this.selectObject(this.maskedPath);
+    };
+
+    // Add text nodes for each playlist side
+    if (cleanedSideA.length > 0) {
+      createTextNode(cleanedSideA.join("\n"), 50, yOffset);
+      yOffset += cleanedSideA.length * 25; // Adjust yOffset for next node
+    }
+    if (cleanedSideB.length > 0) {
+      createTextNode(cleanedSideB.join("\n"), 50, yOffset);
+      yOffset += cleanedSideB.length * 25;
+    }
+    if (cleanedSideC.length > 0) {
+      createTextNode(cleanedSideC.join("\n"), 50, yOffset);
+      yOffset += cleanedSideC.length * 25;
+    }
+    if (cleanedSideD.length > 0) {
+      createTextNode(cleanedSideD.join("\n"), 50, yOffset);
+    }
+
+    // Redraw the layer to reflect changes
+    this.layer.draw();
+  }
+
+  ///////// END MUSIC FILES ///////////////////
 
   // Undo and redo states save and actions ///
   saveState() {
