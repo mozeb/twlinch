@@ -303,3 +303,37 @@
   opacity: 0.2; /* Optional: Makes the button look disabled */
   cursor: not-allowed; /* Optional: Change the cursor style */
 }
+
+.labels-selector{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap:20px;
+  padding:10px;
+  background-color: black;
+  color:white;
+}
+
+.label-button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Ubuntu Mono";
+  font-weight: 700;;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.mat-icon{
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.label-button:hover{
+  //background-color: #fedc00;
+  filter: brightness(0) saturate(100%) invert(90%) sepia(20%) saturate(6713%) hue-rotate(1deg) brightness(107%) contrast(103%);
+  cursor: pointer;
+}

@@ -21,11 +21,19 @@ import WebFont from "webfontloader";
 import { CommonModule } from "@angular/common";
 import { StorageBaseService } from "../../services/api-base/storage-base.service"; // Import CommonModule
 import { ConfirmActionPopupComponent } from "../confirm_action_popup/confirm_action_popup.component";
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: "designer-popup",
   standalone: true,
-  imports: [AsyncPipe, NgIf, MatDialogContent, MatDialogClose, CommonModule],
+  imports: [
+    AsyncPipe,
+    NgIf,
+    MatDialogContent,
+    MatDialogClose,
+    CommonModule,
+    MatIcon,
+  ],
   templateUrl: "./designer-popup.component.html",
   styleUrl: "./designer-popup.component.scss",
   encapsulation: ViewEncapsulation.None,
