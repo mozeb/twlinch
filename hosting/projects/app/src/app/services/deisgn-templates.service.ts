@@ -27,6 +27,14 @@ export class DeisgnTemplatesService {
     cutMarksSvg: "./assets/12_Inch_Record/12_Inch_Cut_Indicators.svg",
   };
 
+  labelTemplate: designTemplate = {
+    type: "label",
+    maskPath:
+      "M 280.28,140.14 A 140.14,140.14 0 1,0 0,140.14 A 140.14,140.14 0 1,0 280.28,140.14",
+    designMarksSvg: "./assets/12_Inch_Record/Label_Cut_Marks.svg",
+    cutMarksSvg: "./assets/12_Inch_Record/Label_Cut_Marks.svg",
+  };
+
   constructor() {}
 
   // Calculate width and height of path data (SVG)
@@ -34,14 +42,17 @@ export class DeisgnTemplatesService {
     type: templateType,
   ): Promise<{ width: number; height: number }> {
     return new Promise((resolve) => {
-      var pathData = "";
+      let pathData = "";
       if (type === "twelve") {
         pathData = this.twelveInchTemplate.maskPath;
       } else if (type === "ten") {
         pathData = this.tenInchTemplate.maskPath;
       } else if (type === "seven") {
         pathData = this.sevenInchTemplate.maskPath;
+      } else if (type === "label") {
+        pathData = this.labelTemplate.maskPath;
       }
+
       // Parse path data into commands
       const commands = pathData.match(/[a-zA-Z][^a-zA-Z]*/g);
       if (!commands) {
@@ -58,6 +69,25 @@ export class DeisgnTemplatesService {
       let maxX = -Infinity;
       let minY = Infinity;
       let maxY = -Infinity;
+
+      // Helper to calculate bounding box of an arc
+      const calculateArcBounds = (
+        cx: number,
+        cy: number,
+        rx: number,
+        ry: number,
+      ) => {
+        const arcMinX = cx - rx;
+        const arcMaxX = cx + rx;
+        const arcMinY = cy - ry;
+        const arcMaxY = cy + ry;
+
+        // Update bounding box
+        minX = Math.min(minX, arcMinX);
+        maxX = Math.max(maxX, arcMaxX);
+        minY = Math.min(minY, arcMinY);
+        maxY = Math.max(maxY, arcMaxY);
+      };
 
       // Process each command in the path
       commands.forEach((command) => {
@@ -91,13 +121,27 @@ export class DeisgnTemplatesService {
           case "v": // Vertical line relative
             currentY += coords[0];
             break;
+          case "A": // Arc to absolute position
+            const [rx, ry, xAxisRotation, largeArcFlag, sweepFlag, x, y] =
+              coords;
+            // Calculate the arc's center
+            const cx = (currentX + x) / 2;
+            const cy = (currentY + y) / 2;
+
+            // Update bounding box with arc bounds
+            calculateArcBounds(cx, cy, rx, ry);
+
+            // Update current position
+            currentX = x;
+            currentY = y;
+            break;
           case "Z": // Close path, return to start
             currentX = startX;
             currentY = startY;
             break;
         }
 
-        // Update bounding box
+        // Update bounding box for line segments
         minX = Math.min(minX, currentX);
         maxX = Math.max(maxX, currentX);
         minY = Math.min(minY, currentY);
@@ -214,6 +258,8 @@ export class DeisgnTemplatesService {
       svgUrl = this.tenInchTemplate.designMarksSvg;
     } else if (type === "seven") {
       svgUrl = this.sevenInchTemplate.designMarksSvg;
+    } else if (type === "label") {
+      svgUrl = this.labelTemplate.designMarksSvg;
     }
 
     return fetch(svgUrl)
@@ -254,4 +300,4 @@ export interface designTemplate {
   cutMarksSvg: string;
 }
 
-export type templateType = "twelve" | "ten" | "seven";
+export type templateType = "twelve" | "ten" | "seven" | "label";

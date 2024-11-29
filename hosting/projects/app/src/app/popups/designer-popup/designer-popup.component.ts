@@ -7,6 +7,7 @@ import {
   ViewEncapsulation,
 } from "@angular/core";
 import {
+  MatDialog,
   MatDialogClose,
   MatDialogContent,
   MatDialogRef,
@@ -19,6 +20,7 @@ import { DeisgnTemplatesService } from "../../services/deisgn-templates.service"
 import WebFont from "webfontloader";
 import { CommonModule } from "@angular/common";
 import { StorageBaseService } from "../../services/api-base/storage-base.service"; // Import CommonModule
+import { ConfirmActionPopupComponent } from "../confirm_action_popup/confirm_action_popup.component";
 
 @Component({
   selector: "designer-popup",
@@ -34,6 +36,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     protected _designTemplatesService: DeisgnTemplatesService,
     protected _authService: AuthService,
     private _storageService: StorageBaseService,
+    private dialog: MatDialog,
   ) {}
 
   stage!: Konva.Stage; // The main stage
@@ -45,6 +48,8 @@ export class DesignerPopupComponent implements AfterViewInit {
   objectNodes: Konva.Node[] = [];
   textNodes: Konva.Text[] = []; // Array to hold multiple images uploaded
   selectedObject: Konva.Node | null = null;
+  cutMarksPath: string = "";
+  cutMarksColor = rgb(0, 0.7, 1);
 
   // Default values of stage width and height
   stageWidth = 1200;
@@ -122,9 +127,10 @@ export class DesignerPopupComponent implements AfterViewInit {
   selectedFont: string = "Ubuntu Mono"; // To store the selected font
 
   ngAfterViewInit() {
-    this.createStage();
+    //this.createStage();
     this.loadFonts();
     this.listenOffStageClick();
+    this.createStageForLabel();
   }
 
   listenOffStageClick() {
@@ -280,6 +286,138 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Set tools at the begining
     this.selectedObject = this.maskedPath;
     this.setAvailableTools();
+
+    // Set cut marks path
+    this.cutMarksPath =
+      this._designTemplatesService.twelveInchTemplate.cutMarksSvg; // Path to your SVG file in the assets folder
+  }
+
+  async createStageForLabel() {
+    // Get the original size of svg path
+    this.sizeInfo =
+      await this._designTemplatesService.getWidthAndHeightOfPath("label");
+    // Determine stage size based on visible width
+    var computedStyle = getComputedStyle(this.container.nativeElement);
+    var elementWidth = this.container.nativeElement.clientWidth;
+    elementWidth -=
+      parseFloat(computedStyle.paddingLeft) +
+      parseFloat(computedStyle.paddingRight);
+
+    // 80% of screen width
+    this.stageWidth = elementWidth - (elementWidth / 100) * 20;
+    if (this.stageWidth > 560.56) {
+      this.stageWidth = 560.56;
+    }
+
+    // Make sure there is at least 150px space on top and bottom
+    if (this.container.nativeElement.clientHeight - this.stageHeight < 300) {
+      this.stageWidth = elementWidth - (elementWidth / 100) * 30;
+    }
+
+    // Calculate the aspect ratio to determine height of Konva stage
+    const aspectRatio = (this.sizeInfo.height * 2) / (this.sizeInfo.width * 2);
+    this.stageHeight = this.stageWidth * aspectRatio;
+
+    // Create Konva Stage
+    this.stage = new Konva.Stage({
+      container: "cont",
+      width: this.stageWidth,
+      height: this.stageHeight,
+    });
+
+    // Create main Layer
+    this.layer = new Konva.Layer();
+    this.stage.add(this.layer);
+
+    // Calculate scaling factors to match the SVG dimensions to the stage
+    const scaleX = this.stageWidth / (this.sizeInfo.width * 2);
+    const scaleY = this.stageHeight / (this.sizeInfo.height * 2);
+    this.scale = Math.min(scaleX, scaleY);
+
+    // Calculate the size based on your logic
+    let size = 0;
+    if (280.28 * this.scale > 560.56) {
+      size = 560.56;
+    } else {
+      size = 280.28 * this.scale;
+    }
+
+    const radius = size; // Half the width or height
+    const centerX = size; // Center X (based on your path data)
+    const centerY = size; // Center Y (based on your path data)
+
+    // Generate an SVG path for the circle
+    const circlePathData = `
+  M ${centerX + radius},${centerY}
+  A ${radius},${radius} 0 1,0 ${centerX - radius},${centerY}
+  A ${radius},${radius} 0 1,0 ${centerX + radius},${centerY}`;
+
+    // Create the Konva path for the circle
+    this.maskedPath = new Konva.Path({
+      data: circlePathData.trim(), // Use the generated circular path
+      fill: "#dcdcdc", // Background color for the mask
+      x: 0, // Align to top-left
+      y: 0,
+    });
+
+    this.layer.add(this.maskedPath);
+
+    // Create bounding mask for limiting objects placing
+    this.maskedGroup = new Konva.Group({
+      clipFunc: (ctx) => {
+        // Define the same clipping logic as the circle path
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false); // Full circle
+        ctx.closePath();
+        ctx.clip(); // Apply clipping
+      },
+    });
+
+    this.layer.add(this.maskedGroup);
+
+    // Add design marks and keep layer on top of others
+    this.designMarksLayer = new Konva.Layer({ listening: false }); // Make this layer non-interactive
+    this.stage.add(this.designMarksLayer);
+    const designMarks =
+      await this._designTemplatesService.loadDesignMarksOverlay(
+        this.stageWidth,
+        this.stageHeight,
+        "label",
+      );
+    this.designMarksLayer.add(designMarks);
+    this.designMarksLayer.draw();
+
+    // Add a Transformer to the layer for resizing objects
+    this.transformer = new Konva.Transformer({
+      enabledAnchors: [
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right",
+        "top-center",
+        "bottom-center",
+        "middle-left",
+        "middle-right",
+      ],
+      boundBoxFunc: (oldBox, newBox) => {
+        // Limit resize to avoid negative width/height
+        if (newBox.width < 10 || newBox.height < 10) {
+          return oldBox;
+        }
+        return newBox;
+      },
+    });
+    this.layer.add(this.transformer);
+
+    // Add the group to the layer
+    this.layer.add(this.maskedGroup);
+
+    // Draw the main layer
+    this.layer.draw();
+
+    // Cut marks path
+    this.cutMarksColor = rgb(0.92, 0.19, 0.5);
+    this.cutMarksPath = this._designTemplatesService.labelTemplate.cutMarksSvg; // Path to your SVG file in the assets folder
   }
 
   // Function to add different shapes
@@ -444,7 +582,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.designMarksLayer.hide();
 
     const highQualityPixelRatio = 3;
-    const svgPath = this._designTemplatesService.twelveInchTemplate.cutMarksSvg; // Path to your SVG file in the assets folder
 
     // Export the stage as an image with high pixel ratio
     const dataURL = this.stage.toDataURL({ pixelRatio: highQualityPixelRatio });
@@ -463,7 +600,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
 
     // Fetch the SVG and extract path data
-    const svgResponse = await fetch(svgPath);
+    const svgResponse = await fetch(this.cutMarksPath);
     if (!svgResponse.ok)
       throw new Error(`Failed to load SVG: ${svgResponse.statusText}`);
     const svgText = await svgResponse.text();
@@ -482,7 +619,7 @@ export class DesignerPopupComponent implements AfterViewInit {
           x: 0,
           y: this.sizeInfo.height,
           scale: 1,
-          color: rgb(0, 0.7, 1), // Set color for visibility
+          color: this.cutMarksColor, // Set color for visibility
         });
         console.log(`Path ${index + 1} drawn successfully.`);
       } catch (error) {
@@ -1008,6 +1145,18 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   //////////////////// END OF TEXT ////////////
+  clearStage() {
+    this.endEditing;
+    this.transformer.hide();
+    this.selectedObject = this.maskedPath;
+    this.setAvailableTools();
+    this.maskedGroup.destroyChildren();
+    this.maskedPath.fill("#dcdcdc");
+    this.layer.draw();
+    if (this.caret) {
+      this.caret.destroy();
+    }
+  }
 
   // Delete object
   deleteObject() {
@@ -1252,6 +1401,20 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   ///////// END MUSIC FILES ///////////////////
+
+  openConfirmActionPopup(action: string) {
+    const dialogRef = this.dialog.open(ConfirmActionPopupComponent, {
+      data: {
+        action_name: action,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (action == "clear stage" && result == true) {
+        this.clearStage();
+      }
+    });
+  }
 }
 
 // Track elements globally

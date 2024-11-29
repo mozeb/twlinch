@@ -23,7 +23,7 @@
       <input type="color" #colorPickerBackground id="colorPickerBackground" (input)="onColorChange($event)"
              style="opacity: 0; height: 0px; width: 0px;"/>
     </button>
-    <button id="eraseButton" #eraseButton class="designer-button">
+    <button id="eraseButton" #eraseButton class="designer-button" (click)="openConfirmActionPopup('clear stage')">
       <img class="designer-button-icon" src="./assets/Designer_Assets/eraser_icon.svg"/>
       <span class="designer-button-text">Clean<br>Canvas</span>
     </button>

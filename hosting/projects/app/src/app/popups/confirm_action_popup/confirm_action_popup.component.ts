@@ -64,6 +64,11 @@ export class ConfirmActionPopupComponent implements OnInit {
     if (this.data.action_name == "add label") {
       this.content_text = "You will add custom printed label for this user.";
     }
+
+    // Designer clear stage
+    if (this.data.action_name == "clear stage") {
+      this.content_text = "All your elements on the canvas will be deleted.";
+    }
   }
 
   closeDialog(selection: boolean) {
