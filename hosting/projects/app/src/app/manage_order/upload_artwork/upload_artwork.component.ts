@@ -51,7 +51,6 @@ export class Upload_artworkComponent implements OnInit {
   ngOnInit() {
     this.innerHeight = window.innerHeight + "px";
     this.getOrderData();
-    this.openDesigner();
   }
 
   async getOrderData() {
@@ -98,6 +97,8 @@ export class Upload_artworkComponent implements OnInit {
           break;
       }
     });
+
+    this.openLabelDesigner();
   }
 
   goToUploader(goTo: string) {
@@ -117,7 +118,8 @@ export class Upload_artworkComponent implements OnInit {
     this._router.navigateByUrl("/manage-order/upload-template");
   }
 
-  openDesigner() {
+  // Open deisgner popup to start label design
+  openLabelDesigner() {
     this.dialog.open(DesignerPopupComponent, {
       disableClose: true,
       width: "100vw",

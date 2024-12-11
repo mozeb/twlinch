@@ -13,6 +13,13 @@ export class DeisgnTemplatesService {
     cutMarksSvg: "./assets/12_Inch_Record/12_Inch_Cut_Indicators.svg",
   };
 
+  twelveInchDoubleTemplate: designTemplate = {
+    type: "twelveDouble",
+    maskPath: "M1807.07,0v912.76h-908.59v-9.92H-.01V9.92h898.5V0h908.59Z",
+    designMarksSvg: "./assets/12_Inch_Record/12_Inch_Design_Marks.svg",
+    cutMarksSvg: "./assets/12_Inch_Record/12_Inch_Cut_Indicators.svg",
+  };
+
   tenInchTemplate: designTemplate = {
     type: "ten",
     maskPath: "M1807.07,0v912.76h-908.59v-9.92H-.01V9.92h898.5V0h908.59Z",
@@ -300,4 +307,9 @@ export interface designTemplate {
   cutMarksSvg: string;
 }
 
-export type templateType = "twelve" | "ten" | "seven" | "label";
+export type templateType =
+  | "twelve"
+  | "ten"
+  | "seven"
+  | "label"
+  | "twelveDouble";

@@ -18,7 +18,10 @@ import { AsyncPipe, NgIf } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
 import Konva from "konva";
 import { PDFDocument, rgb } from "pdf-lib";
-import { DeisgnTemplatesService } from "../../services/deisgn-templates.service";
+import {
+  DeisgnTemplatesService,
+  designTemplate,
+} from "../../services/deisgn-templates.service";
 import WebFont from "webfontloader";
 import { CommonModule } from "@angular/common";
 import { StorageBaseService } from "../../services/api-base/storage-base.service"; // Import CommonModule
@@ -52,18 +55,12 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   stage!: Konva.Stage; // The main stage
 
-  stageLabelA!: string; // Label Stage
-  stageLabelB!: string; // Label Stage
-  stageLabelC!: Konva.Stage; // Label Stage
-  stageLabelD!: Konva.Stage; // Label Stage
-
   labelsJSON: Record<LabelKeys, string> = {
-    A: "",
-    B: "",
+    A: '{"group":{"attrs":{},"className":"Group","children":[]},"backgroundColor":"#dcdcdc"}',
+    B: '{"group":{"attrs":{},"className":"Group","children":[]},"backgroundColor":"#dcdcdc"}',
     C: "",
     D: "",
   }; // Initialize with empty strings for all keys
-
   currentLabel = "A";
 
   layer!: Konva.Layer; // The main elements layer
@@ -139,6 +136,21 @@ export class DesignerPopupComponent implements AfterViewInit {
   @ViewChild("duplicateObjectButton", { static: false })
   duplicateObjectButton!: ElementRef<HTMLDivElement>;
 
+  // LAbels selector buttons
+  @ViewChild("labelAButton", { static: false })
+  labelAButton!: ElementRef<HTMLDivElement>;
+  @ViewChild("labelBButton", { static: false })
+  labelBButton!: ElementRef<HTMLDivElement>;
+  @ViewChild("labelCButton", { static: false })
+  labelCButton!: ElementRef<HTMLDivElement>;
+  @ViewChild("labelDButton", { static: false })
+  labelDButton!: ElementRef<HTMLDivElement>;
+
+  labelsButtons: Record<LabelKeys, HTMLDivElement> = {} as Record<
+    LabelKeys,
+    HTMLDivElement
+  >;
+
   selectedColor: string = "#ff0000"; // Default color
   fontAlign = "left.svg";
 
@@ -153,15 +165,44 @@ export class DesignerPopupComponent implements AfterViewInit {
   selectedFont: string = "Ubuntu Mono"; // To store the selected font
 
   ngAfterViewInit() {
+    // Setup buttons array for labels
+    if (this.labelAButton) {
+      this.labelsButtons["A"] = this.labelAButton.nativeElement;
+    }
+    if (this.labelBButton) {
+      this.labelsButtons["B"] = this.labelBButton.nativeElement;
+    }
+    if (this.labelCButton) {
+      this.labelsButtons["C"] = this.labelCButton.nativeElement;
+    }
+    if (this.labelDButton) {
+      this.labelsButtons["D"] = this.labelDButton.nativeElement;
+    }
+    this.labelsButtons["A"].style.color = "#fedc00";
+
     //this.createStage();
     this.loadFonts();
     this.listenOffStageClick();
 
-    // Create stage based on type label/sleeve
+    // Setup all the info based on input from app
+    this.setUpTwlinchDeisgner();
+  }
+
+  // Setup all the data for designer
+  async setUpTwlinchDeisgner() {
     if (this.data.type === "label") {
+      this.sizeInfo =
+        await this._designTemplatesService.getWidthAndHeightOfPath("label");
       this.createStageForLabel();
-    } else {
-      this.createStage();
+    } else if (this.data.type === "sleeve") {
+      // If 12 inch sleeve
+      if (this.data.vinylSize == "sleeve12") {
+        this.sizeInfo =
+          await this._designTemplatesService.getWidthAndHeightOfPath("twelve");
+        this.createStageForSleeve(
+          this._designTemplatesService.twelveInchTemplate,
+        );
+      }
     }
   }
 
@@ -181,7 +222,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   //////////////// CREATING MAIN STAGE ////////////////
-  async createStage() {
+  async createStageForSleeve(template: designTemplate) {
     // Get the original size of svg path
     this.sizeInfo =
       await this._designTemplatesService.getWidthAndHeightOfPath("twelve");
@@ -325,13 +366,14 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   async createStageForLabel() {
-    // Check for dobule album
-    if (!this.data.doubleAlbum) {
+    // Check for dobule album and add emptry labels for C and D size
+    if (this.data.doubleAlbum) {
+      this.labelsJSON["C"] =
+        '{"group":{"attrs":{},"className":"Group","children":[]},"backgroundColor":"#dcdcdc"}';
+      this.labelsJSON["D"] =
+        '{"group":{"attrs":{},"className":"Group","children":[]},"backgroundColor":"#dcdcdc"}';
     }
 
-    // Get the original size of svg path
-    this.sizeInfo =
-      await this._designTemplatesService.getWidthAndHeightOfPath("label");
     // Determine stage size based on visible width
     var computedStyle = getComputedStyle(this.container.nativeElement);
     var elementWidth = this.container.nativeElement.clientWidth;
@@ -457,27 +499,24 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.cutMarksPath = this._designTemplatesService.labelTemplate.cutMarksSvg; // Path to your SVG file in the assets folder
   }
 
-  // async switchLabel(label: string) {
-  //   if (label == "A") {
-  //     this.labelsJSON[this.currentLabel] = this.saveGroup(this.maskedGroup);
-  //     this.clearStage();
-  //     if (this.labelsJSON[label]) {
-  //       await this.switchLabelFill(this.labelsJSON[label]);
-  //     }
-  //   } else if (label == "B") {
-  //     this.labelsJSON[0] = this.saveGroup(this.maskedGroup);
-  //     this.clearStage();
-  //     if (this.labelsJSON[1]) {
-  //       await this.switchLabelFill(this.labelsJSON[1]);
-  //     }
-  //   }
-  //   this.currentLabel = label;
-  // }
-
   async switchLabel(label: string) {
-    this.labelsJSON[this.currentLabel as LabelKeys] = this.saveGroup(
-      this.maskedGroup,
-    );
+    // Set color o button
+    for (const key in this.labelsButtons) {
+      if (key == label) {
+        this.labelsButtons[key as LabelKeys].style.color = "#fedc00";
+      } else {
+        this.labelsButtons[key as LabelKeys].style.color = "white";
+      }
+    }
+
+    console.log("Switched to: " + label + this.labelsJSON[label as LabelKeys]);
+
+    if (this.maskedGroup.children.length != 0) {
+      this.labelsJSON[this.currentLabel as LabelKeys] = this.saveGroup(
+        this.maskedGroup,
+      );
+    }
+
     this.clearStage();
     if (this.labelsJSON[label as LabelKeys]) {
       await this.switchLabelFill(this.labelsJSON[label as LabelKeys]);
@@ -512,12 +551,14 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   // Method to fill the selected label
   async switchLabelFill(label: string) {
+    console.log(label);
     const data = JSON.parse(label);
     const grp = Konva.Node.create(JSON.stringify(data.group)) as Konva.Group;
     this.maskedPath.fill(data.backgroundColor);
 
-    grp.getChildren().forEach((node) => {
-      let clonedNode = node.clone();
+    for (const node of grp.getChildren()) {
+      const clonedNode = node.clone();
+
       if (clonedNode instanceof Konva.Text) {
         this.addTextNodeEvents(clonedNode as Konva.Text);
       } else if (
@@ -530,18 +571,26 @@ export class DesignerPopupComponent implements AfterViewInit {
         // Get the source and add image
         const src = node.getAttr("src"); // Get the custom src attribute
         if (src) {
-          const img = new Image();
-          img.src = src;
-          img.onload = () => {
-            clonedNode.image(img); // Assign the loaded image to the node
-          };
+          const img = await this.loadImage(src); // Await the image loading
+          clonedNode.image(img); // Assign the loaded image to the node
         } else {
           console.error("Image node is missing src attribute:", node);
         }
         this.addShapeNodeEvents(clonedNode as Konva.Image);
       }
+
       this.maskedGroup.add(clonedNode);
-      this.maskedGroup.draw();
+    }
+
+    this.maskedGroup.draw();
+  }
+
+  loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => resolve(img);
+      img.onerror = (err) => reject(err);
     });
   }
 
@@ -711,6 +760,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Create a new PDF document
     const pdfDoc = await PDFDocument.create();
 
+    // Switch to current label to save current design
     await this.switchLabel(this.currentLabel);
 
     // Save each label to separate page
@@ -725,6 +775,7 @@ export class DesignerPopupComponent implements AfterViewInit {
         const dataURL = this.stage.toDataURL({
           pixelRatio: highQualityPixelRatio,
         });
+
         const page = pdfDoc.addPage([
           this.sizeInfo.width,
           this.sizeInfo.height,
@@ -761,11 +812,13 @@ export class DesignerPopupComponent implements AfterViewInit {
               scale: 1,
               color: this.cutMarksColor, // Set color for visibility
             });
-            console.log(`Path ${index + 1} drawn successfully.`);
+            //console.log(`Path ${index + 1} drawn successfully.`);
           } catch (error) {
             console.error(`Error drawing path ${index + 1}:`, error);
           }
         });
+
+        await this.createPreview();
       }
     }
 
@@ -779,10 +832,25 @@ export class DesignerPopupComponent implements AfterViewInit {
     link.click();
     URL.revokeObjectURL(url);
 
-    this.clearStage();
-    this.switchLabel(this.currentLabel);
     // Show marks again
     this.designMarksLayer.show();
+    this.switchLabel(this.currentLabel);
+  }
+
+  // Creating preview images for user and admin
+  async createPreview() {
+    // Convert the stage to a Data URL (JPG format)
+    const dataURL = this.stage.toDataURL({
+      mimeType: "image/jpeg",
+      quality: 0.9,
+      pixelRatio: 1.5, // Quality of image
+    });
+
+    // Optional: Download as a file
+    const link = document.createElement("a");
+    link.download = "scene-preview.jpg";
+    link.href = dataURL;
+    link.click();
   }
 
   // Save Sleeve
@@ -1447,7 +1515,6 @@ export class DesignerPopupComponent implements AfterViewInit {
   // Set available tools
   setAvailableTools() {
     if (this.selectedObject == this.maskedPath) {
-      console.log(this.selectedObject);
       this.deleteObjectButton.nativeElement.classList.add("unclickable-button");
       this.duplicateObjectButton.nativeElement.classList.add(
         "unclickable-button",
