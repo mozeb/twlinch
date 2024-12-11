@@ -72,26 +72,26 @@
 
 
       <div>
-        <button style="border-radius: 0px; height: 50px;" class="twl-app-button" (click)="saveSleevePDF()">Finish and
+        <button style="border-radius: 0px; height: 50px;" class="twl-app-button" (click)="saveLabelsPDF()">Finish and
           upload
         </button>
       </div>
     </div>
 
-    <div class="labels-selector">
-      <div class="label-button">
+    <div *ngIf="data.type === 'label'" class="labels-selector">
+      <div id="labelA" #labelA class="label-button" (click)="switchLabel('A')">
         <mat-icon style="font-size:20px; padding-right:5px">album</mat-icon>
         Label A
       </div>
-      <div class="label-button">
+      <div id="labelB" #labelB class="label-button" (click)="switchLabel('B')">
         <mat-icon style="font-size:20px; padding-right:5px">album</mat-icon>
         Label B
       </div>
-      <div class="label-button">
+      <div *ngIf="data.doubleAlbum === true" id="labelC" #labelC class="label-button">
         <mat-icon style="font-size:20px; padding-right:5px">album</mat-icon>
         Label C
       </div>
-      <div class="label-button">
+      <div *ngIf="data.doubleAlbum === true" id="labelD" #labelD class="label-button">
         <mat-icon style="font-size:20px; padding-right:5px">album</mat-icon>
         Label D
       </div>

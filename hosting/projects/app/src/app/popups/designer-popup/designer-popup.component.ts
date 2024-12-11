@@ -3,10 +3,12 @@ import {
   Component,
   ElementRef,
   HostListener,
+  Inject,
   ViewChild,
   ViewEncapsulation,
 } from "@angular/core";
 import {
+  MAT_DIALOG_DATA,
   MatDialog,
   MatDialogClose,
   MatDialogContent,
@@ -45,9 +47,25 @@ export class DesignerPopupComponent implements AfterViewInit {
     protected _authService: AuthService,
     private _storageService: StorageBaseService,
     private dialog: MatDialog,
+    @Inject(MAT_DIALOG_DATA) public data: TwlDesigner,
   ) {}
 
   stage!: Konva.Stage; // The main stage
+
+  stageLabelA!: string; // Label Stage
+  stageLabelB!: string; // Label Stage
+  stageLabelC!: Konva.Stage; // Label Stage
+  stageLabelD!: Konva.Stage; // Label Stage
+
+  labelsJSON: Record<LabelKeys, string> = {
+    A: "",
+    B: "",
+    C: "",
+    D: "",
+  }; // Initialize with empty strings for all keys
+
+  currentLabel = "A";
+
   layer!: Konva.Layer; // The main elements layer
   designMarksLayer!: Konva.Layer; // The marks layer
   maskedGroup!: Konva.Group; // The outline mask of the sleeve
@@ -138,7 +156,13 @@ export class DesignerPopupComponent implements AfterViewInit {
     //this.createStage();
     this.loadFonts();
     this.listenOffStageClick();
-    this.createStageForLabel();
+
+    // Create stage based on type label/sleeve
+    if (this.data.type === "label") {
+      this.createStageForLabel();
+    } else {
+      this.createStage();
+    }
   }
 
   listenOffStageClick() {
@@ -301,6 +325,10 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   async createStageForLabel() {
+    // Check for dobule album
+    if (!this.data.doubleAlbum) {
+    }
+
     // Get the original size of svg path
     this.sizeInfo =
       await this._designTemplatesService.getWidthAndHeightOfPath("label");
@@ -313,15 +341,16 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     // 80% of screen width
     this.stageWidth = elementWidth - (elementWidth / 100) * 20;
-    if (this.stageWidth > 560.56) {
-      this.stageWidth = 560.56;
-    }
 
     // Make sure there is at least 150px space on top and bottom
     if (this.container.nativeElement.clientHeight - this.stageHeight < 300) {
       this.stageWidth = elementWidth - (elementWidth / 100) * 30;
     }
 
+    console.log(this.stageWidth);
+    if (this.stageWidth >= 560.56) {
+      this.stageWidth = 560.56;
+    }
     // Calculate the aspect ratio to determine height of Konva stage
     const aspectRatio = (this.sizeInfo.height * 2) / (this.sizeInfo.width * 2);
     this.stageHeight = this.stageWidth * aspectRatio;
@@ -342,7 +371,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     const scaleY = this.stageHeight / (this.sizeInfo.height * 2);
     this.scale = Math.min(scaleX, scaleY);
 
-    // Calculate the size based on your logic
+    // Calculate the size
     let size = 0;
     if (280.28 * this.scale > 560.56) {
       size = 560.56;
@@ -428,7 +457,95 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.cutMarksPath = this._designTemplatesService.labelTemplate.cutMarksSvg; // Path to your SVG file in the assets folder
   }
 
-  // Function to add different shapes
+  // async switchLabel(label: string) {
+  //   if (label == "A") {
+  //     this.labelsJSON[this.currentLabel] = this.saveGroup(this.maskedGroup);
+  //     this.clearStage();
+  //     if (this.labelsJSON[label]) {
+  //       await this.switchLabelFill(this.labelsJSON[label]);
+  //     }
+  //   } else if (label == "B") {
+  //     this.labelsJSON[0] = this.saveGroup(this.maskedGroup);
+  //     this.clearStage();
+  //     if (this.labelsJSON[1]) {
+  //       await this.switchLabelFill(this.labelsJSON[1]);
+  //     }
+  //   }
+  //   this.currentLabel = label;
+  // }
+
+  async switchLabel(label: string) {
+    this.labelsJSON[this.currentLabel as LabelKeys] = this.saveGroup(
+      this.maskedGroup,
+    );
+    this.clearStage();
+    if (this.labelsJSON[label as LabelKeys]) {
+      await this.switchLabelFill(this.labelsJSON[label as LabelKeys]);
+    }
+    this.currentLabel = label;
+  }
+
+  // Save the current label for later if switching
+  saveGroup(group: Konva.Group): string {
+    if (!group) {
+      console.error("No group provided for saving.");
+      return "";
+    }
+    // Iterate through the group's children to handle image nodes
+    group.getChildren().forEach((node) => {
+      if (node instanceof Konva.Image && node.image()) {
+        const imgElement = node.image() as HTMLImageElement;
+        if (imgElement.src) {
+          // Save the image's source URL as a custom attribute
+          node.setAttr("src", imgElement.src);
+        }
+      }
+    });
+    // Convert the group to JSON
+    const groupJSON = group.toJSON();
+    const output = {
+      group: JSON.parse(groupJSON),
+      backgroundColor: this.maskedPath.fill(),
+    };
+    return JSON.stringify(output);
+  }
+
+  // Method to fill the selected label
+  async switchLabelFill(label: string) {
+    const data = JSON.parse(label);
+    const grp = Konva.Node.create(JSON.stringify(data.group)) as Konva.Group;
+    this.maskedPath.fill(data.backgroundColor);
+
+    grp.getChildren().forEach((node) => {
+      let clonedNode = node.clone();
+      if (clonedNode instanceof Konva.Text) {
+        this.addTextNodeEvents(clonedNode as Konva.Text);
+      } else if (
+        clonedNode instanceof Konva.Rect ||
+        clonedNode instanceof Konva.Line ||
+        clonedNode instanceof Konva.Circle
+      ) {
+        this.addShapeNodeEvents(clonedNode as Konva.Shape);
+      } else if (clonedNode instanceof Konva.Image) {
+        // Get the source and add image
+        const src = node.getAttr("src"); // Get the custom src attribute
+        if (src) {
+          const img = new Image();
+          img.src = src;
+          img.onload = () => {
+            clonedNode.image(img); // Assign the loaded image to the node
+          };
+        } else {
+          console.error("Image node is missing src attribute:", node);
+        }
+        this.addShapeNodeEvents(clonedNode as Konva.Image);
+      }
+      this.maskedGroup.add(clonedNode);
+      this.maskedGroup.draw();
+    });
+  }
+
+  // Method to add different shapes
   addShape(type: string) {
     let shape;
     if (type === "circle") {
@@ -585,6 +702,90 @@ export class DesignerPopupComponent implements AfterViewInit {
     }
   }
 
+  // Save Labels
+  async saveLabelsPDF() {
+    // Hide Marks Layer
+    this.designMarksLayer.hide();
+    const highQualityPixelRatio = 3;
+
+    // Create a new PDF document
+    const pdfDoc = await PDFDocument.create();
+
+    await this.switchLabel(this.currentLabel);
+
+    // Save each label to separate page
+    for (const key in this.labelsJSON) {
+      // Clear stage
+      this.clearStage();
+
+      // Add label just if not empty!
+      if (this.labelsJSON[key as LabelKeys] !== "") {
+        await this.switchLabelFill(this.labelsJSON[key as LabelKeys]);
+
+        const dataURL = this.stage.toDataURL({
+          pixelRatio: highQualityPixelRatio,
+        });
+        const page = pdfDoc.addPage([
+          this.sizeInfo.width,
+          this.sizeInfo.height,
+        ]);
+
+        // Embed and draw the stage image first
+        const image = await pdfDoc.embedPng(dataURL);
+        page.drawImage(image, {
+          x: 0,
+          y: 0,
+          width: this.sizeInfo.width,
+          height: this.sizeInfo.height,
+        });
+
+        // Fetch the SVG and extract path data
+        const svgResponse = await fetch(this.cutMarksPath);
+        if (!svgResponse.ok)
+          throw new Error(`Failed to load SVG: ${svgResponse.statusText}`);
+        const svgText = await svgResponse.text();
+
+        // Extract path data
+        const svgPaths = svgText.match(/<path[^>]*d="([^"]*)"/g) || [];
+        const paths = svgPaths.map((path) => {
+          const match = path.match(/d="([^"]*)"/);
+          return match ? match[1] : "";
+        });
+
+        // Render the cut marks
+        paths.forEach((pathData, index) => {
+          try {
+            page.drawSvgPath(pathData, {
+              x: 0,
+              y: this.sizeInfo.height,
+              scale: 1,
+              color: this.cutMarksColor, // Set color for visibility
+            });
+            console.log(`Path ${index + 1} drawn successfully.`);
+          } catch (error) {
+            console.error(`Error drawing path ${index + 1}:`, error);
+          }
+        });
+      }
+    }
+
+    // Save the PDF
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "masked-content-with-svg-overlay.pdf";
+    link.click();
+    URL.revokeObjectURL(url);
+
+    this.clearStage();
+    this.switchLabel(this.currentLabel);
+    // Show marks again
+    this.designMarksLayer.show();
+  }
+
+  // Save Sleeve
   async saveSleevePDF() {
     // Hide Marks Layer
     this.designMarksLayer.hide();
@@ -1425,9 +1626,10 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 }
 
-// Track elements globally
-interface KonvaElement {
-  id: string;
+type LabelKeys = "A" | "B" | "C" | "D";
+
+export interface TwlDesigner {
   type: string;
-  konvaObject: Konva.Node;
+  vinylSize: string;
+  doubleAlbum: boolean;
 }

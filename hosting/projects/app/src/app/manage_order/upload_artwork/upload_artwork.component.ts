@@ -36,6 +36,7 @@ export class Upload_artworkComponent implements OnInit {
   innerHeight: string | undefined;
   vinylSize: artworkType = "sleeve12";
   pictureDiscSize: artworkType = "pictureDisc12";
+  doubleAlbum: boolean = false;
 
   _orderProcess: OrderProcess = {
     musicProcess: "notOrdered",
@@ -82,6 +83,7 @@ export class Upload_artworkComponent implements OnInit {
           break;
         case 5617:
           this.vinylSize = "sleeveDouble";
+          this.doubleAlbum = true;
       }
     });
 
@@ -120,6 +122,11 @@ export class Upload_artworkComponent implements OnInit {
       disableClose: true,
       width: "100vw",
       height: "100vh",
+      data: {
+        type: "label",
+        vinylSize: this.vinylSize,
+        doubleAlbum: this.doubleAlbum,
+      },
     });
   }
 
