@@ -51,10 +51,20 @@ export class DesignerPopupComponent implements AfterViewInit {
   ) {}
 
   stage!: Konva.Stage; // The main stage
+
   stageLabelA!: string; // Label Stage
   stageLabelB!: string; // Label Stage
   stageLabelC!: Konva.Stage; // Label Stage
   stageLabelD!: Konva.Stage; // Label Stage
+
+  labelsJSON: Record<LabelKeys, string> = {
+    A: "",
+    B: "",
+    C: "",
+    D: "",
+  }; // Initialize with empty strings for all keys
+
+  currentLabel = "A";
 
   layer!: Konva.Layer; // The main elements layer
   designMarksLayer!: Konva.Layer; // The marks layer
@@ -447,22 +457,35 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.cutMarksPath = this._designTemplatesService.labelTemplate.cutMarksSvg; // Path to your SVG file in the assets folder
   }
 
-  switchLabel(label: string) {
-    if (label == "A") {
-      this.stageLabelB = this.saveGroup(this.maskedGroup);
-      this.clearStage();
-      if (this.stageLabelA) {
-        this.swithcLabelFill(this.stageLabelA);
-      }
-    } else if (label == "B") {
-      this.stageLabelA = this.saveGroup(this.maskedGroup);
-      this.clearStage();
-      if (this.stageLabelB) {
-        this.swithcLabelFill(this.stageLabelB);
-      }
+  // async switchLabel(label: string) {
+  //   if (label == "A") {
+  //     this.labelsJSON[this.currentLabel] = this.saveGroup(this.maskedGroup);
+  //     this.clearStage();
+  //     if (this.labelsJSON[label]) {
+  //       await this.switchLabelFill(this.labelsJSON[label]);
+  //     }
+  //   } else if (label == "B") {
+  //     this.labelsJSON[0] = this.saveGroup(this.maskedGroup);
+  //     this.clearStage();
+  //     if (this.labelsJSON[1]) {
+  //       await this.switchLabelFill(this.labelsJSON[1]);
+  //     }
+  //   }
+  //   this.currentLabel = label;
+  // }
+
+  async switchLabel(label: string) {
+    this.labelsJSON[this.currentLabel as LabelKeys] = this.saveGroup(
+      this.maskedGroup,
+    );
+    this.clearStage();
+    if (this.labelsJSON[label as LabelKeys]) {
+      await this.switchLabelFill(this.labelsJSON[label as LabelKeys]);
     }
+    this.currentLabel = label;
   }
 
+  // Save the current label for later if switching
   saveGroup(group: Konva.Group): string {
     if (!group) {
       console.error("No group provided for saving.");
@@ -480,13 +503,19 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
     // Convert the group to JSON
     const groupJSON = group.toJSON();
-    console.log("Group saved as JSON:", groupJSON);
-    return groupJSON;
+    const output = {
+      group: JSON.parse(groupJSON),
+      backgroundColor: this.maskedPath.fill(),
+    };
+    return JSON.stringify(output);
   }
 
   // Method to fill the selected label
-  swithcLabelFill(label: string) {
-    const grp = Konva.Node.create(label) as Konva.Group;
+  async switchLabelFill(label: string) {
+    const data = JSON.parse(label);
+    const grp = Konva.Node.create(JSON.stringify(data.group)) as Konva.Group;
+    this.maskedPath.fill(data.backgroundColor);
+
     grp.getChildren().forEach((node) => {
       let clonedNode = node.clone();
       if (clonedNode instanceof Konva.Text) {
@@ -516,9 +545,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
   }
 
-  saveStage() {}
-
-  // Function to add different shapes
+  // Method to add different shapes
   addShape(type: string) {
     let shape;
     if (type === "circle") {
@@ -675,6 +702,90 @@ export class DesignerPopupComponent implements AfterViewInit {
     }
   }
 
+  // Save Labels
+  async saveLabelsPDF() {
+    // Hide Marks Layer
+    this.designMarksLayer.hide();
+    const highQualityPixelRatio = 3;
+
+    // Create a new PDF document
+    const pdfDoc = await PDFDocument.create();
+
+    await this.switchLabel(this.currentLabel);
+
+    // Save each label to separate page
+    for (const key in this.labelsJSON) {
+      // Clear stage
+      this.clearStage();
+
+      // Add label just if not empty!
+      if (this.labelsJSON[key as LabelKeys] !== "") {
+        await this.switchLabelFill(this.labelsJSON[key as LabelKeys]);
+
+        const dataURL = this.stage.toDataURL({
+          pixelRatio: highQualityPixelRatio,
+        });
+        const page = pdfDoc.addPage([
+          this.sizeInfo.width,
+          this.sizeInfo.height,
+        ]);
+
+        // Embed and draw the stage image first
+        const image = await pdfDoc.embedPng(dataURL);
+        page.drawImage(image, {
+          x: 0,
+          y: 0,
+          width: this.sizeInfo.width,
+          height: this.sizeInfo.height,
+        });
+
+        // Fetch the SVG and extract path data
+        const svgResponse = await fetch(this.cutMarksPath);
+        if (!svgResponse.ok)
+          throw new Error(`Failed to load SVG: ${svgResponse.statusText}`);
+        const svgText = await svgResponse.text();
+
+        // Extract path data
+        const svgPaths = svgText.match(/<path[^>]*d="([^"]*)"/g) || [];
+        const paths = svgPaths.map((path) => {
+          const match = path.match(/d="([^"]*)"/);
+          return match ? match[1] : "";
+        });
+
+        // Render the cut marks
+        paths.forEach((pathData, index) => {
+          try {
+            page.drawSvgPath(pathData, {
+              x: 0,
+              y: this.sizeInfo.height,
+              scale: 1,
+              color: this.cutMarksColor, // Set color for visibility
+            });
+            console.log(`Path ${index + 1} drawn successfully.`);
+          } catch (error) {
+            console.error(`Error drawing path ${index + 1}:`, error);
+          }
+        });
+      }
+    }
+
+    // Save the PDF
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "masked-content-with-svg-overlay.pdf";
+    link.click();
+    URL.revokeObjectURL(url);
+
+    this.clearStage();
+    this.switchLabel(this.currentLabel);
+    // Show marks again
+    this.designMarksLayer.show();
+  }
+
+  // Save Sleeve
   async saveSleevePDF() {
     // Hide Marks Layer
     this.designMarksLayer.hide();
@@ -1514,6 +1625,8 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
   }
 }
+
+type LabelKeys = "A" | "B" | "C" | "D";
 
 export interface TwlDesigner {
   type: string;
