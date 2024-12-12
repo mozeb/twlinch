@@ -53,7 +53,7 @@ export class Sleeve_designerComponent implements OnInit, AfterViewInit {
   async createMask() {
     // Get the original size of svg path
     this.sizeInfo =
-      await this._designTemplatesService.getWidthAndHeightOfPath("twelve");
+      await this._designTemplatesService.getWidthAndHeightOfPath("sleeve12");
 
     // Determine stage size based on visible width
     var computedStyle = getComputedStyle(this.container.nativeElement);

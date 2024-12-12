@@ -27,6 +27,7 @@ import { CommonModule } from "@angular/common";
 import { StorageBaseService } from "../../services/api-base/storage-base.service"; // Import CommonModule
 import { ConfirmActionPopupComponent } from "../confirm_action_popup/confirm_action_popup.component";
 import { MatIcon } from "@angular/material/icon";
+import { artworkType } from "../../services/transfer-service";
 
 @Component({
   selector: "designer-popup",
@@ -165,21 +166,6 @@ export class DesignerPopupComponent implements AfterViewInit {
   selectedFont: string = "Ubuntu Mono"; // To store the selected font
 
   ngAfterViewInit() {
-    // Setup buttons array for labels
-    if (this.labelAButton) {
-      this.labelsButtons["A"] = this.labelAButton.nativeElement;
-    }
-    if (this.labelBButton) {
-      this.labelsButtons["B"] = this.labelBButton.nativeElement;
-    }
-    if (this.labelCButton) {
-      this.labelsButtons["C"] = this.labelCButton.nativeElement;
-    }
-    if (this.labelDButton) {
-      this.labelsButtons["D"] = this.labelDButton.nativeElement;
-    }
-    this.labelsButtons["A"].style.color = "#fedc00";
-
     //this.createStage();
     this.loadFonts();
     this.listenOffStageClick();
@@ -190,19 +176,36 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   // Setup all the data for designer
   async setUpTwlinchDeisgner() {
+    // Figure out if label/sleeve/slipmat/pdisc
     if (this.data.type === "label") {
+      // Setup buttons array for labels
+      if (this.labelAButton) {
+        this.labelsButtons["A"] = this.labelAButton.nativeElement;
+      }
+      if (this.labelBButton) {
+        this.labelsButtons["B"] = this.labelBButton.nativeElement;
+      }
+      if (this.labelCButton) {
+        this.labelsButtons["C"] = this.labelCButton.nativeElement;
+      }
+      if (this.labelDButton) {
+        this.labelsButtons["D"] = this.labelDButton.nativeElement;
+      }
+      this.labelsButtons["A"].style.color = "#fedc00";
+
       this.sizeInfo =
-        await this._designTemplatesService.getWidthAndHeightOfPath("label");
+        await this._designTemplatesService.getWidthAndHeightOfPath(
+          this.data.vinylSize as artworkType,
+        );
       this.createStageForLabel();
     } else if (this.data.type === "sleeve") {
-      // If 12 inch sleeve
-      if (this.data.vinylSize == "sleeve12") {
-        this.sizeInfo =
-          await this._designTemplatesService.getWidthAndHeightOfPath("twelve");
-        this.createStageForSleeve(
-          this._designTemplatesService.twelveInchTemplate,
+      this.sizeInfo =
+        await this._designTemplatesService.getWidthAndHeightOfPath(
+          this.data.vinylSize as artworkType,
         );
-      }
+      this.createStageForSleeve(
+        this._designTemplatesService.twelveInchTemplate,
+      );
     }
   }
 
@@ -223,10 +226,6 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   //////////////// CREATING MAIN STAGE ////////////////
   async createStageForSleeve(template: designTemplate) {
-    // Get the original size of svg path
-    this.sizeInfo =
-      await this._designTemplatesService.getWidthAndHeightOfPath("twelve");
-
     // Determine stage size based on visible width
     var computedStyle = getComputedStyle(this.container.nativeElement);
     var elementWidth = this.container.nativeElement.clientWidth;

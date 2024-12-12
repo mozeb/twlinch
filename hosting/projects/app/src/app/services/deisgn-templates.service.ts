@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import Konva from "konva";
+import { artworkType } from "./transfer-service";
 
 @Injectable({
   providedIn: "root",
@@ -7,35 +8,35 @@ import Konva from "konva";
 export class DeisgnTemplatesService {
   // Template objects for each size
   twelveInchTemplate: designTemplate = {
-    type: "twelve",
+    type: "sleeve12",
     maskPath: "M1807.07,0v912.76h-908.59v-9.92H-.01V9.92h898.5V0h908.59Z",
     designMarksSvg: "./assets/12_Inch_Record/12_Inch_Design_Marks.svg",
     cutMarksSvg: "./assets/12_Inch_Record/12_Inch_Cut_Indicators.svg",
   };
 
   twelveInchDoubleTemplate: designTemplate = {
-    type: "twelveDouble",
+    type: "sleeveDouble",
     maskPath: "M1807.07,0v912.76h-908.59v-9.92H-.01V9.92h898.5V0h908.59Z",
     designMarksSvg: "./assets/12_Inch_Record/12_Inch_Design_Marks.svg",
     cutMarksSvg: "./assets/12_Inch_Record/12_Inch_Cut_Indicators.svg",
   };
 
   tenInchTemplate: designTemplate = {
-    type: "ten",
+    type: "sleeve10",
     maskPath: "M1807.07,0v912.76h-908.59v-9.92H-.01V9.92h898.5V0h908.59Z",
     designMarksSvg: "./assets/12_Inch_Record/12_Inch_Design_Marks.svg",
     cutMarksSvg: "./assets/12_Inch_Record/12_Inch_Cut_Indicators.svg",
   };
 
   sevenInchTemplate: designTemplate = {
-    type: "seven",
+    type: "sleeve7",
     maskPath: "M1807.07,0v912.76h-908.59v-9.92H-.01V9.92h898.5V0h908.59Z",
     designMarksSvg: "./assets/12_Inch_Record/12_Inch_Design_Marks.svg",
     cutMarksSvg: "./assets/12_Inch_Record/12_Inch_Cut_Indicators.svg",
   };
 
   labelTemplate: designTemplate = {
-    type: "label",
+    type: "labelAB",
     maskPath:
       "M 280.28,140.14 A 140.14,140.14 0 1,0 0,140.14 A 140.14,140.14 0 1,0 280.28,140.14",
     designMarksSvg: "./assets/12_Inch_Record/Label_Cut_Marks.svg",
@@ -46,17 +47,20 @@ export class DeisgnTemplatesService {
 
   // Calculate width and height of path data (SVG)
   async getWidthAndHeightOfPath(
-    type: templateType,
+    type: artworkType,
   ): Promise<{ width: number; height: number }> {
+    console.log(type);
     return new Promise((resolve) => {
       let pathData = "";
-      if (type === "twelve") {
+      if (type === "sleeve12") {
         pathData = this.twelveInchTemplate.maskPath;
-      } else if (type === "ten") {
+      } else if (type === "sleeve10") {
         pathData = this.tenInchTemplate.maskPath;
-      } else if (type === "seven") {
+      } else if (type === "sleeve7") {
         pathData = this.sevenInchTemplate.maskPath;
-      } else if (type === "label") {
+      } else if (type === "labelAB") {
+        pathData = this.labelTemplate.maskPath;
+      } else if (type === "labelABCD") {
         pathData = this.labelTemplate.maskPath;
       }
 
@@ -301,7 +305,7 @@ export class DeisgnTemplatesService {
 }
 
 export interface designTemplate {
-  type: templateType;
+  type: artworkType;
   maskPath: string;
   designMarksSvg: string;
   cutMarksSvg: string;

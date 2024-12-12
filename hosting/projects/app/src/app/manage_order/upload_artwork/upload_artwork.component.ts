@@ -126,6 +126,20 @@ export class Upload_artworkComponent implements OnInit {
       height: "100vh",
       data: {
         type: "label",
+        vinylSize: "labelAB",
+        doubleAlbum: this.doubleAlbum,
+      },
+    });
+  }
+
+  // Open deisgner popup to start label design
+  openSleeveDesigner() {
+    this.dialog.open(DesignerPopupComponent, {
+      disableClose: true,
+      width: "100vw",
+      height: "100vh",
+      data: {
+        type: "sleeve",
         vinylSize: this.vinylSize,
         doubleAlbum: this.doubleAlbum,
       },
