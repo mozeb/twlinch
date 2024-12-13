@@ -1,0 +1,33 @@
+<div class="dialog">
+  <span class="upload-header">
+    Preview your desing!
+  </span>
+  <span class="upload-subheader" style="padding-bottom: 20px;">
+    Please preview your design and press upload if finished! Images are just for preview purposes only. You can also preview the PDF to see the actual quality of your designs.
+    Please don't mind the pink or blue markers as these are for printing purposes only and wont be visible on the final product!
+  </span>
+
+  <div class="previews">
+    <img  id="preview-label-a"/>
+    <img  id="preview-label-b"/>
+    <img  id="preview-label-c"/>
+    <img  id="preview-label-d"/>
+  </div>
+
+  <div style="display: flex; justify-content: center; align-items: center; gap:15px;">
+    <button (click)="closeDialog(true)"
+            class="twl-app-button"
+            style="margin-top: 20px"
+    >
+      Okay
+    </button>
+
+    <button (click)="uploadDesign()"
+            class="twl-app-button"
+            style="margin-top: 20px"
+    >
+      Upload Stuff
+    </button>
+
+  </div>
+</div>

@@ -87,11 +87,11 @@
         <mat-icon style="font-size:20px; padding-right:5px">album</mat-icon>
         Label B
       </div>
-      <div *ngIf="data.doubleAlbum === true" id="labelCButton" #labelCButton class="label-button">
+      <div *ngIf="data.doubleAlbum === true" id="labelCButton" #labelCButton class="label-button" (click)="switchLabel('C')">
         <mat-icon style="font-size:20px; padding-right:5px">album</mat-icon>
         Label C
       </div>
-      <div *ngIf="data.doubleAlbum === true" id="labelDButton" #labelDButton class="label-button">
+      <div *ngIf="data.doubleAlbum === true" id="labelDButton" #labelDButton class="label-button" (click)="switchLabel('D')">
         <mat-icon style="font-size:20px; padding-right:5px">album</mat-icon>
         Label D
       </div>

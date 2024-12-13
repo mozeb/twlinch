@@ -26,8 +26,10 @@ import WebFont from "webfontloader";
 import { CommonModule } from "@angular/common";
 import { StorageBaseService } from "../../services/api-base/storage-base.service"; // Import CommonModule
 import { ConfirmActionPopupComponent } from "../confirm_action_popup/confirm_action_popup.component";
+import { DesignPreviewPopupComponent } from "../desing-preview-popup/design-preview-popup.component";
 import { MatIcon } from "@angular/material/icon";
 import { artworkType } from "../../services/transfer-service";
+import { object } from "@angular/fire/database";
 
 @Component({
   selector: "designer-popup",
@@ -63,6 +65,11 @@ export class DesignerPopupComponent implements AfterViewInit {
     D: "",
   }; // Initialize with empty strings for all keys
   currentLabel = "A";
+
+  previewImageLabelA: string = "";
+  previewImageLabelB: string = "";
+  previewImageLabelC: string = "";
+  previewImageLabelD: string = "";
 
   layer!: Konva.Layer; // The main elements layer
   designMarksLayer!: Konva.Layer; // The marks layer
@@ -197,6 +204,12 @@ export class DesignerPopupComponent implements AfterViewInit {
         await this._designTemplatesService.getWidthAndHeightOfPath(
           this.data.vinylSize as artworkType,
         );
+      if (this.data.doubleAlbum) {
+        this.sizeInfo =
+          await this._designTemplatesService.getWidthAndHeightOfPath(
+            "labelABCD" as artworkType,
+          );
+      }
       this.createStageForLabel();
     } else if (this.data.type === "sleeve") {
       this.sizeInfo =
@@ -388,7 +401,6 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.stageWidth = elementWidth - (elementWidth / 100) * 30;
     }
 
-    console.log(this.stageWidth);
     if (this.stageWidth >= 560.56) {
       this.stageWidth = 560.56;
     }
@@ -508,8 +520,6 @@ export class DesignerPopupComponent implements AfterViewInit {
       }
     }
 
-    console.log("Switched to: " + label + this.labelsJSON[label as LabelKeys]);
-
     if (this.maskedGroup.children.length != 0) {
       this.labelsJSON[this.currentLabel as LabelKeys] = this.saveGroup(
         this.maskedGroup,
@@ -550,7 +560,6 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   // Method to fill the selected label
   async switchLabelFill(label: string) {
-    console.log(label);
     const data = JSON.parse(label);
     const grp = Konva.Node.create(JSON.stringify(data.group)) as Konva.Group;
     this.maskedPath.fill(data.backgroundColor);
@@ -817,39 +826,77 @@ export class DesignerPopupComponent implements AfterViewInit {
           }
         });
 
-        await this.createPreview();
+        await this.createPreview(key);
       }
     }
 
     // Save the PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "masked-content-with-svg-overlay.pdf";
-    link.click();
-    URL.revokeObjectURL(url);
+    const file = new File([blob], "Labels.pdf", {
+      type: "application/pdf",
+    });
+
+    // const url = URL.createObjectURL(blob);
+    // const link = document.createElement("a");
+    // link.href = url;
+    // link.download = "masked-content-with-svg-overlay.pdf";
+    // link.click();
+    // URL.revokeObjectURL(url);
 
     // Show marks again
     this.designMarksLayer.show();
     this.switchLabel(this.currentLabel);
+
+    this.dialog.open(DesignPreviewPopupComponent, {
+      data: {
+        type: this.data.vinylSize as artworkType,
+        labelAPreview: this.previewImageLabelA,
+        labelBPreview: this.previewImageLabelB,
+        labelCPreview: this.previewImageLabelC,
+        labelDPreview: this.previewImageLabelD,
+        sleevePreview: "",
+        pictureDiscPreview: "",
+        slipmatPreview: "",
+        labelsPDF: file,
+      },
+    });
   }
 
   // Creating preview images for user and admin
-  async createPreview() {
+  // async createPreview() {
+  //   // Convert the stage to a Data URL (JPG format)
+  //   const dataURL = this.stage.toDataURL({
+  //     mimeType: "image/jpeg",
+  //     quality: 0.9,
+  //     pixelRatio: 1.5, // Quality of image
+  //   });
+  //
+  //   // Optional: Download as a file
+  //   const link = document.createElement("a");
+  //   link.download = "scene-preview.jpg";
+  //   link.href = dataURL;
+  //   link.click();
+  // }
+
+  async createPreview(object: string) {
     // Convert the stage to a Data URL (JPG format)
     const dataURL = this.stage.toDataURL({
-      mimeType: "image/jpeg",
+      mimeType: "image/png",
       quality: 0.9,
       pixelRatio: 1.5, // Quality of image
     });
 
-    // Optional: Download as a file
-    const link = document.createElement("a");
-    link.download = "scene-preview.jpg";
-    link.href = dataURL;
-    link.click();
+    // Store the Data URL in a variable
+    if (object == "A") {
+      this.previewImageLabelA = dataURL;
+    } else if (object == "B") {
+      this.previewImageLabelB = dataURL;
+    } else if (object == "C") {
+      this.previewImageLabelC = dataURL;
+    } else if (object == "D") {
+      this.previewImageLabelD = dataURL;
+    }
   }
 
   // Save Sleeve
@@ -1482,9 +1529,7 @@ export class DesignerPopupComponent implements AfterViewInit {
         y: this.selectedObject.y() + this.selectedObject.height(),
       });
 
-      console.log(duplicate);
       if (duplicate instanceof Konva.Text) {
-        console.log("Text");
         this.endEditing();
         this.addTextNodeEvents(duplicate as Konva.Text);
       } else if (duplicate instanceof Konva.Shape) {

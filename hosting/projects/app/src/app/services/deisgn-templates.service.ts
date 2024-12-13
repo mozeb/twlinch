@@ -49,7 +49,6 @@ export class DeisgnTemplatesService {
   async getWidthAndHeightOfPath(
     type: artworkType,
   ): Promise<{ width: number; height: number }> {
-    console.log(type);
     return new Promise((resolve) => {
       let pathData = "";
       if (type === "sleeve12") {

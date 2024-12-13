@@ -5,6 +5,7 @@ import { TwlinchMusicFile } from "../manage_order/upload_music/upload_music.comp
 import { get, keys, padStart } from "lodash";
 import { AuthService } from "./auth.service";
 import { NotifyService } from "./notify.service";
+import { PreviewFile } from "../popups/desing-preview-popup/design-preview-popup.component";
 
 @Injectable({
   providedIn: "root",
@@ -45,6 +46,35 @@ export class StorageApiService extends StorageBaseService {
     const totalSize = designFile.size;
     let bytesUploaded = 0;
     const result = await this.uploadFile(path, designFile);
+    bytesUploaded += designFile.size;
+    this._progressService.updateDonePercent((bytesUploaded * 100) / totalSize);
+  }
+
+  // Uploading design files - label, sleeve, slipmat..
+  public async uploadDesignAndPreviewsFile(
+    pdfPath: string,
+    pdfFolderPath: string,
+    designFile: File,
+    previewFolderPath: string,
+    previewFiles: PreviewFile[],
+  ) {
+    // Show progress
+    this._progressService.show();
+    this._progressService.updateDonePercent(0);
+
+    // Delete folder and contents
+    await this.deleteFolder(pdfFolderPath);
+
+    for (const preview of previewFiles) {
+      await this.uploadFile(
+        previewFolderPath + "/" + preview.name,
+        preview.file,
+      );
+    }
+
+    const totalSize = designFile.size;
+    let bytesUploaded = 0;
+    const result = await this.uploadFile(pdfPath, designFile);
     bytesUploaded += designFile.size;
     this._progressService.updateDonePercent((bytesUploaded * 100) / totalSize);
   }

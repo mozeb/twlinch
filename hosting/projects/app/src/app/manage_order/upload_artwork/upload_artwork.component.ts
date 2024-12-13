@@ -35,6 +35,7 @@ export class Upload_artworkComponent implements OnInit {
 
   innerHeight: string | undefined;
   vinylSize: artworkType = "sleeve12";
+  labelSize: artworkType = "undefined";
   pictureDiscSize: artworkType = "pictureDisc12";
   doubleAlbum: boolean = false;
 
@@ -73,16 +74,20 @@ export class Upload_artworkComponent implements OnInit {
       switch (element.wc_product_id) {
         case 619:
           this.vinylSize = "sleeve12";
+          this.labelSize = "labelAB";
           break;
         case 620:
           this.vinylSize = "sleeve10";
+          this.labelSize = "labelAB";
           break;
         case 621:
           this.vinylSize = "sleeve7";
+          this.labelSize = "labelAB";
           break;
         case 5617:
           this.vinylSize = "sleeveDouble";
           this.doubleAlbum = true;
+          this.labelSize = "labelABCD";
       }
     });
 
@@ -126,7 +131,7 @@ export class Upload_artworkComponent implements OnInit {
       height: "100vh",
       data: {
         type: "label",
-        vinylSize: "labelAB",
+        vinylSize: this.labelSize,
         doubleAlbum: this.doubleAlbum,
       },
     });
