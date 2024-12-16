@@ -8,10 +8,11 @@
   </span>
 
   <div class="previews">
-    <img  id="preview-label-a"/>
-    <img  id="preview-label-b"/>
-    <img  id="preview-label-c"/>
-    <img  id="preview-label-d"/>
+    <img *ngIf="this.data.labelAPreview"  id="preview-label-a"/>
+    <img *ngIf="this.data.labelBPreview"  id="preview-label-b"/>
+    <img *ngIf="this.data.labelCPreview"  id="preview-label-c"/>
+    <img *ngIf="this.data.labelDPreview"  id="preview-label-d"/>
+    <img  id="preview-sleeve"/>
   </div>
 
   <div style="display: flex; justify-content: center; align-items: center; gap:15px;">

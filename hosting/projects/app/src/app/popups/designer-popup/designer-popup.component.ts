@@ -70,6 +70,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   previewImageLabelB: string = "";
   previewImageLabelC: string = "";
   previewImageLabelD: string = "";
+  previewSleeve: string = "";
 
   layer!: Konva.Layer; // The main elements layer
   designMarksLayer!: Konva.Layer; // The marks layer
@@ -108,6 +109,12 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   @ViewChild("shapesToggleButon", { static: false })
   shapesToggleButton!: ElementRef<HTMLButtonElement>;
+
+  @ViewChild("duplicateLabelsSelectDiv", { static: false })
+  duplicateLabelsSelectDiv!: ElementRef<HTMLDivElement>;
+
+  @ViewChild("duplicateLabelsToggleButton", { static: false })
+  duplicateLabelsToggleButton!: ElementRef<HTMLDivElement>;
 
   @ViewChild("sides", { static: false })
   sleeveSidesDiv!: ElementRef<HTMLDivElement>;
@@ -167,6 +174,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   showShapesSelect = false; // Controls the visibility of the shapes select div
   showFontSelect = false; // Controls the visibility of the font select div
   showTextAlignSelect = false; // Controls the visibility of the font select div
+  showLabelsDuplicateSelect = false; // Controls the visibility of the font select div
 
   // Fonts Selection
   fonts: string[] = [];
@@ -759,6 +767,15 @@ export class DesignerPopupComponent implements AfterViewInit {
     }
   }
 
+  // Method to save project depending on project type
+  saveProject() {
+    if (this.data.type == "sleeve") {
+      this.saveSleevePDF();
+    } else if (this.data.type == "label") {
+      this.saveLabelsPDF();
+    }
+  }
+
   // Save Labels
   async saveLabelsPDF() {
     // Hide Marks Layer
@@ -863,22 +880,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
   }
 
-  // Creating preview images for user and admin
-  // async createPreview() {
-  //   // Convert the stage to a Data URL (JPG format)
-  //   const dataURL = this.stage.toDataURL({
-  //     mimeType: "image/jpeg",
-  //     quality: 0.9,
-  //     pixelRatio: 1.5, // Quality of image
-  //   });
-  //
-  //   // Optional: Download as a file
-  //   const link = document.createElement("a");
-  //   link.download = "scene-preview.jpg";
-  //   link.href = dataURL;
-  //   link.click();
-  // }
-
   async createPreview(object: string) {
     // Convert the stage to a Data URL (JPG format)
     const dataURL = this.stage.toDataURL({
@@ -896,6 +897,8 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.previewImageLabelC = dataURL;
     } else if (object == "D") {
       this.previewImageLabelD = dataURL;
+    } else if (object == "sleeve") {
+      this.previewSleeve = dataURL;
     }
   }
 
@@ -950,18 +953,25 @@ export class DesignerPopupComponent implements AfterViewInit {
       }
     });
 
+    await this.createPreview("sleeve");
+
     // Save the PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "masked-content-with-svg-overlay.pdf";
-    link.click();
-    URL.revokeObjectURL(url);
+    const file = new File([blob], "Sleeve.pdf", {
+      type: "application/pdf",
+    });
 
     // Show marks again
     this.designMarksLayer.show();
+
+    this.dialog.open(DesignPreviewPopupComponent, {
+      data: {
+        type: this.data.vinylSize as artworkType,
+        sleevePreview: this.previewSleeve,
+        pdfFile: file,
+      },
+    });
   }
 
   ////////// Object actions ///////////
@@ -1038,6 +1048,20 @@ export class DesignerPopupComponent implements AfterViewInit {
         "px";
       this.shapesSelectDiv.nativeElement.style.top =
         targetButton.getBoundingClientRect().top + "px";
+    }
+  }
+
+  openDuplicateLabelOptions(event: MouseEvent) {
+    const targetButton = event.target as HTMLButtonElement; // Assert the type
+    this.showLabelsDuplicateSelect = !this.showLabelsDuplicateSelect; // Toggle the options div visibility
+    if (this.showLabelsDuplicateSelect) {
+      // Get the button's position
+      this.duplicateLabelsSelectDiv.nativeElement.style.left =
+        this.duplicateLabelsToggleButton.nativeElement.getBoundingClientRect()
+          .left + "px";
+      this.duplicateLabelsSelectDiv.nativeElement.style.top =
+        this.duplicateLabelsToggleButton.nativeElement.getBoundingClientRect()
+          .bottom + "px";
     }
   }
 

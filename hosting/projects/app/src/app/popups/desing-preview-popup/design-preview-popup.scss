@@ -51,14 +51,16 @@ button:focus {outline:0;}
 .previews{
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* Maximum of two columns */
-  gap: 20px;
+}
+
+.previews > *:only-child {
+  grid-column: span 2; /* Force single child to occupy one column */
 }
 
 .previews img {
   width: 100%; /* Ensure images fit their container */
   height: auto; /* Maintain aspect ratio */
   object-fit: cover; /* Optional: Ensures the image fills its container neatly */
-  border-radius: 8px; /* Optional: Add rounded corners */
 }
 
 @media only screen and (min-width: 480px) {

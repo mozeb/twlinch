@@ -68,11 +68,18 @@
           <img class="object-edit-button-icon" src="./assets/Designer_Assets/Text_Decoration_Icon.svg"/>
           </button>
         </div>
+
+        <div class="design-options-sector">
+          <button id="duplicateLabelsToggleButton" #duplicateLabelsToggleButton class="top-bar-button" (click)="openDuplicateLabelOptions($event)">
+            <img class="object-edit-button-icon" src="./assets/Designer_Assets/Duplicate_Label_Icon.svg"/>
+          </button>
+        </div>
+
       </div>
 
 
       <div>
-        <button style="border-radius: 0px; height: 50px;" class="twl-app-button" (click)="saveLabelsPDF()">Finish and
+        <button style="border-radius: 0px; height: 50px;" class="twl-app-button" (click)="saveProject()">Finish and
           upload
         </button>
       </div>
@@ -175,6 +182,22 @@
     <div *ngFor="let font of fonts" class="option-button-font" [style.font-family]="font" (click)="selectFont(font)">
       {{ font }}
     </div>
+  </div>
+</div>
+
+<!--  popup to duplicate label-->
+<div id="duplicateLabelsSelectDiv" #duplicateLabelsSelectDiv class="options-div" [style.display]="showLabelsDuplicateSelect ? 'grid' : 'none'">
+  <div class="options-header">
+    Duplicate label content
+  </div>
+  <div class="option-button">
+    <button class="option-sel-button">Duplicate from Label A</button>
+  </div>
+  <div class="option-button">
+    <button class="option-sel-button">Duplicate from label B</button>
+  </div>
+  <div class="option-button">
+    <button class="option-sel-button">Duplicate from Label C</button>
   </div>
 </div>
 

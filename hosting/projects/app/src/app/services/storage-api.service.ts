@@ -60,7 +60,7 @@ export class StorageApiService extends StorageBaseService {
   ) {
     // Show progress
     this._progressService.show();
-    this._progressService.updateDonePercent(0);
+    this._progressService.updateDonePercent(10);
 
     // Delete folder and contents
     await this.deleteFolder(pdfFolderPath);

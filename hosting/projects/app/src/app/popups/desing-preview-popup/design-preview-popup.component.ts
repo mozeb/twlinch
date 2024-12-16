@@ -87,29 +87,31 @@ export class DesignPreviewPopupComponent implements OnInit {
         lblD.src = this.data.labelDPreview;
       }
     }
+
+    const sleeve = document.getElementById(
+      "preview-sleeve",
+    ) as HTMLImageElement;
+    if (sleeve) {
+      if (this.data.sleevePreview != "") {
+        sleeve.src = this.data.sleevePreview;
+      }
+    }
   }
 
   async uploadDesign() {
     // Wait for the result of createFileFromURL
-    if (!this.data.labelsPDF) {
+    if (!this.data.pdfFile) {
       console.error("Failed to create the file from URL");
       return; // Exit early if the file creation fails
     }
 
-    // Uplaod of the labels and its previews
+    const user = await this._authService.currentUser;
+    const folderPath = `/orders/${user?.uid}/artwork/${this.fPath}`;
+    const path = `/orders/${user?.uid}/artwork/${this.fPath}/${this.data.pdfFile.name}`;
+    const previewFolderPath = `/orders/${user?.uid}/previews/${this.fPath}`;
+    let previewFiles: PreviewFile[] = [];
+
     if (this.data.type == "labelABCD" || this.data.type == "labelAB") {
-      const user = await this._authService.currentUser;
-      const folderPath = `/orders/${user?.uid}/artwork/${this.fPath}`;
-      const path = `/orders/${user?.uid}/artwork/${this.fPath}/${this.data.labelsPDF.name}`;
-
-      this.dialog.open(UploadDialogComponent, {
-        data: { template: this.tempType },
-        disableClose: true,
-      });
-
-      const previewFiles: PreviewFile[] = [];
-      const previewFolderPath = `/orders/${user?.uid}/previews/${this.fPath}`;
-
       if (this.data.type == "labelAB") {
         const fileNameA = "preview-label-a.png";
         const fileA = this.dataURLToFile(this.data.labelAPreview, fileNameA);
@@ -117,9 +119,7 @@ export class DesignPreviewPopupComponent implements OnInit {
         const fileB = this.dataURLToFile(this.data.labelBPreview, fileNameB);
         previewFiles.push({ file: fileA, name: "Preview_A" });
         previewFiles.push({ file: fileB, name: "Preview_B" });
-      }
-
-      if (this.data.type == "labelABCD") {
+      } else if (this.data.type == "labelABCD") {
         const fileNameA = "preview-label-a.png";
         const fileA = this.dataURLToFile(this.data.labelAPreview, fileNameA);
         const fileNameB = "preview-label-b.png";
@@ -133,16 +133,36 @@ export class DesignPreviewPopupComponent implements OnInit {
         previewFiles.push({ file: fileC, name: "Preview_C" });
         previewFiles.push({ file: fileD, name: "Preview_D" });
       }
+    } else if (
+      this.data.type == "sleeve12" ||
+      this.data.type == "sleeve7" ||
+      this.data.type == "sleeve10" ||
+      this.data.type == "sleeveDouble"
+    ) {
+      const file = this.dataURLToFile(this.data.sleevePreview, "");
+      previewFiles.push({ file: file, name: "Preview_Sleeve" });
+    } else if (this.data.type == "pictureDisc") {
+      const file = this.dataURLToFile(this.data.pictureDiscPreview, "");
+      previewFiles.push({ file: file, name: "Preview_Picture_Disc" });
+    } else if (this.data.type == "slipmat") {
+      const file = this.dataURLToFile(this.data.pictureDiscPreview, "");
+      previewFiles.push({ file: file, name: "Preview_Slipmat" });
+    }
 
-      if (this.data.labelsPDF) {
-        this._storageService.uploadDesignAndPreviewsFile(
-          path,
-          folderPath,
-          this.data.labelsPDF,
-          previewFolderPath,
-          previewFiles,
-        );
-      }
+    this.dialog.open(UploadDialogComponent, {
+      data: { template: this.tempType },
+      disableClose: true,
+    });
+
+    // Do the upload
+    if (this.data.pdfFile) {
+      this._storageService.uploadDesignAndPreviewsFile(
+        path,
+        folderPath,
+        this.data.pdfFile,
+        previewFolderPath,
+        previewFiles,
+      );
     }
   }
 
@@ -183,7 +203,7 @@ export interface DesignerPreviewData {
   sleevePreview: string;
   pictureDiscPreview: string;
   slipmatPreview: string;
-  labelsPDF: File;
+  pdfFile: File;
 }
 
 export interface PreviewFile {
