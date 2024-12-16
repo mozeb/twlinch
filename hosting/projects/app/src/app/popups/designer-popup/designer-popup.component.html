@@ -56,7 +56,7 @@
 
 
         <div class="design-options-sector">
-          <button id="fontSelectButton" #fontSelectButton class="top-bar-button-font" (click)="changeFont($event)">
+          <button id="fontSelectButton" #fontSelectButton class="top-bar-button-font" (click)="openEditorOptions($event, 'fontSelectDiv', 'set_font')">
             {{ this.selectedFont }}
           </button>
 
@@ -119,7 +119,7 @@
 
 
 <!--  popup with option to select layer position -->
-<div id="layerPositionDiv" #layerPositionDiv class="options-div" [style.display]="showLayerPosition ? 'grid' : 'none'">
+<div id="layerPositionDiv" #layerPositionDiv class="options-div">
   <div class="options-header">
     Layer position
   </div>
@@ -134,7 +134,7 @@
 </div>
 
 <!-- popup for setting text aligment -->
-<div id="textAlignDiv" #textAlignDiv class="options-div" [style.display]="showTextAlignSelect ? 'grid' : 'none'">
+<div id="textAlignDiv" #textAlignDiv class="options-div">
   <div class="options-header">
     Align Text
   </div>
@@ -153,7 +153,7 @@
 </div>
 
 <!--  popup with option to select shape-->
-<div id="shapesSelectDiv" #shapesSelectDiv class="options-div" [style.display]="showShapesSelect ? 'grid' : 'none'">
+<div id="shapesSelectDiv" #shapesSelectDiv class="options-div">
   <div class="options-header">
     Select shape
   </div>
@@ -174,7 +174,7 @@
 <!-- Font selection dropdown -->
 
 <!-- font-picker.component.html -->
-<div id="fontsSelectDiv" #fontsSelectDiv class="options-div" [style.display]="showFontSelect ? 'grid' : 'none'">
+<div id="fontSelectDiv" #fontSelectDiv class="options-div">
   <div class="options-header">
     Select font
   </div>
@@ -186,7 +186,7 @@
 </div>
 
 <!--  popup to duplicate label-->
-<div id="duplicateLabelsSelectDiv" #duplicateLabelsSelectDiv class="options-div" [style.display]="showLabelsDuplicateSelect ? 'grid' : 'none'">
+<div id="duplicateLabelsSelectDiv" #duplicateLabelsSelectDiv class="options-div">
   <div class="options-header">
     Copy content from
   </div>

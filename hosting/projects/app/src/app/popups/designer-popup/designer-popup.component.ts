@@ -65,6 +65,34 @@ export class DesignerPopupComponent implements AfterViewInit {
   }; // Initialize with empty strings for all keys
   currentLabel = "A";
 
+  designerTools: DesignTool[] = [
+    {
+      divId: "duplicateLabelsSelectDiv",
+      triggerButtonId: "duplicateLabelsToggleButton",
+      displayBool: false,
+    },
+    {
+      divId: "shapesSelectDiv",
+      triggerButtonId: "shapesToggleButon",
+      displayBool: false,
+    },
+    {
+      divId: "textAlignDiv",
+      triggerButtonId: "textAlignButton",
+      displayBool: false,
+    },
+    {
+      divId: "layerPositionDiv",
+      triggerButtonId: "positionElementButton",
+      displayBool: false,
+    },
+    {
+      divId: "fontSelectDiv",
+      triggerButtonId: "fontSelectButton",
+      displayBool: false,
+    },
+  ];
+
   previewImageLabelA: string = "";
   previewImageLabelB: string = "";
   previewImageLabelC: string = "";
@@ -168,21 +196,15 @@ export class DesignerPopupComponent implements AfterViewInit {
   selectedColor: string = "#ff0000"; // Default color
   fontAlign = "left.svg";
 
-  // Bools to display differnt options selector
-  showLayerPosition = false; // Controls the visibility of the options div
-  showShapesSelect = false; // Controls the visibility of the shapes select div
-  showFontSelect = false; // Controls the visibility of the font select div
-  showTextAlignSelect = false; // Controls the visibility of the font select div
-  showLabelsDuplicateSelect = false; // Controls the visibility of the font select div
-
   // Fonts Selection
   fonts: string[] = [];
   selectedFont: string = "Ubuntu Mono"; // To store the selected font
 
   ngAfterViewInit() {
-    //this.createStage();
+    // Load all fonts
     this.loadFonts();
-    this.listenOffStageClick();
+    // Listen to clicks
+    this.clickListener();
     // Setup all the info based on input from app
     this.setUpTwlinchDeisgner();
   }
@@ -228,12 +250,26 @@ export class DesignerPopupComponent implements AfterViewInit {
     }
   }
 
-  listenOffStageClick() {
+  // Listen to clicks on the view
+  clickListener() {
     // Add global click event to hide transformer when clicking outside the stage
     document.addEventListener("click", (event: MouseEvent) => {
       const container = this.stage.container(); // Get the stage container element
       const clickedNode = event.target as HTMLElement;
 
+      // Hide tools if not selected
+      for (const tool of this.designerTools) {
+        if (clickedNode.id != tool.triggerButtonId) {
+          tool.displayBool = false;
+          const toolElement = document.getElementById(
+            tool.divId,
+          ) as HTMLDivElement;
+          toolElement.style.display = "none";
+        } else {
+        }
+      }
+
+      // Select object inside stage if clicked
       if (container === clickedNode) {
         // If the clicked element is the container but not a stage object
         this.transformer.hide();
@@ -964,80 +1000,46 @@ export class DesignerPopupComponent implements AfterViewInit {
     }
   }
 
-  // Show options
-  toggleOptions(event: MouseEvent) {
-    const targetButton = event.target as HTMLButtonElement; // Assert the type
-    this.showLayerPosition = !this.showLayerPosition; // Toggle the options div visibility
-    if (this.showLayerPosition) {
-      // Get the button's position
-      const buttonRect = targetButton.getBoundingClientRect();
-      this.optionsDiv.nativeElement.style.left =
-        targetButton.getBoundingClientRect().left + "px";
-      this.optionsDiv.nativeElement.style.top =
-        targetButton.getBoundingClientRect().bottom + "px";
-    }
-  }
-
-  // Move selected layer
-  moveLayer(direction: "up" | "down") {
-    if (!this.selectedObject) {
-      console.error("Layer is undefined.");
-      return;
-    }
-
-    if (direction === "up") {
-      this.selectedObject.moveUp(); // Moves the layer up by one step in the rendering order
-    } else if (direction === "down") {
-      // Prevent moving below the background layer
-
-      this.selectedObject.moveDown(); // Moves the layer down by one step in the rendering order
-    } else {
-      console.error('Invalid direction. Use "up" or "down".');
-    }
-    // Redraw the stage to reflect the changes
-    this.stage.batchDraw();
-  }
-
-  // Hide layer options when clicking outside
-  @HostListener("document:click", ["$event"])
-  onDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (
-      this.optionsDiv &&
-      !this.optionsDiv.nativeElement.contains(target) &&
-      this.layerPositionButton &&
-      !this.layerPositionButton.nativeElement.contains(target)
-    ) {
-      //console.log("Clicked outside of the toggle");
-      this.showLayerPosition = false;
-    }
-
-    if (
-      this.shapesSelectDiv &&
-      !this.shapesSelectDiv.nativeElement.contains(target) &&
-      this.shapesToggleButton &&
-      !this.shapesToggleButton.nativeElement.contains(target)
-    ) {
-      this.showShapesSelect = false;
-    }
-
-    if (
-      this.duplicateLabelsSelectDiv &&
-      !this.duplicateLabelsSelectDiv.nativeElement.contains(target) &&
-      this.duplicateLabelsToggleButton &&
-      !this.duplicateLabelsToggleButton.nativeElement.contains(target)
-    ) {
-      this.showLabelsDuplicateSelect = false;
-    }
-
-    if (
-      this.fontSelectButton &&
-      !this.fontSelectButton.nativeElement.contains(target)
-    ) {
-      //console.log("Clicked outside of the toggle");
-      this.showFontSelect = false;
-    }
-  }
+  // // Hide layer options when clicking outside
+  // @HostListener("document:click", ["$event"])
+  // onDocumentClick(event: MouseEvent) {
+  //   const target = event.target as HTMLElement;
+  //   if (
+  //     this.optionsDiv &&
+  //     !this.optionsDiv.nativeElement.contains(target) &&
+  //     this.layerPositionButton &&
+  //     !this.layerPositionButton.nativeElement.contains(target)
+  //   ) {
+  //     //console.log("Clicked outside of the toggle");
+  //     this.showLayerPosition = false;
+  //   }
+  //
+  //   if (
+  //     this.shapesSelectDiv &&
+  //     !this.shapesSelectDiv.nativeElement.contains(target) &&
+  //     this.shapesToggleButton &&
+  //     !this.shapesToggleButton.nativeElement.contains(target)
+  //   ) {
+  //     this.showShapesSelect = false;
+  //   }
+  //
+  //   if (
+  //     this.duplicateLabelsSelectDiv &&
+  //     !this.duplicateLabelsSelectDiv.nativeElement.contains(target) &&
+  //     this.duplicateLabelsToggleButton &&
+  //     !this.duplicateLabelsToggleButton.nativeElement.contains(target)
+  //   ) {
+  //     this.showLabelsDuplicateSelect = false;
+  //   }
+  //
+  //   if (
+  //     this.fontSelectButton &&
+  //     !this.fontSelectButton.nativeElement.contains(target)
+  //   ) {
+  //     //console.log("Clicked outside of the toggle");
+  //     this.showFontSelect = false;
+  //   }
+  // }
 
   ////////////////////////////////  All fonts related stuff   ////////////////////////////////////
 
@@ -1082,7 +1084,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.selectedFont = font; // Update the selected font
     if (this.selectedObject instanceof Konva.Text) {
       this.selectedObject.fontFamily(this.selectedFont);
-      this.showFontSelect = false;
       this.transformer.forceUpdate();
       this.updateCaretPosition();
       this.layer.draw();
@@ -1371,20 +1372,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.layer.draw();
   };
 
-  // Show options
-  changeFont(event: MouseEvent) {
-    const targetButton = event.target as HTMLButtonElement; // Assert the type
-    this.showFontSelect = !this.showFontSelect; // Toggle the options div visibility
-    if (this.showFontSelect) {
-      // Get the button's position
-      const buttonRect = targetButton.getBoundingClientRect();
-      this.fontsSelectDiv.nativeElement.style.left =
-        targetButton.getBoundingClientRect().left + "px";
-      this.fontsSelectDiv.nativeElement.style.top =
-        targetButton.getBoundingClientRect().bottom + "px";
-    }
-  }
-
   //////////////////// END OF TEXT ////////////
   clearStage() {
     this.endEditing;
@@ -1645,19 +1632,25 @@ export class DesignerPopupComponent implements AfterViewInit {
     const targetDiv = document.getElementById(elementID) as HTMLDivElement;
 
     let bul = false;
-    if (action == "copy_label") {
-      this.showLabelsDuplicateSelect = !this.showLabelsDuplicateSelect; // Toggle the options div visibility
-      bul = this.showLabelsDuplicateSelect;
-    } else if (action == "text_align") {
-      this.showTextAlignSelect = !this.showTextAlignSelect; // Toggle the options div visibility
-      bul = this.showTextAlignSelect;
-    } else if (action == "set_position") {
-      this.showLayerPosition = !this.showLayerPosition; // Toggle the options div visibility
-      bul = this.showLayerPosition;
-    } else if (action == "add_shape") {
-      this.showShapesSelect = !this.showShapesSelect; // Toggle the options div visibility
-      bul = this.showShapesSelect;
+    for (const tool of this.designerTools) {
+      // First hide all the tools
+      tool.displayBool = false;
+      const toolElement = document.getElementById(tool.divId) as HTMLDivElement;
+      toolElement.style.display = "none";
+
+      // Show just the selected tool
+      if (tool.divId == targetDiv.id) {
+        tool.displayBool = !tool.displayBool;
+        bul = tool.displayBool;
+        console.log(this.designerTools);
+        if (tool.displayBool) {
+          targetDiv.style.display = "grid";
+        } else {
+          targetDiv.style.display = "none";
+        }
+      }
     }
+
     if (bul) {
       // Get the button's position
       targetDiv.style.left = targetButton.getBoundingClientRect().left + "px";
@@ -1699,7 +1692,6 @@ export class DesignerPopupComponent implements AfterViewInit {
         //console.error(`No font Selected`);
       }
     }
-    this.showTextAlignSelect = !this.showTextAlignSelect; // Toggle the options div visibility
   }
 
   // Method to add different shapes
@@ -1754,8 +1746,26 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.layer.draw();
 
     this.setAvailableTools();
+  }
 
-    this.showShapesSelect = false;
+  // Move selected layer
+  moveLayer(direction: "up" | "down") {
+    if (!this.selectedObject) {
+      console.error("Layer is undefined.");
+      return;
+    }
+
+    if (direction === "up") {
+      this.selectedObject.moveUp(); // Moves the layer up by one step in the rendering order
+    } else if (direction === "down") {
+      // Prevent moving below the background layer
+
+      this.selectedObject.moveDown(); // Moves the layer down by one step in the rendering order
+    } else {
+      console.error('Invalid direction. Use "up" or "down".');
+    }
+    // Redraw the stage to reflect the changes
+    this.stage.batchDraw();
   }
 
   //</editor-fold>
@@ -1783,4 +1793,10 @@ export interface TwlDesigner {
   type: string;
   vinylSize: string;
   doubleAlbum: boolean;
+}
+
+export interface DesignTool {
+  divId: string;
+  triggerButtonId: string;
+  displayBool: boolean;
 }
