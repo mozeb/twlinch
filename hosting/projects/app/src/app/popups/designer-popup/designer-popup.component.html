@@ -13,7 +13,7 @@
       <img class="designer-button-icon" src="./assets/Designer_Assets/music_list_icon.svg"/>
       <span class="designer-button-text">Add<br>Tracklist</span>
     </button>
-    <button id="shapesToggleButon" #shapesToggleButon class="designer-button" (click)="toggleShapes($event)">
+    <button id="shapesToggleButon" #shapesToggleButon class="designer-button" (click)="openEditorOptions($event, 'shapesSelectDiv', 'add_shape')">
       <img class="designer-button-icon" src="./assets/Designer_Assets/add_shape_icon.svg"/>
       <span class="designer-button-text">Add<br>Shape</span>
     </button>
@@ -44,7 +44,7 @@
           <button id="duplicateObjectButton" #duplicateObjectButton class="top-bar-button" (click)="duplicateObject()">
             <img class="object-edit-button-icon" src="./assets/Designer_Assets/duplicate_icon.svg"/>
           </button>
-          <button id="optionsToggle" #optionsToggle class="top-bar-button" (click)="toggleOptions($event)">
+          <button id="positionElementButton" #positionElementButton class="top-bar-button" (click)="openEditorOptions($event, 'layerPositionDiv', 'set_position')">
             <img class="object-edit-button-icon" src="./assets/Designer_Assets/layers_icon.svg"/>
           </button>
           <button class="top-bar-button">
@@ -60,7 +60,7 @@
             {{ this.selectedFont }}
           </button>
 
-          <button id="textAlignButton" #textAlignButton class="top-bar-button" (click)="openTextAlignOptions()">
+          <button id="textAlignButton" #textAlignButton class="top-bar-button" (click)="openEditorOptions($event, 'textAlignDiv', 'text_align')">
             <img class="object-edit-button-icon" src="./assets/Designer_Assets/{{ this.fontAlign }}"/>
           </button>
 
@@ -69,8 +69,8 @@
           </button>
         </div>
 
-        <div class="design-options-sector">
-          <button id="duplicateLabelsToggleButton" #duplicateLabelsToggleButton class="top-bar-button" (click)="openDuplicateLabelOptions($event)">
+        <div *ngIf="data.type === 'label'" class="design-options-sector">
+          <button id="duplicateLabelsToggleButton" #duplicateLabelsToggleButton class="top-bar-button" (click)="openEditorOptions($event, 'duplicateLabelsSelectDiv', 'copy_label')">
             <img class="object-edit-button-icon" src="./assets/Designer_Assets/Duplicate_Label_Icon.svg"/>
           </button>
         </div>
@@ -119,7 +119,7 @@
 
 
 <!--  popup with option to select layer position -->
-<div id="optionsDiv" #optionsDiv class="options-div" [style.display]="showOptions ? 'grid' : 'none'">
+<div id="layerPositionDiv" #layerPositionDiv class="options-div" [style.display]="showLayerPosition ? 'grid' : 'none'">
   <div class="options-header">
     Layer position
   </div>
@@ -188,16 +188,19 @@
 <!--  popup to duplicate label-->
 <div id="duplicateLabelsSelectDiv" #duplicateLabelsSelectDiv class="options-div" [style.display]="showLabelsDuplicateSelect ? 'grid' : 'none'">
   <div class="options-header">
-    Duplicate label content
+    Copy content from
   </div>
   <div class="option-button">
-    <button class="option-sel-button">Duplicate from Label A</button>
+    <button class="option-sel-button" (click)="copyContentOfLabel('A')">Copy all from label A</button>
   </div>
   <div class="option-button">
-    <button class="option-sel-button">Duplicate from label B</button>
+    <button class="option-sel-button" (click)="copyContentOfLabel('B')">Copy all from label B</button>
   </div>
-  <div class="option-button">
-    <button class="option-sel-button">Duplicate from Label C</button>
+  <div *ngIf="this.data.doubleAlbum" class="option-button">
+    <button class="option-sel-button" (click)="copyContentOfLabel('C')">Copy all from label C</button>
+  </div>
+  <div *ngIf="this.data.doubleAlbum" class="option-button">
+    <button class="option-sel-button" (click)="copyContentOfLabel('D')">Copy all from label D</button>
   </div>
 </div>
 

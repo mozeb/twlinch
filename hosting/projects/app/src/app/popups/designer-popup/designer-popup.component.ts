@@ -29,7 +29,6 @@ import { ConfirmActionPopupComponent } from "../confirm_action_popup/confirm_act
 import { DesignPreviewPopupComponent } from "../desing-preview-popup/design-preview-popup.component";
 import { MatIcon } from "@angular/material/icon";
 import { artworkType } from "../../services/transfer-service";
-import { object } from "@angular/fire/database";
 
 @Component({
   selector: "designer-popup",
@@ -101,7 +100,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   @ViewChild("optionsDiv", { static: false })
   optionsDiv!: ElementRef<HTMLDivElement>;
 
-  @ViewChild("optionsToggle", { static: false })
+  @ViewChild("positionElementButton", { static: false })
   layerPositionButton!: ElementRef<HTMLButtonElement>;
 
   @ViewChild("shapesSelectDiv", { static: false })
@@ -170,7 +169,7 @@ export class DesignerPopupComponent implements AfterViewInit {
   fontAlign = "left.svg";
 
   // Bools to display differnt options selector
-  showOptions = false; // Controls the visibility of the options div
+  showLayerPosition = false; // Controls the visibility of the options div
   showShapesSelect = false; // Controls the visibility of the shapes select div
   showFontSelect = false; // Controls the visibility of the font select div
   showTextAlignSelect = false; // Controls the visibility of the font select div
@@ -184,7 +183,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     //this.createStage();
     this.loadFonts();
     this.listenOffStageClick();
-
     // Setup all the info based on input from app
     this.setUpTwlinchDeisgner();
   }
@@ -610,62 +608,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     });
   }
 
-  // Method to add different shapes
-  addShape(type: string) {
-    let shape;
-    if (type === "circle") {
-      shape = new Konva.Circle({
-        x: this.stageWidth / 2,
-        y: this.stageHeight / 2,
-        radius: 50,
-        fill: "#000000",
-        draggable: true,
-      });
-    } else if (type === "square") {
-      shape = new Konva.Rect({
-        x: this.stageWidth / 2 - 50,
-        y: this.stageHeight / 2 - 50,
-        width: 100,
-        height: 100,
-        fill: "#000000",
-        draggable: true,
-      });
-    } else if (type === "triangle") {
-      shape = new Konva.Line({
-        x: this.stageWidth / 2 - 100,
-        y: this.stageHeight / 2 - 110,
-        points: [50, 150, 150, 150, 100, 75], // x1, y1, x2, y2, x3, y3
-        fill: "#000000", // fill color
-        closed: true, // close the shape to form a triangle
-        draggable: true,
-      });
-    } else {
-      shape = new Konva.Circle({
-        x: this.stageWidth / 2,
-        y: this.stageHeight / 2,
-        radius: 50,
-        fill: "#00000",
-        draggable: true,
-      });
-    }
-
-    this.addShapeNodeEvents(shape);
-
-    // Set up at the begining
-    this.transformer.nodes([]);
-    this.transformer.nodes([shape]);
-    this.selectObject(shape);
-    this.transformer.show();
-
-    // Add shape to the layer
-    this.maskedGroup.add(shape);
-    this.layer.draw();
-
-    this.setAvailableTools();
-
-    this.showShapesSelect = false;
-  }
-
   addShapeNodeEvents(shape: Konva.Shape) {
     this.objectNodes.push(shape);
     // Add click event to image for selecting and attaching transformer
@@ -1025,43 +967,14 @@ export class DesignerPopupComponent implements AfterViewInit {
   // Show options
   toggleOptions(event: MouseEvent) {
     const targetButton = event.target as HTMLButtonElement; // Assert the type
-    this.showOptions = !this.showOptions; // Toggle the options div visibility
-    if (this.showOptions) {
+    this.showLayerPosition = !this.showLayerPosition; // Toggle the options div visibility
+    if (this.showLayerPosition) {
       // Get the button's position
       const buttonRect = targetButton.getBoundingClientRect();
       this.optionsDiv.nativeElement.style.left =
         targetButton.getBoundingClientRect().left + "px";
       this.optionsDiv.nativeElement.style.top =
         targetButton.getBoundingClientRect().bottom + "px";
-    }
-  }
-
-  // Show shape select
-  toggleShapes(event: MouseEvent) {
-    const targetButton = event.target as HTMLButtonElement; // Assert the type
-    this.showShapesSelect = !this.showShapesSelect; // Toggle the options div visibility
-    if (this.showShapesSelect) {
-      // Get the button's position
-      this.shapesSelectDiv.nativeElement.style.left =
-        targetButton.getBoundingClientRect().left +
-        targetButton.clientWidth +
-        "px";
-      this.shapesSelectDiv.nativeElement.style.top =
-        targetButton.getBoundingClientRect().top + "px";
-    }
-  }
-
-  openDuplicateLabelOptions(event: MouseEvent) {
-    const targetButton = event.target as HTMLButtonElement; // Assert the type
-    this.showLabelsDuplicateSelect = !this.showLabelsDuplicateSelect; // Toggle the options div visibility
-    if (this.showLabelsDuplicateSelect) {
-      // Get the button's position
-      this.duplicateLabelsSelectDiv.nativeElement.style.left =
-        this.duplicateLabelsToggleButton.nativeElement.getBoundingClientRect()
-          .left + "px";
-      this.duplicateLabelsSelectDiv.nativeElement.style.top =
-        this.duplicateLabelsToggleButton.nativeElement.getBoundingClientRect()
-          .bottom + "px";
     }
   }
 
@@ -1096,7 +1009,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       !this.layerPositionButton.nativeElement.contains(target)
     ) {
       //console.log("Clicked outside of the toggle");
-      this.showOptions = false;
+      this.showLayerPosition = false;
     }
 
     if (
@@ -1105,8 +1018,16 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.shapesToggleButton &&
       !this.shapesToggleButton.nativeElement.contains(target)
     ) {
-      //console.log("Clicked outside of the toggle");
       this.showShapesSelect = false;
+    }
+
+    if (
+      this.duplicateLabelsSelectDiv &&
+      !this.duplicateLabelsSelectDiv.nativeElement.contains(target) &&
+      this.duplicateLabelsToggleButton &&
+      !this.duplicateLabelsToggleButton.nativeElement.contains(target)
+    ) {
+      this.showLabelsDuplicateSelect = false;
     }
 
     if (
@@ -1464,33 +1385,6 @@ export class DesignerPopupComponent implements AfterViewInit {
     }
   }
 
-  updateTextAlignment(alignment: "left" | "center" | "right"): void {
-    this.fontAlign = alignment + ".svg";
-    // End editing if text editing opened
-    this.endEditing();
-    if (["left", "center", "right"].includes(alignment)) {
-      if (this.selectedObject instanceof Konva.Text) {
-        this.selectedObject.align(alignment); // Update alignment
-        this.layer.draw(); // Redraw the layer to apply changes
-      } else {
-        //console.error(`No font Selected`);
-      }
-    }
-    this.showTextAlignSelect = !this.showTextAlignSelect; // Toggle the options div visibility
-  }
-
-  openTextAlignOptions() {
-    this.showTextAlignSelect = !this.showTextAlignSelect; // Toggle the options div visibility
-    if (this.showTextAlignSelect) {
-      // Get the button's position
-      this.textAlignDiv.nativeElement.style.left =
-        this.textAlignButton.nativeElement.getBoundingClientRect().left + "px";
-      this.textAlignDiv.nativeElement.style.top =
-        this.textAlignButton.nativeElement.getBoundingClientRect().bottom +
-        "px";
-    }
-  }
-
   //////////////////// END OF TEXT ////////////
   clearStage() {
     this.endEditing;
@@ -1743,6 +1637,128 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Redraw the layer to reflect changes
     this.layer.draw();
   }
+
+  //<editor-fold desc="All designer action buttons logic">
+
+  openEditorOptions(event: MouseEvent, elementID: string, action: string) {
+    const targetButton = event.target as HTMLButtonElement;
+    const targetDiv = document.getElementById(elementID) as HTMLDivElement;
+
+    let bul = false;
+    if (action == "copy_label") {
+      this.showLabelsDuplicateSelect = !this.showLabelsDuplicateSelect; // Toggle the options div visibility
+      bul = this.showLabelsDuplicateSelect;
+    } else if (action == "text_align") {
+      this.showTextAlignSelect = !this.showTextAlignSelect; // Toggle the options div visibility
+      bul = this.showTextAlignSelect;
+    } else if (action == "set_position") {
+      this.showLayerPosition = !this.showLayerPosition; // Toggle the options div visibility
+      bul = this.showLayerPosition;
+    } else if (action == "add_shape") {
+      this.showShapesSelect = !this.showShapesSelect; // Toggle the options div visibility
+      bul = this.showShapesSelect;
+    }
+    if (bul) {
+      // Get the button's position
+      targetDiv.style.left = targetButton.getBoundingClientRect().left + "px";
+      targetDiv.style.top = targetButton.getBoundingClientRect().bottom + "px";
+
+      // Sett up div for left side menu
+      if (action == "add_shape") {
+        targetDiv.style.left = targetButton.clientWidth + "px";
+        targetDiv.style.top = targetButton.getBoundingClientRect().top + "px";
+      }
+    }
+  }
+
+  // Copy content from another label
+  copyContentOfLabel(targetLabel: string) {
+    const dialogRef = this.dialog.open(ConfirmActionPopupComponent, {
+      data: {
+        action_name: "copy label",
+      },
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result == true) {
+        this.clearStage();
+        await this.switchLabelFill(this.labelsJSON[targetLabel as LabelKeys]);
+      }
+    });
+  }
+
+  updateTextAlignment(alignment: "left" | "center" | "right"): void {
+    this.fontAlign = alignment + ".svg";
+    // End editing if text editing opened
+    this.endEditing();
+    if (["left", "center", "right"].includes(alignment)) {
+      if (this.selectedObject instanceof Konva.Text) {
+        this.selectedObject.align(alignment); // Update alignment
+        this.layer.draw(); // Redraw the layer to apply changes
+      } else {
+        //console.error(`No font Selected`);
+      }
+    }
+    this.showTextAlignSelect = !this.showTextAlignSelect; // Toggle the options div visibility
+  }
+
+  // Method to add different shapes
+  addShape(type: string) {
+    let shape;
+    if (type === "circle") {
+      shape = new Konva.Circle({
+        x: this.stageWidth / 2,
+        y: this.stageHeight / 2,
+        radius: 50,
+        fill: "#000000",
+        draggable: true,
+      });
+    } else if (type === "square") {
+      shape = new Konva.Rect({
+        x: this.stageWidth / 2 - 50,
+        y: this.stageHeight / 2 - 50,
+        width: 100,
+        height: 100,
+        fill: "#000000",
+        draggable: true,
+      });
+    } else if (type === "triangle") {
+      shape = new Konva.Line({
+        x: this.stageWidth / 2 - 100,
+        y: this.stageHeight / 2 - 110,
+        points: [50, 150, 150, 150, 100, 75], // x1, y1, x2, y2, x3, y3
+        fill: "#000000", // fill color
+        closed: true, // close the shape to form a triangle
+        draggable: true,
+      });
+    } else {
+      shape = new Konva.Circle({
+        x: this.stageWidth / 2,
+        y: this.stageHeight / 2,
+        radius: 50,
+        fill: "#00000",
+        draggable: true,
+      });
+    }
+
+    this.addShapeNodeEvents(shape);
+
+    // Set up at the begining
+    this.transformer.nodes([]);
+    this.transformer.nodes([shape]);
+    this.selectObject(shape);
+    this.transformer.show();
+
+    // Add shape to the layer
+    this.maskedGroup.add(shape);
+    this.layer.draw();
+
+    this.setAvailableTools();
+
+    this.showShapesSelect = false;
+  }
+
+  //</editor-fold>
 
   ///////// END MUSIC FILES ///////////////////
 

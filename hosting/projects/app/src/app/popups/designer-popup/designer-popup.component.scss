@@ -180,7 +180,7 @@
   position: absolute;
   background: #F0F0F0;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  //border-radius: 5px;
   z-index: 1000;
   display: grid;
   overflow: hidden;
@@ -241,8 +241,11 @@
   font-size: 12px;
   text-transform: uppercase;
   padding: 15px 20px;
-  background-color: black;
-  color:white;
+  background-color: #cecece;
+  color:black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .option-sel-button{

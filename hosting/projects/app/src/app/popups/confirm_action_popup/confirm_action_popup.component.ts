@@ -69,6 +69,11 @@ export class ConfirmActionPopupComponent implements OnInit {
     if (this.data.action_name == "clear stage") {
       this.content_text = "All your elements on the canvas will be deleted.";
     }
+
+    if (this.data.action_name == "copy label") {
+      this.content_text =
+        "All of your current label elements will be deleted and replaced by content from your selected label.";
+    }
   }
 
   closeDialog(selection: boolean) {
