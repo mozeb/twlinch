@@ -562,11 +562,9 @@ export class DesignerPopupComponent implements AfterViewInit {
       }
     }
 
-    if (this.maskedGroup.children.length != 0) {
-      this.labelsJSON[this.currentLabel as LabelKeys] = this.saveGroup(
-        this.maskedGroup,
-      );
-    }
+    this.labelsJSON[this.currentLabel as LabelKeys] = this.saveGroup(
+      this.maskedGroup,
+    );
 
     this.clearStage();
     if (this.labelsJSON[label as LabelKeys]) {
