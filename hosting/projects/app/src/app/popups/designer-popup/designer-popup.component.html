@@ -5,7 +5,7 @@
       <span class="designer-button-text">Add<br>Image</span>
     </button>
     <input type="file" #fileInput (change)="onFileSelected($event)" style="display:none;"/>
-    <button class="designer-button" (click)="addTextNode()">
+    <button id="addTextButton" class="designer-button" (click)="addTextNode()">
       <img class="designer-button-icon" src="./assets/Designer_Assets/add_text_icon.svg"/>
       <span class="designer-button-text">Add<br>Text</span>
     </button>
@@ -52,13 +52,31 @@
               <input type="color" #colorPicker id="colorPicker" (input)="onColorChange($event)" style="opacity: 0"/>
             </div>
           </button>
+
+
         </div>
 
 
         <div class="design-options-sector">
+
+
           <button id="fontSelectButton" #fontSelectButton class="top-bar-button-font" (click)="openEditorOptions($event, 'fontSelectDiv', 'set_font')">
             {{ this.selectedFont }}
           </button>
+
+          <div id="fontSizeButton" #fontSizeButton  class="top-bar-font-size" (click)="adjustFontSize()">
+            Size:
+            <input
+              class="text-size-input"
+              id="fontSizeInput"
+              type="number"
+              [formControl]="fontSizeControl"
+              [(ngModel)]="fontSize"
+              (input)="adjustFontSize()"
+              min="1"
+              step="1"
+            />
+          </div>
 
           <button id="textAlignButton" #textAlignButton class="top-bar-button" (click)="openEditorOptions($event, 'textAlignDiv', 'text_align')">
             <img class="object-edit-button-icon" src="./assets/Designer_Assets/{{ this.fontAlign }}"/>

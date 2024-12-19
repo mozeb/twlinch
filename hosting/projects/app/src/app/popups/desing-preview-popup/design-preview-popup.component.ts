@@ -13,11 +13,12 @@ import { UploadDialogComponent } from "../upload-dialog/upload-dialog.component"
 import { StorageApiService } from "../../services/storage-api.service";
 import { AuthService } from "../../services/auth.service";
 import { StorageBaseService } from "../../services/api-base/storage-base.service";
+import { FormsModule } from "@angular/forms";
 
 @Component({
   selector: "design-preview-popup",
   standalone: true,
-  imports: [AsyncPipe, NgIf, MatDialogContent, MatDialogClose],
+  imports: [AsyncPipe, NgIf, MatDialogContent, MatDialogClose, FormsModule],
   templateUrl: "./design-preview-popup.html",
   styleUrl: "./design-preview-popup.scss",
   encapsulation: ViewEncapsulation.None,
@@ -57,6 +58,8 @@ export class DesignPreviewPopupComponent implements OnInit {
     ) {
       this.fPath = "picture-disc";
     }
+
+    console.log(this.data.type);
   }
 
   showPreviews() {

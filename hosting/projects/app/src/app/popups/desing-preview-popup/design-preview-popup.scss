@@ -51,10 +51,12 @@ button:focus {outline:0;}
 .previews{
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* Maximum of two columns */
+  gap:10px;
 }
 
 .previews > *:only-child {
   grid-column: span 2; /* Force single child to occupy one column */
+
 }
 
 .previews img {

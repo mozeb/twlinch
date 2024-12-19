@@ -29,6 +29,12 @@ import { ConfirmActionPopupComponent } from "../confirm_action_popup/confirm_act
 import { DesignPreviewPopupComponent } from "../desing-preview-popup/design-preview-popup.component";
 import { MatIcon } from "@angular/material/icon";
 import { artworkType } from "../../services/transfer-service";
+import {
+  FormControl,
+  FormsModule,
+  NgModel,
+  ReactiveFormsModule,
+} from "@angular/forms";
 
 @Component({
   selector: "designer-popup",
@@ -40,6 +46,8 @@ import { artworkType } from "../../services/transfer-service";
     MatDialogClose,
     CommonModule,
     MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   templateUrl: "./designer-popup.component.html",
   styleUrl: "./designer-popup.component.scss",
@@ -70,26 +78,55 @@ export class DesignerPopupComponent implements AfterViewInit {
       divId: "duplicateLabelsSelectDiv",
       triggerButtonId: "duplicateLabelsToggleButton",
       displayBool: false,
+      toolType: "alwaysOn",
     },
     {
       divId: "shapesSelectDiv",
       triggerButtonId: "shapesToggleButon",
       displayBool: false,
+      toolType: "alwaysOn",
+    },
+    {
+      divId: "",
+      triggerButtonId: "deleteObjectButton",
+      displayBool: false,
+      toolType: "all",
+    },
+    {
+      divId: "",
+      triggerButtonId: "colorPickerButton",
+      displayBool: false,
+      toolType: "color",
+    },
+    {
+      divId: "",
+      triggerButtonId: "duplicateObjectButton",
+      displayBool: false,
+      toolType: "all",
     },
     {
       divId: "textAlignDiv",
       triggerButtonId: "textAlignButton",
       displayBool: false,
+      toolType: "text",
     },
     {
       divId: "layerPositionDiv",
       triggerButtonId: "positionElementButton",
       displayBool: false,
+      toolType: "all",
     },
     {
       divId: "fontSelectDiv",
       triggerButtonId: "fontSelectButton",
       displayBool: false,
+      toolType: "text",
+    },
+    {
+      divId: "",
+      triggerButtonId: "fontSizeButton",
+      displayBool: false,
+      toolType: "text",
     },
   ];
 
@@ -118,6 +155,8 @@ export class DesignerPopupComponent implements AfterViewInit {
   sizeInfo: any;
 
   scale: number = 1;
+
+  fontSizeControl = new FormControl(20); // Initialize with default font s
 
   @ViewChild("cont") container!: ElementRef;
 
@@ -211,6 +250,8 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   // Setup all the data for designer
   async setUpTwlinchDeisgner() {
+    // Set stage tools
+    this.setAvailableTools("stage");
     // Figure out if label/sleeve/slipmat/pdisc
     if (this.data.type === "label") {
       // Setup buttons array for labels
@@ -264,7 +305,9 @@ export class DesignerPopupComponent implements AfterViewInit {
           const toolElement = document.getElementById(
             tool.divId,
           ) as HTMLDivElement;
-          toolElement.style.display = "none";
+          if (toolElement) {
+            toolElement.style.display = "none";
+          }
         } else {
         }
       }
@@ -274,7 +317,7 @@ export class DesignerPopupComponent implements AfterViewInit {
         // If the clicked element is the container but not a stage object
         this.transformer.hide();
         this.selectedObject = this.maskedPath;
-        this.setAvailableTools();
+        this.setAvailableTools("stage");
       }
     });
   }
@@ -378,7 +421,7 @@ export class DesignerPopupComponent implements AfterViewInit {
         this.transformer.nodes([]); // Clear selection
         this.layer.draw();
         this.selectedObject = this.maskedPath;
-        this.setAvailableTools();
+        this.setAvailableTools("stage");
 
         // Remove text edit stuff
         if (this.caret) {
@@ -412,7 +455,7 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     // Set tools at the begining
     this.selectedObject = this.maskedPath;
-    this.setAvailableTools();
+    this.setAvailableTools("shape");
 
     // Set cut marks path
     this.cutMarksPath =
@@ -644,6 +687,12 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   addShapeNodeEvents(shape: Konva.Shape) {
     this.objectNodes.push(shape);
+
+    let objectType = "shape";
+    if (shape instanceof Konva.Image) {
+      objectType = "image";
+    } else {
+    }
     // Add click event to image for selecting and attaching transformer
     shape.on("click", () => {
       this.transformer.show();
@@ -651,7 +700,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.nodes([shape]);
       this.layer.draw();
       this.selectObject(shape);
-      this.setAvailableTools();
+      this.setAvailableTools(objectType);
     });
 
     // Add drag event to shape for selecting and attaching transformer
@@ -668,7 +717,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.nodes([shape]);
       this.layer.draw();
       this.selectObject(shape);
-      this.setAvailableTools();
+      this.setAvailableTools(objectType);
     });
 
     // Hide the Transformer when rotating
@@ -734,7 +783,7 @@ export class DesignerPopupComponent implements AfterViewInit {
           this.transformer.nodes([konvaImage]);
           this.transformer.show();
           this.layer.draw();
-          this.setAvailableTools();
+          this.setAvailableTools("image");
         };
       };
 
@@ -1108,13 +1157,15 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     // Set up at the begining
     this.transformer.nodes([]);
-    this.transformer.nodes([textNode]);
+    // this.transformer
+    //   .nodes([textNode])
+    //   .enabledAnchors(["middle-left", "middle-right"]);
     this.selectObject(textNode);
     this.transformer.show();
     this.maskedGroup.add(textNode);
 
     // Set available tools
-    this.setAvailableTools();
+    this.setAvailableTools("text");
   }
 
   addTextNodeEvents(textNode: Konva.Text) {
@@ -1127,7 +1178,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.nodes([textNode]);
       this.layer.draw();
       this.selectObject(textNode);
-      this.setAvailableTools();
+      this.setAvailableTools("text");
     });
 
     // Add drag event to shape for selecting and attaching transformer
@@ -1147,7 +1198,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.transformer.nodes([textNode]);
       this.layer.draw();
       this.selectObject(textNode);
-      this.setAvailableTools();
+      this.setAvailableTools("text");
     });
 
     //Hide the Transformer when rotating
@@ -1160,6 +1211,17 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     //Show the Transformer again after rotation ends
     textNode.on("transformend", () => {
+      // Get new font size
+      const scaleX = textNode.scaleX();
+      const newFontSize = Math.round(textNode.fontSize() * scaleX * 10) / 10; // Round to 1 decimal place
+      // Update font size and reset scale
+      textNode.fontSize(newFontSize);
+      textNode.scaleX(1); // Reset scale to avoid double scaling
+      textNode.scaleY(1);
+
+      // Update the form control to reflect the new font size
+      this.fontSizeControl.setValue(newFontSize, { emitEvent: false });
+
       this.editText();
       this.transformer.show(); // Show transformer after rotation ends
       this.selectObject(textNode);
@@ -1181,8 +1243,8 @@ export class DesignerPopupComponent implements AfterViewInit {
   editText() {
     const textNode = this.selectedObject as Konva.Text;
     const scale = textNode.getAbsoluteScale(); // Get both X and Y scales
-    const lineHeight = textNode.fontSize() * scale.x; // Get both X and Y scales
-    let originalText = textNode.text();
+    // const lineHeight = textNode.fontSize() * scale.x; // Get both X and Y scales
+    // let originalText = textNode.text();
 
     // Initialize caret position at the end of the text
     const lines = textNode.text().split("\n");
@@ -1213,7 +1275,6 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     this.onKeyDown = (event: KeyboardEvent) => {
       const lines = textNode.text().split("\n");
-
       if (event.key === "Enter") {
         const currentLine = lines[this.caretPosition.lineIndex];
         const beforeCaret = currentLine.slice(0, this.caretPosition.charIndex);
@@ -1323,7 +1384,9 @@ export class DesignerPopupComponent implements AfterViewInit {
     const scale = textNode.getAbsoluteScale(); // Get both X and Y scales
     const lines = textNode.text().split("\n");
     const context = this.layer.getContext()._context; // Canvas 2D context
-    const lineHeight = textNode.fontSize() * scale.x; // Calculate scaled line height
+    scale.x = 1;
+    scale.y = 1;
+    const lineHeight = textNode.fontSize() * scale.x; // Calculate scaled line
 
     // Set the context font to match the text node
     context.font = `${textNode.fontSize() * scale.x}px ${textNode.fontFamily()}`;
@@ -1346,17 +1409,17 @@ export class DesignerPopupComponent implements AfterViewInit {
       alignmentOffset = 10 * scale.x; // Default for left alignment
     }
 
-    // Update caret position points
+    let textHeight = (textNode.height() - 20) / lines.length;
     this.caret.points([
       textNode.x() + alignmentOffset + textWidth,
       textNode.y() +
-        lineHeight * (this.caretPosition.lineIndex + 1) -
-        10 * scale.y,
+        textHeight * this.caretPosition.lineIndex +
+        textNode.padding(),
       textNode.x() + alignmentOffset + textWidth,
       textNode.y() +
-        lineHeight * (this.caretPosition.lineIndex + 1) +
-        lineHeight -
-        10 * scale.y,
+        textHeight * this.caretPosition.lineIndex +
+        textHeight +
+        textNode.padding(),
     ]);
   }
 
@@ -1375,7 +1438,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.endEditing;
     this.transformer.hide();
     this.selectedObject = this.maskedPath;
-    this.setAvailableTools();
+    this.setAvailableTools("stage");
     this.maskedGroup.destroyChildren();
     this.maskedPath.fill("#dcdcdc");
     this.layer.draw();
@@ -1390,7 +1453,7 @@ export class DesignerPopupComponent implements AfterViewInit {
       this.selectedObject?.destroy();
       this.transformer.hide();
       this.selectedObject = this.maskedPath;
-      this.setAvailableTools();
+      this.setAvailableTools("stage");
       if (this.caret) {
         this.caret.destroy();
         clearInterval(this.caretInterval);
@@ -1460,78 +1523,30 @@ export class DesignerPopupComponent implements AfterViewInit {
   }
 
   // Set available tools
-  setAvailableTools() {
-    if (this.selectedObject == this.maskedPath) {
-      this.deleteObjectButton.nativeElement.classList.add("unclickable-button");
-      this.duplicateObjectButton.nativeElement.classList.add(
-        "unclickable-button",
-      );
-      this.textAlignButton.nativeElement.classList.add("unclickable-button");
-      this.fontSelectButton.nativeElement.classList.add("unclickable-button");
-      this.colorPickerButton.nativeElement.classList.add("unclickable-button");
-      this.layerPositionButton.nativeElement.classList.add(
-        "unclickable-button",
-      );
-      this.textThicknessButton.nativeElement.classList.add(
-        "unclickable-button",
-      );
-    } else if (this.selectedObject instanceof Konva.Text) {
-      this.textAlignButton.nativeElement.classList.remove("unclickable-button");
-      this.fontSelectButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.duplicateObjectButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.deleteObjectButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.colorPickerButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.layerPositionButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.textThicknessButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-    } else if (
-      this.selectedObject instanceof Konva.Shape &&
-      !(this.selectedObject instanceof Konva.Image)
-    ) {
-      this.textAlignButton.nativeElement.classList.add("unclickable-button");
-      this.fontSelectButton.nativeElement.classList.add("unclickable-button");
-      this.textThicknessButton.nativeElement.classList.add(
-        "unclickable-button",
-      );
-      this.deleteObjectButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.duplicateObjectButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.colorPickerButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.layerPositionButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-    } else if (this.selectedObject instanceof Konva.Image) {
-      this.colorPickerButton.nativeElement.classList.add("unclickable-button");
-      this.textAlignButton.nativeElement.classList.add("unclickable-button");
-      this.fontSelectButton.nativeElement.classList.add("unclickable-button");
-      this.textThicknessButton.nativeElement.classList.add(
-        "unclickable-button",
-      );
-      this.deleteObjectButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.duplicateObjectButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
-      this.layerPositionButton.nativeElement.classList.remove(
-        "unclickable-button",
-      );
+  setAvailableTools(type: string) {
+    for (const tool of this.designerTools) {
+      const toolButton = document.getElementById(
+        tool.triggerButtonId,
+      ) as HTMLElement;
+      if (toolButton && tool.toolType != type && tool.toolType != "all") {
+        toolButton.classList.add("unclickable-button");
+      } else if (type == "stage") {
+        toolButton.classList.add("unclickable-button");
+      } else {
+        toolButton.classList.remove("unclickable-button");
+      }
+      // Always show duplicate label option
+      if (toolButton && tool.toolType == "alwaysOn") {
+        toolButton.classList.remove("unclickable-button");
+      }
+      // Show color picker
+      if (
+        toolButton &&
+        (type == "shape" || type == "text") &&
+        tool.toolType == "color"
+      ) {
+        toolButton.classList.remove("unclickable-button");
+      }
     }
   }
 
@@ -1634,7 +1649,9 @@ export class DesignerPopupComponent implements AfterViewInit {
       // First hide all the tools
       tool.displayBool = false;
       const toolElement = document.getElementById(tool.divId) as HTMLDivElement;
-      toolElement.style.display = "none";
+      if (toolElement) {
+        toolElement.style.display = "none";
+      }
 
       // Show just the selected tool
       if (tool.divId == targetDiv.id) {
@@ -1743,7 +1760,7 @@ export class DesignerPopupComponent implements AfterViewInit {
     this.maskedGroup.add(shape);
     this.layer.draw();
 
-    this.setAvailableTools();
+    this.setAvailableTools("shape");
   }
 
   // Move selected layer
@@ -1764,6 +1781,21 @@ export class DesignerPopupComponent implements AfterViewInit {
     }
     // Redraw the stage to reflect the changes
     this.stage.batchDraw();
+  }
+
+  fontSize: number = 20; // Default font size
+  // Adjust font size
+  adjustFontSize(): void {
+    window.removeEventListener("keydown", this.onKeyDown);
+    this.endEditing;
+    this.isEditing = false;
+    if (this.fontSize > 0) {
+      if (this.selectedObject instanceof Konva.Text) {
+        this.selectedObject.fontSize(this.fontSize);
+        this.updateCaretPosition();
+        this.layer.batchDraw(); // Re-draw layer to apply changes
+      }
+    }
   }
 
   //</editor-fold>
@@ -1797,4 +1829,5 @@ export interface DesignTool {
   divId: string;
   triggerButtonId: string;
   displayBool: boolean;
+  toolType: string;
 }

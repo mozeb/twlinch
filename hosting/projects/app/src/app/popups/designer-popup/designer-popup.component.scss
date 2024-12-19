@@ -146,6 +146,21 @@
   min-width: 50px;
 }
 
+.top-bar-font-size{
+  background-color: transparent;
+  border: none;
+  display: flex;
+  flex-direction: row;
+  gap:3px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-width: 70px;
+
+  padding-left:10px;
+  padding-right: 10px;
+}
+
 .top-bar-button-font{
   background-color: transparent;
   border: none;
@@ -162,7 +177,7 @@
   font-weight:700
 }
 
-.top-bar-button:hover, .top-bar-button-font:hover{
+.top-bar-button:hover, .top-bar-button-font:hover, .top-bar-font-size:hover{
   background-color: #eaeaea;
 }
 
@@ -340,4 +355,42 @@
   //background-color: #fedc00;
   filter: brightness(0) saturate(100%) invert(90%) sepia(20%) saturate(6713%) hue-rotate(1deg) brightness(107%) contrast(103%);
   cursor: pointer;
+}
+
+
+/* Minimalistic square input */
+.text-size-input {
+  appearance: none; /* Removes browser's default styling */
+  -moz-appearance: textfield; /* Removes number arrows for Firefox */
+  -webkit-appearance: none; /* Removes number arrows for Chrome/Safari */
+
+  width: 30px; /* Square size */
+  text-align: center; /* Centers text */
+  font-size: 14px; /* Adjust font size */
+  border: none; /* Removes border */
+
+  transition: box-shadow 0.2s ease, background-color 0.2s ease; /* Smooth transitions */
+  font-family: "Ubuntu Mono";
+  font-weight: 600;
+  background-color: transparent;
+  }
+
+.text-size-input:focus {
+  background-color: transparent; /* White background on focus */
+  outline: none !important; /* Removes focus outline */
+  border:none !important;
+  box-shadow: none;
+  border-radius: 0px;
+}
+
+/* Remove the arrows for all browsers */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"]::-moz-inner-spin-button,
+input[type="number"]::-moz-outer-spin-button {
+  appearance: none;
 }
