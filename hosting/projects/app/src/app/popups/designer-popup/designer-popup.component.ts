@@ -803,6 +803,9 @@ export class DesignerPopupComponent implements AfterViewInit {
 
   // Save Labels
   async saveLabelsPDF() {
+    // Switch to current label to save current design
+    await this.switchLabel(this.currentLabel);
+
     // Hide Marks Layer
     this.designMarksLayer.hide();
     const highQualityPixelRatio = 3;
@@ -810,14 +813,9 @@ export class DesignerPopupComponent implements AfterViewInit {
     // Create a new PDF document
     const pdfDoc = await PDFDocument.create();
 
-    // Switch to current label to save current design
-    await this.switchLabel(this.currentLabel);
-
     // Save each label to separate page
     for (const key in this.labelsJSON) {
-      // Clear stage
       this.clearStage();
-
       // Add label just if not empty!
       if (this.labelsJSON[key as LabelKeys] !== "") {
         await this.switchLabelFill(this.labelsJSON[key as LabelKeys]);
@@ -872,6 +870,9 @@ export class DesignerPopupComponent implements AfterViewInit {
       }
     }
 
+    // Fill back the label that was presented before save
+    await this.switchLabelFill(this.labelsJSON[this.currentLabel as LabelKeys]);
+
     // Save the PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
@@ -888,9 +889,8 @@ export class DesignerPopupComponent implements AfterViewInit {
 
     // Show marks again
     this.designMarksLayer.show();
-    this.switchLabel(this.currentLabel);
 
-    this.dialog.open(DesignPreviewPopupComponent, {
+    const dialogRef = this.dialog.open(DesignPreviewPopupComponent, {
       data: {
         type: this.data.vinylSize as artworkType,
         labelAPreview: this.previewImageLabelA,
@@ -903,6 +903,8 @@ export class DesignerPopupComponent implements AfterViewInit {
         labelsPDF: file,
       },
     });
+
+    dialogRef.afterClosed().subscribe(async (result) => {});
   }
 
   async createPreview(object: string) {
