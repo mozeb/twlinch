@@ -1532,10 +1532,12 @@ export class DesignerPopupComponent implements AfterViewInit {
       ) as HTMLElement;
       if (toolButton && tool.toolType != type && tool.toolType != "all") {
         toolButton.classList.add("unclickable-button");
-      } else if (type == "stage") {
+      } else if (toolButton && type == "stage") {
         toolButton.classList.add("unclickable-button");
       } else {
-        toolButton.classList.remove("unclickable-button");
+        if (toolButton) {
+          toolButton.classList.remove("unclickable-button");
+        }
       }
       // Always show duplicate label option
       if (toolButton && tool.toolType == "alwaysOn") {

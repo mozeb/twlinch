@@ -103,7 +103,7 @@ export class Upload_artworkComponent implements OnInit {
       }
     });
 
-    this.openLabelDesigner();
+    this.openSleeveDesigner();
   }
 
   goToUploader(goTo: string) {
