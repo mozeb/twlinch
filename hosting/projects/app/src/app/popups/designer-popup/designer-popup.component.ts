@@ -128,6 +128,12 @@ export class DesignerPopupComponent implements AfterViewInit {
       displayBool: false,
       toolType: "text",
     },
+    {
+      divId: "tracklistSelectDiv",
+      triggerButtonId: "addTracklistButton",
+      displayBool: false,
+      toolType: "alwaysOn",
+    },
   ];
 
   previewImageLabelA: string = "";
@@ -1561,20 +1567,32 @@ export class DesignerPopupComponent implements AfterViewInit {
   sideC: Array<string> = [];
   sideD: Array<string> = [];
 
-  public async getMusicPlaylist() {
+  public async getMusicPlaylist(side: string) {
     const user = await this._authService.currentUser;
-    this.sideA = await this._storageService.getFileName(
-      `/orders/${user?.uid}/music/A`,
-    );
-    this.sideB = await this._storageService.getFileName(
-      `/orders/${user?.uid}/music/B`,
-    );
-    this.sideC = await this._storageService.getFileName(
-      `/orders/${user?.uid}/music/C`,
-    );
-    this.sideD = await this._storageService.getFileName(
-      `/orders/${user?.uid}/music/D`,
-    );
+
+    if (side == "A" || side == "all") {
+      this.sideA = await this._storageService.getFileName(
+        `/orders/${user?.uid}/music/A`,
+      );
+    }
+
+    if (side == "B" || side == "all") {
+      this.sideB = await this._storageService.getFileName(
+        `/orders/${user?.uid}/music/B`,
+      );
+    }
+
+    if (this.data.doubleAlbum && (side == "C" || side == "all")) {
+      this.sideC = await this._storageService.getFileName(
+        `/orders/${user?.uid}/music/C`,
+      );
+    }
+
+    if (this.data.doubleAlbum && (side == "D" || side == "all")) {
+      this.sideD = await this._storageService.getFileName(
+        `/orders/${user?.uid}/music/D`,
+      );
+    }
 
     this.createPlaylistTextNode();
   }
@@ -1677,6 +1695,12 @@ export class DesignerPopupComponent implements AfterViewInit {
 
       // Sett up div for left side menu
       if (action == "add_shape") {
+        targetDiv.style.left = targetButton.clientWidth + "px";
+        targetDiv.style.top = targetButton.getBoundingClientRect().top + "px";
+      }
+
+      // Sett up div for left side menu
+      if (action == "add_tracklist") {
         targetDiv.style.left = targetButton.clientWidth + "px";
         targetDiv.style.top = targetButton.getBoundingClientRect().top + "px";
       }

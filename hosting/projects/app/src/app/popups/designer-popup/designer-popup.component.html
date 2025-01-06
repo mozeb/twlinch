@@ -9,7 +9,7 @@
       <img class="designer-button-icon" src="./assets/Designer_Assets/add_text_icon.svg"/>
       <span class="designer-button-text">Add<br>Text</span>
     </button>
-    <button id="addTracklistButton" #addTracklistButton class="designer-button" (click)="getMusicPlaylist()">
+    <button id="addTracklistButton" #addTracklistButton class="designer-button" (click)="openEditorOptions($event, 'tracklistSelectDiv', 'add_tracklist')">
       <img class="designer-button-icon" src="./assets/Designer_Assets/music_list_icon.svg"/>
       <span class="designer-button-text">Add<br>Tracklist</span>
     </button>
@@ -219,6 +219,28 @@
   </div>
   <div *ngIf="this.data.doubleAlbum" class="option-button">
     <button class="option-sel-button" (click)="copyContentOfLabel('D')">Copy all from label D</button>
+  </div>
+</div>
+
+<!--  popup to add tracklist -->
+<div id="tracklistSelectDiv" #tracklistSelectDiv class="options-div">
+  <div class="options-header">
+    Add track list
+  </div>
+  <div class="option-button" (click)="getMusicPlaylist('A')">
+    <button class="option-sel-button">Track List Side A</button>
+  </div>
+  <div class="option-button" (click)="getMusicPlaylist('B')">
+    <button class="option-sel-button">Track List Side B</button>
+  </div>
+  <div class="option-button" *ngIf="data.doubleAlbum" (click)="getMusicPlaylist('C')">
+    <button class="option-sel-button">Track List Side C</button>
+  </div>
+  <div class="option-button" *ngIf="data.doubleAlbum" (click)="getMusicPlaylist('D')">
+    <button class="option-sel-button">Track List Side D</button>
+  </div>
+  <div class="option-button" (click)="getMusicPlaylist('all')">
+    <button class="option-sel-button">Add All Sides</button>
   </div>
 </div>
 

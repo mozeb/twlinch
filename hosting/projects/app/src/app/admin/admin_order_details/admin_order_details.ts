@@ -399,7 +399,6 @@ export class Admin_orderDetailsComponent implements OnInit {
               sleeveProcess: "waitingForUpload",
               labelProcess: "waitingForUpload",
             },
-            order_add_ons: { doubleAlbumAddOn: "added" },
           },
         );
       }

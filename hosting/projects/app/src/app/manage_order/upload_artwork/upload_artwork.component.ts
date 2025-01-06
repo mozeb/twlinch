@@ -13,7 +13,7 @@ import { MatButton } from "@angular/material/button";
 import { artworkType, TransferService } from "../../services/transfer-service";
 import { Route, Router } from "@angular/router";
 import { FirestoreApiService } from "../../services/firestore-api.service";
-import { OrderProcess } from "../../services/interfaces";
+import { OrderAddOns, OrderProcess } from "../../services/interfaces";
 import { doc, Firestore, onSnapshot } from "@angular/fire/firestore";
 import { DesignerPopupComponent } from "../../popups/designer-popup/designer-popup.component";
 
@@ -47,6 +47,15 @@ export class Upload_artworkComponent implements OnInit {
     pictureDiscProcess: "notOrdered",
   };
 
+  _orderAddOns: OrderAddOns = {
+    doubleAlbumAddOn: "notAdded",
+    sleeveAddOn: "notAdded",
+    labelAddOn: "notAdded",
+    slipmatAddOn: "notAdded",
+    designServicesAddOn: "notAdded",
+    onlineDesignerAddOn: "notAdded",
+  };
+
   protected firestore: Firestore = inject(Firestore);
 
   ngOnInit() {
@@ -61,6 +70,13 @@ export class Upload_artworkComponent implements OnInit {
       doc(this.firestore, `shopOrders/${user?.uid as string}`),
       (doc) => {
         this._orderProcess = doc.get("order_process") as OrderProcess;
+
+        // Get nodes
+        this._orderAddOns = doc.get("order_add_ons") as OrderAddOns;
+
+        if (this._orderAddOns.doubleAlbumAddOn == "added") {
+          this.doubleAlbum = true;
+        }
       },
     );
 
